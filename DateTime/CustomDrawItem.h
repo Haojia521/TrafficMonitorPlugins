@@ -1,20 +1,15 @@
 ﻿#pragma once
 #include "PluginInterface.h"
 
-class GPItem : public IPluginItem
+class CCustomDrawItem : public IPluginItem
 {
-public:
+    // 通过 IPluginItem 继承
     virtual const wchar_t* GetItemName() const override;
     virtual const wchar_t* GetItemId() const override;
     virtual const wchar_t* GetItemLableText() const override;
     virtual const wchar_t* GetItemValueText() const override;
     virtual const wchar_t* GetItemValueSampleText() const override;
     virtual bool IsCustomDraw() const override;
-    virtual int GetItemWidthEx(void* hDC) const override;
+    virtual int GetItemWidth() const override;
     virtual void DrawItem(void* hDC, int x, int y, int w, int h, bool dark_mode) override;
-    virtual int OnMouseEvent(MouseEventType type, int x, int y, void* hWnd, int flag) override;
-
-    int index;
-    CString gp_id;
-    bool enable;
 };
