@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="WeatherPro">
+      <UniqueIdentifier>{87bc08a8-9083-4db0-9127-ddc755e31b37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WeatherProItem">
+      <UniqueIdentifier>{2d62af54-c29b-411e-b2f5-983872a0c3e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DLG">
+      <UniqueIdentifier>{f497cfe4-5137-4d71-9cf3-c530ab831eb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{cee30953-b5aa-4e82-8470-aa88ca2df320}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WeatherPro.cpp">
+      <Filter>WeatherPro</Filter>
+    </ClCompile>
+    <ClCompile Include="WeatherProItem.cpp">
+      <Filter>WeatherProItem</Filter>
+    </ClCompile>
+    <ClCompile Include="DataQuerier.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectCityDlg.cpp">
+      <Filter>DLG</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsDlg.cpp">
+      <Filter>DLG</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManager.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WeatherPro.def">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="res\WeatherPro.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherPro.h">
+      <Filter>WeatherPro</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherProItem.h">
+      <Filter>WeatherProItem</Filter>
+    </ClInclude>
+    <ClInclude Include="DataQuerier.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectCityDlg.h">
+      <Filter>DLG</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsDlg.h">
+      <Filter>DLG</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManager.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WeatherPro.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\weather_icons_blue\02.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\04.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\05.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\06.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\07.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\08.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\09.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\10.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\11.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\12.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\14.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\15.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\16.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\17.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\18.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\19.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\20.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\29.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\30.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\31.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\53.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\54.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\55.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\56.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\99.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\d00.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\d01.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\d03.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\d13.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\n00.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\n01.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\n03.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_blue\n13.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
