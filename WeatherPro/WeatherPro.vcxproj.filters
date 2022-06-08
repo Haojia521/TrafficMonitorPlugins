@@ -51,6 +51,12 @@
     <ClCompile Include="DataManager.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="DataQuerierWeatherComCnSpider.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="DataQuerierHefengWeather.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="WeatherPro.def">

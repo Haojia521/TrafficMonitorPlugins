@@ -52,11 +52,46 @@ struct SWeatherInfo
     std::wstring ToString() const;
 };
 
-namespace query
+class WeatherAPI
 {
-    bool QueryCityInfo(const std::wstring &q_name, CityInfoList &city_list);
+public:
+    virtual bool QueryCityInfo(const std::wstring &query, CityInfoList &city_list) = 0;
 
-    bool QueryRealTimeWeather(const std::wstring &code, SRealTimeWeather &weather);
-    bool QueryWeatherAlerts(const std::wstring &code, WeatherAlertList &alerts);
-    bool QueryForecastWeather(const std::wstring &code, SWeatherInfo &weather_td, SWeatherInfo &weather_tm);
-}
+    virtual bool QueryRealTimeWeather(const std::wstring &query, SRealTimeWeather &weather) = 0;
+    virtual bool QueryWeatherAlerts(const std::wstring &query, WeatherAlertList &alerts) = 0;
+    virtual bool QueryForecastWeather(const std::wstring &query, SWeatherInfo &weather_td, SWeatherInfo &weather_tm) = 0;
+
+    virtual const std::wstring& GetLastError() = 0;
+};
+
+class ApiWeatherComCnSpider : public WeatherAPI
+{
+public:
+    bool QueryCityInfo(const std::wstring &query, CityInfoList &city_list) override;
+
+    bool QueryRealTimeWeather(const std::wstring &query, SRealTimeWeather &weather) override;
+    bool QueryWeatherAlerts(const std::wstring &query, WeatherAlertList &alerts) override;
+    bool QueryForecastWeather(const std::wstring &query, SWeatherInfo &weather_td, SWeatherInfo &weather_tm) override;
+
+    const std::wstring& GetLastError() override;
+};
+
+class ApiHefengWeather : public WeatherAPI
+{
+public:
+    ApiHefengWeather(const std::wstring &key);
+
+    const std::wstring &GetKey() const;
+    void SetKey(const std::wstring &key);
+
+    bool QueryCityInfo(const std::wstring &query, CityInfoList &city_list) override;
+
+    bool QueryRealTimeWeather(const std::wstring &query, SRealTimeWeather &weather) override;
+    bool QueryWeatherAlerts(const std::wstring &query, WeatherAlertList &alerts) override;
+    bool QueryForecastWeather(const std::wstring &query, SWeatherInfo &weather_td, SWeatherInfo &weather_tm) override;
+
+    const std::wstring& GetLastError() override;
+private:
+    std::wstring _key;
+    std::wstring _lastError;
+};
