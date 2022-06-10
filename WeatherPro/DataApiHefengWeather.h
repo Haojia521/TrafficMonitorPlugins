@@ -12,8 +12,8 @@ public:
         bool ShowRealtimeWind{ true };
         bool ShowRealtimeWindScale{ true };
         bool ShowRealtimeHumidity{ true };
-        bool ShowForcastUVIdex{ false };
-        bool showForcastHumidity{ false };
+        bool ShowForecastUVIdex{ false };
+        bool showForecastHumidity{ false };
         bool ShowAirQuality{ true };
         bool ShowAirQualityAQI{ true };
         bool ShowAirQualityPM2p5{ true };
@@ -70,7 +70,7 @@ public:
 
     using WeatherAlertList = std::vector<WeatherAlert>;
 
-    CityInfoList QueryCity(const std::wstring &query) override;
+    bool QueryCity(const std::wstring &query, CityInfoList &info) override;
 
     std::wstring GetWeatherInfoSummary() override;
     std::wstring GetTemprature(EWeatherInfoType type) override;
@@ -81,7 +81,7 @@ public:
     std::wstring GetLastError() override;
 
     bool QueryRealtimeWeather(const std::wstring &query);
-    bool QueryForcastWeather(const std::wstring &query);
+    bool QueryForecastWeather(const std::wstring &query);
     bool QueryRealtimeAirQuality(const std::wstring &query);
     bool QueryWeatherAlerts(const std::wstring &query);
 

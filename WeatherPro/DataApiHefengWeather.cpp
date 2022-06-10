@@ -204,8 +204,10 @@ namespace hf
     }
 }
 
-CityInfoList DataApiHefengWeather::QueryCity(const std::wstring &query)
+bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info)
 {
+    info.clear();
+
     auto queryEncoded = CCommon::URLEncode(query);
 
     CString url;
@@ -229,7 +231,13 @@ CityInfoList DataApiHefengWeather::QueryCity(const std::wstring &query)
             cities.push_back(get_city_info(yyjson_arr_get(loc_arr, i)));
     };
 
-    return cities;
+    auto err = hf::query_func_frame(url, func);
+    if (err.empty())
+        info = cities;
+    else
+        _lastError = err;
+
+    return err.empty();
 }
 
 std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
@@ -290,25 +298,25 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
     // - today
     oss << L"今天: " << GetWeatherText(EWeatherInfoType::WEATHER_TODAY)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_TODAY);
-    if (config.ShowForcastUVIdex)
+    if (config.ShowForecastUVIdex)
         oss << L" 紫外线强度: " << hf::translate_uv_index(_forcastWeatherTD.UVIndex);
-    if (config.showForcastHumidity)
+    if (config.showForecastHumidity)
         oss << L" 相对湿度: " << _forcastWeatherTD.Humidity << L"%";
     oss << std::endl;
     // - tomorrow
-    oss << L"今天: " << GetWeatherText(EWeatherInfoType::WEATHER_TOMMROW)
+    oss << L"明天: " << GetWeatherText(EWeatherInfoType::WEATHER_TOMMROW)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_TOMMROW);
-    if (config.ShowForcastUVIdex)
+    if (config.ShowForecastUVIdex)
         oss << L" 紫外线强度: " << hf::translate_uv_index(_forcastWeatherTM.UVIndex);
-    if (config.showForcastHumidity)
+    if (config.showForecastHumidity)
         oss << L" 相对湿度: " << _forcastWeatherTM.Humidity << L"%";
     oss << std::endl;
     // - day after tomorrow
-    oss << L"今天: " << GetWeatherText(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW)
+    oss << L"后天: " << GetWeatherText(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW);
-    if (config.ShowForcastUVIdex)
+    if (config.ShowForecastUVIdex)
         oss << L" 紫外线强度: " << hf::translate_uv_index(_forcastWeatherDATM.UVIndex);
-    if (config.showForcastHumidity)
+    if (config.showForecastHumidity)
         oss << L" 相对湿度: " << _forcastWeatherDATM.Humidity << L"%";
     oss << std::endl;
 
@@ -407,7 +415,7 @@ bool DataApiHefengWeather::UpdateWeather()
 
     if (!QueryRealtimeWeather(currunt_city.CityNO))
         oss << L"[RealtimeWeather]" << _lastError << L"\r\n";
-    if (!QueryForcastWeather(currunt_city.CityNO))
+    if (!QueryForecastWeather(currunt_city.CityNO))
         oss << L"[ForcastWeather]" << _lastError << L"\r\n";
     if (config.ShowAirQuality && !QueryRealtimeAirQuality(currunt_city.CityNO))
         oss << L"[RealtimeAirQuality]" << _lastError << L"\r\n";
@@ -480,7 +488,7 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
     return err.empty();
 }
 
-bool DataApiHefengWeather::QueryForcastWeather(const std::wstring &query)
+bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
 {
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/weather/3d?key=%s&location=%s", config.AppKey.c_str(), query.c_str());

@@ -23,7 +23,7 @@ using CityInfoList = std::vector<SCityInfo>;
 class DataAPI
 {
 public:
-    virtual CityInfoList QueryCity(const std::wstring &query) = 0;
+    virtual bool QueryCity(const std::wstring &query, CityInfoList &info) = 0;
 
     virtual std::wstring GetWeatherInfoSummary() = 0;
     virtual std::wstring GetTemprature(EWeatherInfoType type) = 0;
