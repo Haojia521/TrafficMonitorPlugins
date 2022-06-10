@@ -458,7 +458,7 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
         data.TemperatureFeelsLike = hf::get_json_str_value(now_obj, "feelsLike");
         data.UpdateTime = hf::get_json_str_value(now_obj, "obsTime").substr(11, 5);
         data.WeatherText = hf::get_json_str_value(now_obj, "text");
-        data.WeatherCode = hf::get_json_str_value(now_obj, "icon");
+        data.WeatherCode = hf::convert_weather_code(hf::get_json_str_value(now_obj, "icon"));
         data.WindDirection = hf::get_json_str_value(now_obj, "windDir");
         data.WindScale = hf::get_json_str_value(now_obj, "windScale");
         data.WindSpeed = hf::get_json_str_value(now_obj, "windSpeed");
