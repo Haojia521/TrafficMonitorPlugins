@@ -638,6 +638,7 @@ std::wstring DataApiWeatherComCnSpider::GetTemprature(EWeatherInfoType type)
 
     case EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW:
     default:
+        break;
     }
 
     return oss.str();
@@ -666,8 +667,10 @@ std::wstring DataApiWeatherComCnSpider::GetWeatherText(EWeatherInfoType type)
         else
             oss << _weatherTM.WeatherDay << L"转" << _weatherTM.WeatherNight;
         break;
+
     case EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW:
     default:
+        break;
     }
 
     return oss.str();

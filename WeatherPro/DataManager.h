@@ -1,26 +1,30 @@
 ﻿#pragma once
 #include <map>
 #include <functional>
+#include <memory>
 
-#include "DataQuerier.h"
+#include "DataApiWeatherComCnSpider.h"
+#include "DataApiHefengWeather.h"
 
-enum class EWeatherInfoType
+
+enum class DataApiType
 {
-    WEATHER_REALTIME,
-    WEATHER_TODAY,
-    WEATHER_TOMMROW
+    API_WeatherComCnSpider,
+    API_HefengWeather,
 };
 
 struct SConfiguration
 {
     SConfiguration();
 
+    DataApiType m_api_type;
     EWeatherInfoType m_wit;
     bool m_show_weather_icon;
     bool m_show_weather_in_tooltips;
     bool m_show_brief_rt_weather_info;
     bool m_show_weather_alerts;
     bool m_show_brief_weather_alert_info;
+    bool m_show_error_info;
 };
 
 using WeatherInfoUpdatedCallback = std::function<void(const std::wstring & info)>;
@@ -46,9 +50,9 @@ public:
     void UpdateWeather(WeatherInfoUpdatedCallback callback = nullptr);
 
     std::wstring GetWeatherTemperature() const;
-    std::wstring GetRealTimeWeatherInfo() const;
-    std::wstring GetWeatherAlertsInfo() const;
-    std::wstring GetWeatherInfo() const;
+    //std::wstring GetRealTimeWeatherInfo() const;
+    //std::wstring GetWeatherAlertsInfo() const;
+    //std::wstring GetWeatherInfo() const;
 
     std::wstring GetTooptipInfo() const;
 
@@ -62,6 +66,7 @@ public:
 
     void RefreshWeatherInfoCache();
     
+    DataApiPtr GetCurrentApi() const;
 private:
     void _updateWeather(WeatherInfoUpdatedCallback callback = nullptr);
     HICON _getIcon();
@@ -69,10 +74,11 @@ private:
     HICON _getIconByCode(const std::wstring& w_code);
     UINT _getIconIdBlue(const std::wstring &code) const;
 
+
     std::wstring _getWeatherTemperature() const;
-    std::wstring _getRealTimeWeatherInfo(bool brief) const;
-    std::wstring _getWeatherAlertsInfo(bool brief) const;
-    std::wstring _getWeatherInfo() const;
+    //std::wstring _getRealTimeWeatherInfo(bool brief) const;
+    //std::wstring _getWeatherAlertsInfo(bool brief) const;
+    //std::wstring _getWeatherInfo() const;
     std::wstring _getTooptipInfo() const;
 
     static CDataManager m_instance;
@@ -84,23 +90,22 @@ private:
 
     SCityInfo m_currentCityInfo;
 
-    SRealTimeWeather m_rt_weather;
-    WeatherAlertList m_weather_alerts;
-    SWeatherInfo m_weather_today;
-    SWeatherInfo m_weather_tommrow;
-
     std::map<UINT, HICON> m_icons;
 
     struct SWeatherInfoCache
     {
         std::wstring WeatherTemperature;
-        std::wstring RealTimeWeatherInfo;
-        std::wstring WeatherAlersInfo;
-        std::wstring WeatherInfo;
+        //std::wstring RealTimeWeatherInfo;
+        //std::wstring WeatherAlersInfo;
+        //std::wstring WeatherInfo;
         std::wstring TooltipInfo;
 
         HICON Icon{ nullptr };
     };
 
     SWeatherInfoCache m_weather_info_cache;
+    std::wstring m_lastUpdateError;
+
+    std::shared_ptr<DataApiWeatherComCnSpider> m_api_wccs;
+    std::shared_ptr<DataApiHefengWeather> m_api_hfw;
 };

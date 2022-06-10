@@ -21,6 +21,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
     , m_showWeatherAlerts(FALSE)
     , m_showBriefWeatherAlertInfo(FALSE)
     , m_showBriefRTWeather(FALSE)
+    , m_showErrorInfo(FALSE)
 {
 
 }
@@ -39,6 +40,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Check(pDX, IDC_CHECK_SHOW_WEATHER_ALERTS, m_showWeatherAlerts);
     DDX_Check(pDX, IDC_CHECK_SHOW_BRIEF_WEATHER_ALERT_INFO, m_showBriefWeatherAlertInfo);
     DDX_Check(pDX, IDC_CHECK_SHOW_BRIEF_RT_WEATHER, m_showBriefRTWeather);
+    DDX_Check(pDX, IDC_CHECK_SHOW_ERROR_INFO, m_showErrorInfo);
 }
 
 
@@ -70,6 +72,7 @@ BOOL COptionsDlg::OnInitDialog()
     m_showWeatherAlerts = config.m_show_weather_alerts ? TRUE : FALSE;
     m_showBriefWeatherAlertInfo = config.m_show_brief_weather_alert_info ? TRUE : FALSE;
     m_showBriefRTWeather = config.m_show_brief_rt_weather_info ? TRUE : FALSE;
+    m_showErrorInfo = config.m_show_error_info ? TRUE : FALSE;
 
     UpdateData(FALSE);
 
@@ -81,6 +84,8 @@ BOOL COptionsDlg::OnInitDialog()
 void COptionsDlg::OnBnClickedBtnSelectCity()
 {
     CSelectCityDlg dlg(this);
+    dlg.data_api = CDataManager::Instance().GetCurrentApi();
+
     if (dlg.DoModal() == IDOK)
     {
         if (!dlg.m_selectedCityInfo.CityName.empty() &&
@@ -113,6 +118,7 @@ void COptionsDlg::OnOK()
     config.m_show_brief_rt_weather_info = m_showBriefRTWeather == TRUE;
     config.m_show_weather_alerts = m_showWeatherAlerts == TRUE;
     config.m_show_brief_weather_alert_info = m_showBriefWeatherAlertInfo == TRUE;
+    config.m_show_error_info = m_showErrorInfo == TRUE;
 
     // 更新tooltip
     CDataManager::InstanceRef().RefreshWeatherInfoCache();

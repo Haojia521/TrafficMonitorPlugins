@@ -10,6 +10,11 @@
 
 #include "DataManager.h"
 
+#define CHECK_KEY if (config.AppKey.empty()) {\
+    _lastError = L"no application key";\
+    return false;\
+}
+
 namespace hf
 {
     bool call_internet(const CString &url, std::wstring &content)
@@ -206,6 +211,8 @@ namespace hf
 
 bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info)
 {
+    CHECK_KEY
+
     info.clear();
 
     auto queryEncoded = CCommon::URLEncode(query);
@@ -351,6 +358,7 @@ std::wstring DataApiHefengWeather::GetTemprature(EWeatherInfoType type)
         break;
 
     default:
+        break;
     }
 
     return oss.str();
@@ -409,6 +417,8 @@ std::wstring DataApiHefengWeather::GetWeatherCode(EWeatherInfoType type)
 
 bool DataApiHefengWeather::UpdateWeather()
 {
+    CHECK_KEY
+
     std::wostringstream oss;
 
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
@@ -435,6 +445,8 @@ std::wstring DataApiHefengWeather::GetLastError()
 
 bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
 {
+    CHECK_KEY
+
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
 
@@ -444,7 +456,7 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
 
         data.Temperature = hf::get_json_str_value(now_obj, "temp");
         data.TemperatureFeelsLike = hf::get_json_str_value(now_obj, "feelsLike");
-        data.UpdateTime = hf::get_json_str_value(now_obj, "updateTime").substr(11, 5);
+        data.UpdateTime = hf::get_json_str_value(now_obj, "obsTime").substr(11, 5);
         data.WeatherText = hf::get_json_str_value(now_obj, "text");
         data.WeatherCode = hf::get_json_str_value(now_obj, "icon");
         data.WindDirection = hf::get_json_str_value(now_obj, "windDir");
@@ -464,6 +476,8 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
 
 bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
 {
+    CHECK_KEY
+
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/air/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
 
@@ -490,6 +504,8 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
 
 bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
 {
+    CHECK_KEY
+
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/weather/3d?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
 
@@ -528,6 +544,8 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
 
 bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
 {
+    CHECK_KEY
+
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/warning/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
 

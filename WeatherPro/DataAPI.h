@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 enum class EWeatherInfoType
 {
@@ -34,3 +35,5 @@ public:
 
     virtual std::wstring GetLastError() = 0;
 };
+
+using DataApiPtr = std::shared_ptr<DataAPI>;

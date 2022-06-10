@@ -36,9 +36,6 @@
     <ClCompile Include="WeatherProItem.cpp">
       <Filter>WeatherProItem</Filter>
     </ClCompile>
-    <ClCompile Include="DataQuerier.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
     <ClCompile Include="Common.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -51,10 +48,10 @@
     <ClCompile Include="DataManager.cpp">
       <Filter>Data</Filter>
     </ClCompile>
-    <ClCompile Include="DataQuerierWeatherComCnSpider.cpp">
+    <ClCompile Include="DataApiHefengWeather.cpp">
       <Filter>Data</Filter>
     </ClCompile>
-    <ClCompile Include="DataQuerierHefengWeather.cpp">
+    <ClCompile Include="DataApiWeatherComCnSpider.cpp">
       <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
@@ -85,9 +82,6 @@
     <ClInclude Include="WeatherProItem.h">
       <Filter>WeatherProItem</Filter>
     </ClInclude>
-    <ClInclude Include="DataQuerier.h">
-      <Filter>Data</Filter>
-    </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -98,6 +92,15 @@
       <Filter>DLG</Filter>
     </ClInclude>
     <ClInclude Include="DataManager.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="DataAPI.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="DataApiHefengWeather.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="DataApiWeatherComCnSpider.h">
       <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>

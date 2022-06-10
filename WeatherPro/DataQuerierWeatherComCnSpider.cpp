@@ -582,7 +582,7 @@ bool ApiWeatherComCnSpider::QueryForecastWeather(const std::wstring &query, SWea
     return details::QueryForecastWeather(query, weather_td, weather_tm);
 }
 
-const std::wstring& ApiWeatherComCnSpider::GetLastError()
+std::wstring ApiWeatherComCnSpider::GetLastError()
 {
-    return std::wstring();
+    return L"";
 }

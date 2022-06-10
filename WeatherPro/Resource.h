@@ -36,6 +36,8 @@
 #define IDI_ICON_B_A07                  1012
 #define IDS_DAY_AFTER_TOMORROW          1012
 #define IDI_ICON_B_A08                  1013
+#define IDC_CHECK1                      1013
+#define IDC_CHECK_SHOW_ERROR_INFO       1013
 #define IDI_ICON_B_A09                  1014
 #define IDI_ICON_B_A10                  1015
 #define IDI_ICON_B_A11                  1016
@@ -70,7 +72,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1041
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1013
+#define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

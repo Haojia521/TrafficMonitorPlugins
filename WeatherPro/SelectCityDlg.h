@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "afxdialogex.h"
-#include "DataQuerier.h"
+#include "DataAPI.h"
 
 // CSelectCityDlg 对话框
 
@@ -34,4 +34,6 @@ public:
     void ResetStates();
     SCityInfo m_selectedCityInfo;
     CString m_cityNameQuery;
+
+    DataApiPtr data_api;
 };

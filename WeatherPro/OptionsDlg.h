@@ -28,6 +28,7 @@ public:
     BOOL m_showWeatherAlerts;
     BOOL m_showBriefWeatherAlertInfo;
     BOOL m_showBriefRTWeather;
+    BOOL m_showErrorInfo;
 
     afx_msg void OnBnClickedBtnSelectCity();
     virtual BOOL OnInitDialog();

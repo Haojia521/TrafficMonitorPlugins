@@ -1,9 +1,9 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "DataQuerier.h"
 #include "Common.h"
 #include <afxinet.h>
 #include <utilities/yyjson/yyjson.h>
-
+#include <unordered_map>
 
 namespace hf
 {
@@ -16,7 +16,11 @@ namespace hf
         CInternetSession *session{ nullptr };
         CHttpFile *httpFile{ nullptr };
 
-        char *multi_byte_content_buffer{ nullptr };
+        char *http_content_buffer{ nullptr };
+        size_t http_content_len{ 0 };
+
+        unsigned char *contents_buffer = new unsigned char[1024 * 64]{ 0 };  // ÂÅáËÆæËß£ÂéãÂêéÂÜÖÂÆπÈïøÂ∫¶‰∏ç‰ºöË∂ÖËøá64kÂ≠óËäÇ
+        unsigned long contents_len{ 0 };
 
         try
         {
@@ -28,14 +32,11 @@ namespace hf
             
             if (dwStatusCode == HTTP_STATUS_OK)
             {
-                auto offset = httpFile->Seek(0, CFile::end);
-                multi_byte_content_buffer = new char[offset + 1]{ 0 };
+                http_content_len = httpFile->Seek(0, CFile::end);
+                http_content_buffer = new char[http_content_len + 1]{ 0 };
 
                 httpFile->Seek(0, CFile::begin);
-                httpFile->Read(multi_byte_content_buffer, static_cast<UINT>(offset + 1));
-
-                content = CCommon::StrToUnicode(multi_byte_content_buffer, true);
-                succeed = true;
+                httpFile->Read(http_content_buffer, static_cast<UINT>(http_content_len + 1));
             }
 
             httpFile->Close();
@@ -50,11 +51,93 @@ namespace hf
             e->Delete();
         }
 
-        delete[] multi_byte_content_buffer;
+
+        // decompress
+        if (CCommon::GZipDecompress((Byte*)http_content_buffer, (uLong)http_content_len,
+            contents_buffer, &contents_len) == 0)
+        {
+            content = CCommon::StrToUnicode((char*)contents_buffer, true);
+            succeed = true;
+        }
+
+        delete[] http_content_buffer;
+        delete[] contents_buffer;
         delete httpFile;
         delete session;
 
         return succeed;
+    }
+
+    std::wstring convert_weather_code(const std::wstring &code)
+    {
+        static const std::unordered_map<std::wstring, std::wstring> dmap{
+            {L"100", L"d00"},
+            {L"101", L"d01"},
+            {L"102", L"d01"},
+            {L"103", L"d01"},
+            {L"104", L"02"},
+            {L"150", L"n00"},
+            {L"151", L"n01"},
+            {L"152", L"n01"},
+            {L"153", L"n01"},
+            {L"154", L"02"},
+            {L"300", L"d03"},
+            {L"301", L"d03"},
+            {L"302", L"04"},
+            {L"303", L"04"},
+            {L"304", L"05"},
+            {L"305", L"07"},
+            {L"306", L"08"},
+            {L"307", L"09"},
+            {L"308", L"12"},
+            {L"309", L"07"},
+            {L"310", L"10"},
+            {L"311", L"11"},
+            {L"312", L"12"},
+            {L"313", L"19"},
+            {L"314", L"21"},
+            {L"315", L"22"},
+            {L"316", L"23"},
+            {L"317", L"24"},
+            {L"318", L"25"},
+            {L"350", L"n03"},
+            {L"351", L"n03"},
+            {L"399", L"97"},
+            {L"400", L"14"},
+            {L"401", L"15"},
+            {L"402", L"16"},
+            {L"403", L"17"},
+            {L"404", L"06"},
+            {L"405", L"06"},
+            {L"406", L"06"},
+            {L"407", L"d13"},
+            {L"408", L"26"},
+            {L"409", L"27"},
+            {L"410", L"28"},
+            {L"456", L"06"},
+            {L"457", L"n13"},
+            {L"499", L"98"},
+            {L"500", L"18"},
+            {L"501", L"18"},
+            {L"502", L"53"},
+            {L"503", L"30"},
+            {L"504", L"29"},
+            {L"507", L"20"},
+            {L"508", L"31"},
+            {L"509", L"32"},
+            {L"510", L"49"},
+            {L"511", L"54"},
+            {L"512", L"55"},
+            {L"513", L"56"},
+            {L"514", L"57"},
+            {L"515", L"58"},
+        };
+
+        auto itr = dmap.find(code);
+        if (itr != dmap.end())
+            return itr->second;
+        else
+            return L"";
     }
 }
 
@@ -75,8 +158,10 @@ bool ApiHefengWeather::QueryCityInfo(const std::wstring &query, CityInfoList &ci
 {
     city_list.clear();
 
+    auto qNameEncoded = CCommon::URLEncode(query);
+
     CString url;
-    url.Format(L"https://geoapi.qweather.com/v2/city/lookup?key=%s&location=%s", _key.c_str(), query.c_str());
+    url.Format(L"https://geoapi.qweather.com/v2/city/lookup?key=%s&location=%s", _key.c_str(), qNameEncoded.c_str());
 
     std::wstring content;
     auto succeed = hf::call_internet(url, content);
@@ -161,10 +246,10 @@ bool ApiHefengWeather::QueryRealTimeWeather(const std::wstring &query, SRealTime
                 weather.Temperature = get_str_value(now_obj, "temp");
                 weather.UpdateTime = get_str_value(now_obj, "obsTime").substr(11, 5);
                 weather.Weather = get_str_value(now_obj, "text");
-                weather.WeatherCode = get_str_value(now_obj, "icon");
+                weather.WeatherCode = hf::convert_weather_code(get_str_value(now_obj, "icon"));
                 weather.WindDirection = get_str_value(now_obj, "windDir");
-                weather.WindStrength = get_str_value(now_obj, "windScale") + L"º∂";  // todo: ‘› ± π”√÷–Œƒ
-                weather.AqiPM25 = L"-";  // todo: ‘› ±≤ª…Ë÷√pm2.5
+                weather.WindStrength = get_str_value(now_obj, "windScale") + L"Á∫ß";  // todo: ÊöÇÊó∂‰ΩøÁî®‰∏≠Êñá
+                weather.AqiPM25 = L"-";  // todo: ÊöÇÊó∂‰∏çËÆæÁΩÆpm2.5
             }
             else
             {
@@ -276,8 +361,8 @@ bool ApiHefengWeather::QueryForecastWeather(const std::wstring &query, SWeatherI
                 wi.TemperatureNight = get_str_value(j_val, "tempMin");
                 wi.WeatherDay = get_str_value(j_val, "textDay");
                 wi.WeatherNight = get_str_value(j_val, "textNight");
-                wi.WeatherCodeDay = get_str_value(j_val, "iconDay");
-                wi.WeatherCodeNight = get_str_value(j_val, "iconNight");
+                wi.WeatherCodeDay = hf::convert_weather_code(get_str_value(j_val, "iconDay"));
+                wi.WeatherCodeNight = hf::convert_weather_code(get_str_value(j_val, "iconNight"));
             };
 
             auto code = get_str_value(root, "code");
@@ -308,7 +393,7 @@ bool ApiHefengWeather::QueryForecastWeather(const std::wstring &query, SWeatherI
     return succeed;
 }
 
-const std::wstring& ApiHefengWeather::GetLastError()
+std::wstring ApiHefengWeather::GetLastError()
 {
     return _lastError;
 }

@@ -101,12 +101,15 @@ void CSelectCityDlg::OnCancel()
 
 void CSelectCityDlg::OnBnClickedSearchBtn()
 {
+    if (data_api == nullptr)
+        MessageBox(L"无效的数据API", CDataManager::Instance().StringRes(IDS_WEATHER_PRO));
+
     UpdateData(TRUE);
     if (m_cityNameQuery.IsEmpty()) return;
 
     ResetStates();
 
-    if (query::QueryCityInfo(std::wstring(m_cityNameQuery), m_cityInfoList))
+    if (data_api->QueryCity(std::wstring(m_cityNameQuery), m_cityInfoList))
     {
         if (m_cityInfoList.size() == 0) return;
 
@@ -121,6 +124,10 @@ void CSelectCityDlg::OnBnClickedSearchBtn()
         }
     }
     else
-        MessageBox(CDataManager::Instance().StringRes(IDS_QUERY_ERR),
-                   CDataManager::Instance().StringRes(IDS_WEATHER_PRO));
+    {
+        auto err = data_api->GetLastError();
+        CString info;
+        info.Format(L"%s\r\n%s", CDataManager::Instance().StringRes(IDS_QUERY_ERR), err.c_str());
+        MessageBox(info, CDataManager::Instance().StringRes(IDS_WEATHER_PRO));
+    }
 }
