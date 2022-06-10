@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <zlib.h>
 class CCommon
 {
 public:
@@ -11,4 +12,6 @@ public:
     //将一个字符串转换成URL编码（以UTF8编码格式）
     static std::wstring URLEncode(const std::wstring& wstr);
 
+    // 解码gzip压缩的字节数据
+    static int GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata);
 };

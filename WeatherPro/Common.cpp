@@ -54,3 +54,39 @@ std::wstring CCommon::URLEncode(const std::wstring& wstr)
     }
     return result;
 }
+
+int CCommon::GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata)
+{
+    int err = 0;
+    z_stream d_stream = { 0 }; /* decompression stream */
+    unsigned char dummy_head[2] = { 0x1F, 0x8B };
+    d_stream.zalloc = (alloc_func)0;
+    d_stream.zfree = (free_func)0;
+    d_stream.opaque = (voidpf)0;
+    d_stream.next_in = zdata;
+    d_stream.avail_in = 0;
+    d_stream.next_out = data;
+
+    if (inflateInit2(&d_stream, 47) != Z_OK) return -1;
+    while (d_stream.total_in < nzdata) {
+        d_stream.avail_in = d_stream.avail_out = 2048; /* force small buffers */
+        if ((err = inflate(&d_stream, Z_NO_FLUSH)) == Z_STREAM_END) break;
+        if (err != Z_OK)
+        {
+            if (err == Z_DATA_ERROR)
+            {
+                d_stream.next_in = (Bytef*)dummy_head;
+                d_stream.avail_in = sizeof(dummy_head);
+                if ((err = inflate(&d_stream, Z_NO_FLUSH)) != Z_OK)
+                {
+                    return -1;
+                }
+            }
+            else return -1;
+        }
+    }
+    *ndata = d_stream.total_out;
+    if (inflateEnd(&d_stream) != Z_OK) return -1;
+
+    return 0;
+}
