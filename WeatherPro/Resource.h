@@ -64,9 +64,10 @@
 #define IDI_ICON_B_A30                  1026
 #define IDC_COMBO_DATA_API_TYPE         1026
 #define IDI_ICON_B_A31                  1027
-#define IDC_BUTTON1                     1027
 #define IDC_BTN_API_SETTINGS            1027
 #define IDI_ICON_B_A53                  1028
+#define IDC_COMBO1                      1028
+#define IDC_COMBO_UPDATE_FREQUENCY      1028
 #define IDI_ICON_B_A54                  1029
 #define IDI_ICON_B_A55                  1030
 #define IDI_ICON_B_A56                  1031
@@ -87,7 +88,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1043
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

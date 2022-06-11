@@ -131,6 +131,7 @@ void COptionsDlg::OnOK()
     auto &config = CDataManager::InstanceRef().GetConfig();
     config.m_api_type = static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel());
     config.m_wit = static_cast<EWeatherInfoType>(m_ctrlInfoType.GetCurSel());
+    config.m_update_frequency = static_cast<UpdateFrequency>(m_ctrlUpdateFrequency.GetCurSel());
     config.m_show_weather_icon = m_showWeatherIcon == TRUE;
     config.m_show_weather_in_tooltips = m_showWeatherInTooltip == TRUE;
     config.m_show_brief_rt_weather_info = m_showBriefRTWeather == TRUE;
