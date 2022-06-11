@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "afxdialogex.h"
+#include "DataAPI.h"
 
 // COptionsDlg 对话框
 
@@ -21,6 +22,7 @@ protected:
 
     DECLARE_MESSAGE_MAP()
 public:
+    SCityInfo m_selected_city;
     CString m_currentCityName;
 
     BOOL m_showWeatherIcon;
@@ -29,10 +31,12 @@ public:
     BOOL m_showBriefWeatherAlertInfo;
     BOOL m_showBriefRTWeather;
     BOOL m_showErrorInfo;
+    CComboBox m_ctrlInfoType;
+    CComboBox m_ctrlDataApiType;
 
     afx_msg void OnBnClickedBtnSelectCity();
     virtual BOOL OnInitDialog();
     virtual void OnOK();
-    CComboBox m_ctrlInfoType;
     afx_msg void OnBnClickedBtnUpdateManually();
+    afx_msg void OnBnClickedBtnApiSettings();
 };

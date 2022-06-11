@@ -6,6 +6,7 @@
 #include "OptionsDlg.h"
 
 #include "SelectCityDlg.h"
+#include "OptionsHfwDlg.h"
 #include "DataManager.h"
 
 
@@ -41,12 +42,14 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Check(pDX, IDC_CHECK_SHOW_BRIEF_WEATHER_ALERT_INFO, m_showBriefWeatherAlertInfo);
     DDX_Check(pDX, IDC_CHECK_SHOW_BRIEF_RT_WEATHER, m_showBriefRTWeather);
     DDX_Check(pDX, IDC_CHECK_SHOW_ERROR_INFO, m_showErrorInfo);
+    DDX_Control(pDX, IDC_COMBO_DATA_API_TYPE, m_ctrlDataApiType);
 }
 
 
 BEGIN_MESSAGE_MAP(COptionsDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_SELECT_CITY, &COptionsDlg::OnBnClickedBtnSelectCity)
     ON_BN_CLICKED(IDC_BTN_UPDATE_MANUALLY, &COptionsDlg::OnBnClickedBtnUpdateManually)
+    ON_BN_CLICKED(IDC_BTN_API_SETTINGS, &COptionsDlg::OnBnClickedBtnApiSettings)
 END_MESSAGE_MAP()
 
 
@@ -57,8 +60,8 @@ BOOL COptionsDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // 在此添加额外的初始化
-    m_currentCityName = CDataManager::Instance().GetCurrentCityInfo().CityName.c_str();
+    m_selected_city = CDataManager::Instance().GetCurrentCityInfo();
+    m_currentCityName = m_selected_city.CityName.c_str();
 
     const auto &config = CDataManager::Instance().GetConfig();
 
@@ -66,6 +69,10 @@ BOOL COptionsDlg::OnInitDialog()
     m_ctrlInfoType.AddString(CDataManager::Instance().StringRes(IDS_WIT_24H));
     m_ctrlInfoType.AddString(CDataManager::Instance().StringRes(IDS_WIT_48H));
     m_ctrlInfoType.SetCurSel(static_cast<int>(config.m_wit));
+
+    m_ctrlDataApiType.AddString(L"Weather.com.cn(抓取)");
+    m_ctrlDataApiType.AddString(L"和风天气Api");
+    m_ctrlDataApiType.SetCurSel(static_cast<int>(config.m_api_type));
 
     m_showWeatherIcon = config.m_show_weather_icon ? TRUE : FALSE;
     m_showWeatherInTooltip = config.m_show_weather_in_tooltips ? TRUE : FALSE;
@@ -88,19 +95,21 @@ void COptionsDlg::OnBnClickedBtnSelectCity()
 
     if (dlg.DoModal() == IDOK)
     {
-        if (!dlg.m_selectedCityInfo.CityName.empty() &&
-            dlg.m_selectedCityInfo.CityNO != CDataManager::Instance().GetCurrentCityInfo().CityNO)
+        if (!dlg.m_selectedCityInfo.CityName.empty() && dlg.m_selectedCityInfo.CityNO != m_selected_city.CityNO)
         {
-            if (CDataManager::Instance().GetCurrentCityInfo().CityNO != dlg.m_selectedCityInfo.CityNO)
-            {
-                // 更换了城市，更新天气信息
-                CDataManager::InstanceRef().SetCurrentCityInfo(dlg.m_selectedCityInfo);
+            m_selected_city = dlg.m_selectedCityInfo;
+            m_currentCityName = m_selected_city.CityName.c_str();
+            UpdateData(FALSE);
+            //if (CDataManager::Instance().GetCurrentCityInfo().CityNO != dlg.m_selectedCityInfo.CityNO)
+            //{
+            //    // 更换了城市，更新天气信息
+            //    CDataManager::InstanceRef().SetCurrentCityInfo(dlg.m_selectedCityInfo);
 
-                m_currentCityName = dlg.m_selectedCityInfo.CityName.c_str();
-                UpdateData(FALSE);
+            //    m_currentCityName = dlg.m_selectedCityInfo.CityName.c_str();
+            //    UpdateData(FALSE);
 
-                CWeatherPro::Instance().UpdateWeatherInfo(true);
-            }
+            //    CWeatherPro::Instance().UpdateWeatherInfo(true);
+            //}
         }
     }
 }
@@ -112,6 +121,7 @@ void COptionsDlg::OnOK()
     UpdateData(TRUE);
 
     auto &config = CDataManager::InstanceRef().GetConfig();
+    config.m_api_type = static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel());
     config.m_wit = static_cast<EWeatherInfoType>(m_ctrlInfoType.GetCurSel());
     config.m_show_weather_icon = m_showWeatherIcon == TRUE;
     config.m_show_weather_in_tooltips = m_showWeatherInTooltip == TRUE;
@@ -120,9 +130,17 @@ void COptionsDlg::OnOK()
     config.m_show_brief_weather_alert_info = m_showBriefWeatherAlertInfo == TRUE;
     config.m_show_error_info = m_showErrorInfo == TRUE;
 
-    // 更新tooltip
-    CDataManager::InstanceRef().RefreshWeatherInfoCache();
-    CWeatherPro::Instance().UpdateTooltip(CDataManager::Instance().GetTooptipInfo());
+    if (m_selected_city.CityNO != CDataManager::Instance().GetCurrentCityInfo().CityNO)
+    {
+        CDataManager::InstanceRef().SetCurrentCityInfo(m_selected_city);
+        CWeatherPro::Instance().UpdateWeatherInfo(true);
+    }
+    else
+    {
+        // 更新tooltip
+        CDataManager::InstanceRef().RefreshWeatherInfoCache();
+        CWeatherPro::Instance().UpdateTooltip(CDataManager::Instance().GetTooptipInfo());
+    }
 
     // 保存配置文件
     CDataManager::Instance().SaveConfigs();
@@ -148,4 +166,16 @@ void COptionsDlg::OnBnClickedBtnUpdateManually()
     }
 
     CWeatherPro::Instance().UpdateWeatherInfo(true);
+}
+
+
+void COptionsDlg::OnBnClickedBtnApiSettings()
+{
+    if (static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel()) == DataApiType::API_HefengWeather)
+    {
+        OptionsHfwDlg dlg;
+        dlg.m_api = CDataManager::Instance().m_api_hfw;
+
+        dlg.DoModal();
+    }
 }
