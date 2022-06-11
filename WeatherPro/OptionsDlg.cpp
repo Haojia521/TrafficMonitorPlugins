@@ -99,7 +99,11 @@ BOOL COptionsDlg::OnInitDialog()
 void COptionsDlg::OnBnClickedBtnSelectCity()
 {
     CSelectCityDlg dlg(this);
-    dlg.data_api = CDataManager::Instance().GetCurrentApi();
+    auto api_type = static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel());
+    if (api_type == DataApiType::API_HefengWeather)
+        dlg.data_api = CDataManager::Instance().m_api_hfw;
+    else if (api_type == DataApiType::API_WeatherComCnSpider)
+        dlg.data_api = CDataManager::Instance().m_api_wccs;
 
     if (dlg.DoModal() == IDOK)
     {
