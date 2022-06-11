@@ -54,6 +54,9 @@
     <ClCompile Include="DataApiWeatherComCnSpider.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="OptionsHfwDlg.cpp">
+      <Filter>DLG</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="WeatherPro.def">
@@ -102,6 +105,9 @@
     </ClInclude>
     <ClInclude Include="DataApiWeatherComCnSpider.h">
       <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsHfwDlg.h">
+      <Filter>DLG</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

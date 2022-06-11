@@ -30,26 +30,38 @@
 #define IDC_CHECK_SHOW_BRIEF_WEATHER_ALERT_INFO 1010
 #define IDI_ICON_B_A05                  1010
 #define IDS_TODAY                       1010
+#define IDC_CHECK_HFW_FC_UV             1010
 #define IDI_ICON_B_A06                  1011
 #define IDC_BTN_UPDATE_MANUALLY         1011
 #define IDS_TOMORROW                    1011
 #define IDI_ICON_B_A07                  1012
 #define IDS_DAY_AFTER_TOMORROW          1012
 #define IDI_ICON_B_A08                  1013
-#define IDC_CHECK1                      1013
 #define IDC_CHECK_SHOW_ERROR_INFO       1013
 #define IDI_ICON_B_A09                  1014
 #define IDI_ICON_B_A10                  1015
+#define IDC_EDIT_HFW_APP_KEY            1015
 #define IDI_ICON_B_A11                  1016
+#define IDC_CHECK_HFW_RT_TEMP_FEELS     1016
 #define IDI_ICON_B_A12                  1017
+#define IDC_CHECK_HFW_RT_WIND           1017
 #define IDI_ICON_B_A14                  1018
+#define IDC_CHECK_HFW_RT_WIND_SCALE     1018
 #define IDI_ICON_B_A15                  1019
+#define IDC_CHECK_HFW_RT_HUMIDITY       1019
 #define IDI_ICON_B_A16                  1020
+#define IDC_CHECK_HFW_FC_HUMIDITY       1020
 #define IDI_ICON_B_A17                  1021
+#define IDC_CHECK_HFW_AQ                1021
 #define IDI_ICON_B_A18                  1022
+#define IDC_CHECK_HFW_AQ_AQI            1022
 #define IDI_ICON_B_A19                  1023
+#define IDC_CHECK_HFW_AQ_PM2P5          1023
 #define IDI_ICON_B_A20                  1024
+#define IDC_CHECK_HFW_AQ_PM10           1024
 #define IDI_ICON_B_A29                  1025
+#define IDC_CHECK1                      1025
+#define IDC_CHECK_HFW_ALERT             1025
 #define IDI_ICON_B_A30                  1026
 #define IDI_ICON_B_A31                  1027
 #define IDI_ICON_B_A53                  1028
@@ -65,14 +77,15 @@
 #define IDI_ICON_B_N01                  1038
 #define IDI_ICON_B_N03                  1039
 #define IDI_ICON_B_N13                  1040
+#define IDD_OPTIONS_HFW_DLG             1041
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1041
+#define _APS_NEXT_RESOURCE_VALUE        1043
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_CONTROL_VALUE         1026
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif
