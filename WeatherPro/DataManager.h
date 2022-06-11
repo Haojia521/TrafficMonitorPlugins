@@ -104,7 +104,6 @@ private:
     };
 
     SWeatherInfoCache m_weather_info_cache;
-    std::wstring m_lastUpdateError;
 
     std::shared_ptr<DataApiWeatherComCnSpider> m_api_wccs;
     std::shared_ptr<DataApiHefengWeather> m_api_hfw;

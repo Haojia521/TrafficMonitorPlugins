@@ -409,12 +409,13 @@ std::wstring CDataManager::_getTooptipInfo() const
 
         wss << m_currentCityInfo.CityName << L" " << api->GetWeatherInfoSummary();
 
-        if (m_config.m_show_error_info && !m_lastUpdateError.empty())
+        auto lastErr = api->GetLastError();
+        if (m_config.m_show_error_info && !lastErr.empty())
         {
             wss << std::endl;
 
             wss << L"=====WeatherPro-Errors=====" << std::endl
-                << m_lastUpdateError << std::endl
+                << lastErr << std::endl
                 << L"===========================";
         }
 

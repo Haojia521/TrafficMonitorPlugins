@@ -92,5 +92,8 @@ protected:
     RealtimeAirQuality _realtimeAirQuality;
     WeatherAlertList _weatherAlerts;
 
+    bool _airQualityDataOutdated{ true };
+    bool _alertsDataOutdated{ true };
+
     std::wstring _lastError;
 };

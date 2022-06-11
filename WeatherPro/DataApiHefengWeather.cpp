@@ -211,7 +211,7 @@ namespace hf
 
 bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info)
 {
-    CHECK_KEY
+    CHECK_KEY;
 
     info.clear();
 
@@ -250,6 +250,22 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
 std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
 {
     const auto &app_config = CDataManager::Instance().GetConfig();
+    const auto &city_info = CDataManager::Instance().GetCurrentCityInfo();
+
+    std::wostringstream oss_err;
+
+    if (config.ShowAirQuality && _airQualityDataOutdated)
+    {
+        if (!QueryRealtimeAirQuality(city_info.CityNO))
+            oss_err << _lastError;
+    }
+    if (config.ShowWeatherAlert && _alertsDataOutdated)
+    {
+        if (!QueryWeatherAlerts(city_info.CityNO))
+            oss_err << std::endl << _lastError;
+    }
+
+    _lastError = oss_err.str();
 
     std::wostringstream oss;
 
@@ -271,12 +287,11 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
         if (config.ShowRealtimeHumidity)
             oss << L" 相对湿度 " << _realtimeWeather.Humidity << L"%";
 
-        oss << std::endl;
 
         // format realtime air quality information
         if (config.ShowAirQuality)
         {
-            oss << L"空气质量: " << _realtimeAirQuality.Category;
+            oss << std::endl << L"空气质量: " << _realtimeAirQuality.Category;
 
             if (config.ShowAirQualityAQI)
                 oss << L" AQI: " << _realtimeAirQuality.AQI;
@@ -417,20 +432,23 @@ std::wstring DataApiHefengWeather::GetWeatherCode(EWeatherInfoType type)
 
 bool DataApiHefengWeather::UpdateWeather()
 {
-    CHECK_KEY
+    CHECK_KEY;
+
+    _airQualityDataOutdated = true;
+    _alertsDataOutdated = true;
 
     std::wostringstream oss;
 
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
 
     if (!QueryRealtimeWeather(currunt_city.CityNO))
-        oss << L"[RealtimeWeather]" << _lastError << L"\r\n";
+        oss << L"[RealtimeWeather]" << _lastError << std::endl;
     if (!QueryForecastWeather(currunt_city.CityNO))
-        oss << L"[ForcastWeather]" << _lastError << L"\r\n";
+        oss << L"[ForcastWeather]" << _lastError << std::endl;
     if (config.ShowAirQuality && !QueryRealtimeAirQuality(currunt_city.CityNO))
-        oss << L"[RealtimeAirQuality]" << _lastError << L"\r\n";
+        oss << L"[RealtimeAirQuality]" << _lastError << std::endl;
     if (config.ShowWeatherAlert && !QueryWeatherAlerts(currunt_city.CityNO))
-        oss << L"[WeatherAlerts]" << _lastError << L"\r\n";
+        oss << L"[WeatherAlerts]" << _lastError;
 
     auto err = oss.str();
     if (!err.empty()) _lastError = err;
@@ -445,7 +463,7 @@ std::wstring DataApiHefengWeather::GetLastError()
 
 bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
 {
-    CHECK_KEY
+    CHECK_KEY;
 
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
@@ -476,7 +494,7 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
 
 bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
 {
-    CHECK_KEY
+    CHECK_KEY;
 
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/air/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
@@ -495,7 +513,10 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
 
     auto err = hf::query_func_frame(url, func);
     if (err.empty())
+    {
         _realtimeAirQuality = data;
+        _airQualityDataOutdated = false;
+    }
     else
         _lastError = err;
 
@@ -504,7 +525,7 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
 
 bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
 {
-    CHECK_KEY
+    CHECK_KEY;
 
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/weather/3d?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
@@ -544,7 +565,7 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
 
 bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
 {
-    CHECK_KEY
+    CHECK_KEY;
 
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/warning/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
@@ -573,7 +594,10 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
 
     auto err = hf::query_func_frame(url, func);
     if (err.empty())
+    {
         _weatherAlerts = data;
+        _alertsDataOutdated = false;
+    }
     else
         _lastError = err;
 
