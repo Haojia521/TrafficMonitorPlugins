@@ -119,7 +119,10 @@ void COptionsDlg::OnOK()
     UpdateData(TRUE);
 
     auto &config = CDataManager::InstanceRef().GetConfig();
+
+    bool api_changed = config.m_api_type != static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel());
     config.m_api_type = static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel());
+
     config.m_wit = static_cast<EWeatherInfoType>(m_ctrlInfoType.GetCurSel());
     config.m_update_frequency = static_cast<UpdateFrequency>(m_ctrlUpdateFrequency.GetCurSel());
     config.m_show_weather_icon = m_showWeatherIcon == TRUE;
@@ -134,6 +137,8 @@ void COptionsDlg::OnOK()
         CDataManager::InstanceRef().SetCurrentCityInfo(m_selected_city);
         CWeatherPro::Instance().UpdateWeatherInfo(true);
     }
+    else if (api_changed)
+        CWeatherPro::Instance().UpdateWeatherInfo(true);
     else
     {
         // 更新tooltip
