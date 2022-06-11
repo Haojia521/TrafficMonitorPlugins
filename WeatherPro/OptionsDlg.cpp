@@ -43,6 +43,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Check(pDX, IDC_CHECK_SHOW_BRIEF_RT_WEATHER, m_showBriefRTWeather);
     DDX_Check(pDX, IDC_CHECK_SHOW_ERROR_INFO, m_showErrorInfo);
     DDX_Control(pDX, IDC_COMBO_DATA_API_TYPE, m_ctrlDataApiType);
+    DDX_Control(pDX, IDC_COMBO_UPDATE_FREQUENCY, m_ctrlUpdateFrequency);
 }
 
 
@@ -73,6 +74,13 @@ BOOL COptionsDlg::OnInitDialog()
     m_ctrlDataApiType.AddString(L"Weather.com.cn(抓取)");
     m_ctrlDataApiType.AddString(L"和风天气Api");
     m_ctrlDataApiType.SetCurSel(static_cast<int>(config.m_api_type));
+
+    m_ctrlUpdateFrequency.AddString(L"每1小时3次");
+    m_ctrlUpdateFrequency.AddString(L"每1小时2次");
+    m_ctrlUpdateFrequency.AddString(L"每1小时1次");
+    m_ctrlUpdateFrequency.AddString(L"每2小时1次");
+    m_ctrlUpdateFrequency.AddString(L"每3小时1次");
+    m_ctrlUpdateFrequency.SetCurSel(static_cast<int>(config.m_update_frequency));
 
     m_showWeatherIcon = config.m_show_weather_icon ? TRUE : FALSE;
     m_showWeatherInTooltip = config.m_show_weather_in_tooltips ? TRUE : FALSE;

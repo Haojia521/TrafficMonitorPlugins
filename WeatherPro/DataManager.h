@@ -6,6 +6,14 @@
 #include "DataApiWeatherComCnSpider.h"
 #include "DataApiHefengWeather.h"
 
+enum class UpdateFrequency
+{
+    UF_3T1H,
+    UF_2T1H,
+    UF_1T1H,
+    UF_1T2H,
+    UF_1T3H,
+};
 
 enum class DataApiType
 {
@@ -19,6 +27,7 @@ struct SConfiguration
 
     DataApiType m_api_type;
     EWeatherInfoType m_wit;
+    UpdateFrequency m_update_frequency;
     bool m_show_weather_icon;
     bool m_show_weather_in_tooltips;
     bool m_show_brief_rt_weather_info;

@@ -10,6 +10,34 @@
 
 #include <cstdlib>
 
+namespace helper
+{
+    std::time_t gen_time_span(std::time_t t)
+    {
+        std::srand(static_cast<unsigned int>(t));
+        auto rand_number = std::rand();
+
+        switch (CDataManager::Instance().GetConfig().m_update_frequency)
+        {
+        case UpdateFrequency::UF_3T1H:
+            return static_cast<std::time_t>(900 + rand_number % 600);
+
+        default:
+        case UpdateFrequency::UF_2T1H:
+            return static_cast<std::time_t>(1500 + rand_number % 600);
+
+        case UpdateFrequency::UF_1T1H:
+            return static_cast<std::time_t>(3300 + rand_number % 600);
+
+        case UpdateFrequency::UF_1T2H:
+            return static_cast<std::time_t>(6600 + rand_number % 1200);
+
+        case UpdateFrequency::UF_1T3H:
+            return static_cast<std::time_t>(9600 + rand_number % 2400);
+        }
+    }
+}
+
 CWeatherPro CWeatherPro::m_instance;
 
 CWeatherPro::CWeatherPro() :
@@ -120,9 +148,7 @@ void CWeatherPro::UpdateWeatherInfo(bool force /* = false */)
         if (t > m_last_update_timestamp + m_next_update_time_span)
         {
             m_last_update_timestamp = t;
-
-            std::srand(static_cast<unsigned int>(t));
-            m_next_update_time_span = static_cast<std::time_t>(std::rand() % 300 + 300);
+            m_next_update_time_span = helper::gen_time_span(t);
 
             CDataManager::InstanceRef().UpdateWeather(cb);
         }

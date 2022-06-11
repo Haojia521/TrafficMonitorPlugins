@@ -33,6 +33,7 @@ public:
     BOOL m_showErrorInfo;
     CComboBox m_ctrlInfoType;
     CComboBox m_ctrlDataApiType;
+    CComboBox m_ctrlUpdateFrequency;
 
     afx_msg void OnBnClickedBtnSelectCity();
     virtual BOOL OnInitDialog();

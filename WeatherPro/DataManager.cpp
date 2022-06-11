@@ -181,6 +181,7 @@ void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
 
     m_config.m_api_type = static_cast<DataApiType>(cfg_int_val_getter(L"config", L"api_type", 1));
     m_config.m_wit = static_cast<EWeatherInfoType>(cfg_int_val_getter(L"config", L"wit", 0));
+    m_config.m_update_frequency = static_cast<UpdateFrequency>(cfg_int_val_getter(L"config", L"update_freq", 1));
     m_config.m_show_weather_icon = cfg_bool_val_getter(L"config", L"show_weather_icon", 1);
     m_config.m_show_weather_in_tooltips = cfg_bool_val_getter(L"config", L"show_weather_in_tooltips", 1);
     m_config.m_show_brief_rt_weather_info = cfg_bool_val_getter(L"config", L"show_brief_rt_weather_info", 0);
@@ -225,6 +226,7 @@ void CDataManager::SaveConfigs() const
 
     cfg_int_val_writter(L"config", L"api_type", static_cast<int>(m_config.m_api_type));
     cfg_int_val_writter(L"config", L"wit", static_cast<int>(m_config.m_wit));
+    cfg_int_val_writter(L"config", L"update_freq", static_cast<int>(m_config.m_update_frequency));
     cfg_bool_val_writter(L"config", L"show_weather_icon", m_config.m_show_weather_icon);
     cfg_bool_val_writter(L"config", L"show_weather_icon", m_config.m_show_weather_icon);
     cfg_bool_val_writter(L"config", L"show_weather_in_tooltips", m_config.m_show_weather_in_tooltips);
