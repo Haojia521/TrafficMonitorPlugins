@@ -190,23 +190,6 @@ namespace hf
 
         return error;
     }
-
-    std::wstring translate_uv_index(const std::wstring &uvi)
-    {
-        static std::unordered_map<std::wstring, std::wstring> dmap{
-            {L"1", L"最弱"},
-            {L"2", L"弱"},
-            {L"3", L"中等"},
-            {L"4", L"强"},
-            {L"5", L"很强"},
-        };
-
-        auto itr = dmap.find(uvi);
-        if (itr != dmap.end())
-            return itr->second;
-        else
-            return L"未知";
-    }
 }
 
 bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info)
@@ -321,7 +304,7 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
     oss << L"今天: " << GetWeatherText(EWeatherInfoType::WEATHER_TODAY)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_TODAY);
     if (config.ShowForecastUVIdex)
-        oss << L" 紫外线强度: " << hf::translate_uv_index(_forcastWeatherTD.UVIndex);
+        oss << L" 紫外线强度: " << _forcastWeatherTD.UVIndex;
     if (config.showForecastHumidity)
         oss << L" 相对湿度: " << _forcastWeatherTD.Humidity << L"%";
     oss << std::endl;
@@ -329,7 +312,7 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
     oss << L"明天: " << GetWeatherText(EWeatherInfoType::WEATHER_TOMMROW)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_TOMMROW);
     if (config.ShowForecastUVIdex)
-        oss << L" 紫外线强度: " << hf::translate_uv_index(_forcastWeatherTM.UVIndex);
+        oss << L" 紫外线强度: " << _forcastWeatherTM.UVIndex;
     if (config.showForecastHumidity)
         oss << L" 相对湿度: " << _forcastWeatherTM.Humidity << L"%";
     oss << std::endl;
@@ -337,7 +320,7 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
     oss << L"后天: " << GetWeatherText(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW);
     if (config.ShowForecastUVIdex)
-        oss << L" 紫外线强度: " << hf::translate_uv_index(_forcastWeatherDATM.UVIndex);
+        oss << L" 紫外线强度: " << _forcastWeatherDATM.UVIndex;
     if (config.showForecastHumidity)
         oss << L" 相对湿度: " << _forcastWeatherDATM.Humidity << L"%";
     oss << std::endl;
@@ -450,10 +433,9 @@ bool DataApiHefengWeather::UpdateWeather()
     if (config.ShowWeatherAlert && !QueryWeatherAlerts(currunt_city.CityNO))
         oss << L"[WeatherAlerts]" << _lastError;
 
-    auto err = oss.str();
-    if (!err.empty()) _lastError = err;
+    _lastError = oss.str();
 
-    return err.empty();
+    return _lastError.empty();
 }
 
 std::wstring DataApiHefengWeather::GetLastError()

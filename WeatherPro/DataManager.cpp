@@ -101,10 +101,7 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
     std::shared_ptr<DataAPI> current_api{ GetCurrentApi() };
     if (current_api != nullptr)
     {
-        auto succeed = current_api->UpdateWeather();
-
-        if (succeed) m_lastUpdateError.clear();
-        else m_lastUpdateError = current_api->GetLastError();
+        current_api->UpdateWeather();
 
         RefreshWeatherInfoCache();
 

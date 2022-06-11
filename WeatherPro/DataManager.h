@@ -67,6 +67,9 @@ public:
     void RefreshWeatherInfoCache();
     
     DataApiPtr GetCurrentApi() const;
+
+    std::shared_ptr<DataApiWeatherComCnSpider> m_api_wccs;
+    std::shared_ptr<DataApiHefengWeather> m_api_hfw;
 private:
     void _updateWeather(WeatherInfoUpdatedCallback callback = nullptr);
     HICON _getIcon();
@@ -104,7 +107,4 @@ private:
     };
 
     SWeatherInfoCache m_weather_info_cache;
-
-    std::shared_ptr<DataApiWeatherComCnSpider> m_api_wccs;
-    std::shared_ptr<DataApiHefengWeather> m_api_hfw;
 };
