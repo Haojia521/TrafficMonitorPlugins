@@ -59,10 +59,6 @@ public:
     void UpdateWeather(WeatherInfoUpdatedCallback callback = nullptr);
 
     std::wstring GetWeatherTemperature() const;
-    //std::wstring GetRealTimeWeatherInfo() const;
-    //std::wstring GetWeatherAlertsInfo() const;
-    //std::wstring GetWeatherInfo() const;
-
     std::wstring GetTooptipInfo() const;
 
     SConfiguration& GetConfig();
@@ -88,9 +84,6 @@ private:
 
 
     std::wstring _getWeatherTemperature() const;
-    //std::wstring _getRealTimeWeatherInfo(bool brief) const;
-    //std::wstring _getWeatherAlertsInfo(bool brief) const;
-    //std::wstring _getWeatherInfo() const;
     std::wstring _getTooptipInfo() const;
 
     static CDataManager m_instance;
@@ -107,9 +100,6 @@ private:
     struct SWeatherInfoCache
     {
         std::wstring WeatherTemperature;
-        //std::wstring RealTimeWeatherInfo;
-        //std::wstring WeatherAlersInfo;
-        //std::wstring WeatherInfo;
         std::wstring TooltipInfo;
 
         HICON Icon{ nullptr };

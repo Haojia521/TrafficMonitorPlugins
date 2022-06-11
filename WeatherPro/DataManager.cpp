@@ -13,6 +13,7 @@ std::mutex g_weather_update_nutex;
 SConfiguration::SConfiguration() :
     m_api_type(DataApiType::API_HefengWeather),
     m_wit(EWeatherInfoType::WEATHER_REALTIME),
+    m_update_frequency(UpdateFrequency::UF_1T2H),
     m_show_weather_icon(true),
     m_show_weather_in_tooltips(true),
     m_show_brief_rt_weather_info(false),
@@ -122,21 +123,6 @@ std::wstring CDataManager::GetWeatherTemperature() const
 {
     return m_weather_info_cache.WeatherTemperature;
 }
-
-//std::wstring CDataManager::GetRealTimeWeatherInfo() const
-//{
-//    return m_weather_info_cache.RealTimeWeatherInfo;
-//}
-//
-//std::wstring CDataManager::GetWeatherAlertsInfo() const
-//{
-//    return m_weather_info_cache.WeatherAlersInfo;
-//}
-//
-//std::wstring CDataManager::GetWeatherInfo() const
-//{
-//    return m_weather_info_cache.WeatherInfo;
-//}
 
 std::wstring CDataManager::GetTooptipInfo() const
 {
@@ -367,38 +353,6 @@ std::wstring CDataManager::_getWeatherTemperature() const
         return L"";
 }
 
-//std::wstring CDataManager::_getRealTimeWeatherInfo(bool brief) const
-//{
-//    return m_rt_weather.ToString(brief);
-//}
-//
-//std::wstring CDataManager::_getWeatherAlertsInfo(bool brief) const
-//{
-//    if (m_weather_alerts.empty())
-//    {
-//        return std::wstring();
-//    }
-//    else
-//    {
-//        std::wstringstream wss;
-//
-//        for (const auto& alert : m_weather_alerts)
-//            wss << L"[!] " << alert.ToString(brief) << std::endl;
-//
-//        return wss.str();
-//    }
-//}
-//
-//std::wstring CDataManager::_getWeatherInfo() const
-//{
-//    std::wstringstream wss;
-//
-//    wss << std::wstring(StringRes(IDS_TODAY)) << L": " << m_weather_today.ToString() << std::endl
-//        << std::wstring(StringRes(IDS_TOMORROW)) << L": " << m_weather_tommrow.ToString();
-//
-//    return wss.str();
-//}
-
 std::wstring CDataManager::_getTooptipInfo() const
 {
     auto api = GetCurrentApi();
@@ -427,9 +381,6 @@ std::wstring CDataManager::_getTooptipInfo() const
 void CDataManager::RefreshWeatherInfoCache()
 {
     m_weather_info_cache.WeatherTemperature = _getWeatherTemperature();
-    //m_weather_info_cache.RealTimeWeatherInfo = _getRealTimeWeatherInfo(m_config.m_show_brief_rt_weather_info);
-    //m_weather_info_cache.WeatherAlersInfo = _getWeatherAlertsInfo(m_config.m_show_brief_weather_alert_info);
-    //m_weather_info_cache.WeatherInfo = _getWeatherInfo();
     m_weather_info_cache.TooltipInfo = _getTooptipInfo();
     m_weather_info_cache.Icon = _getIcon();
 }

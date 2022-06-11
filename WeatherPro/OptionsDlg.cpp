@@ -108,16 +108,6 @@ void COptionsDlg::OnBnClickedBtnSelectCity()
             m_selected_city = dlg.m_selectedCityInfo;
             m_currentCityName = m_selected_city.CityName.c_str();
             UpdateData(FALSE);
-            //if (CDataManager::Instance().GetCurrentCityInfo().CityNO != dlg.m_selectedCityInfo.CityNO)
-            //{
-            //    // 更换了城市，更新天气信息
-            //    CDataManager::InstanceRef().SetCurrentCityInfo(dlg.m_selectedCityInfo);
-
-            //    m_currentCityName = dlg.m_selectedCityInfo.CityName.c_str();
-            //    UpdateData(FALSE);
-
-            //    CWeatherPro::Instance().UpdateWeatherInfo(true);
-            //}
         }
     }
 }

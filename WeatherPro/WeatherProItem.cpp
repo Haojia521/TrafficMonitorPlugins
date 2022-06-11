@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "WeatherProItem.h"
 #include "DataManager.h"
+#include <algorithm>
 
 const wchar_t* CWeatherProItem::GetItemName() const
 {
@@ -24,6 +25,21 @@ const wchar_t* CWeatherProItem::GetItemValueText() const
 
 const wchar_t* CWeatherProItem::GetItemValueSampleText() const
 {
+    const auto &config = CDataManager::Instance().GetConfig();
+    if (config.m_show_weather_icon)
+    {
+        if (config.m_wit == EWeatherInfoType::WEATHER_REALTIME)
+            return L"20℃";
+        else
+            return L"20℃~20℃";
+    }
+    else
+    {
+        if (config.m_wit == EWeatherInfoType::WEATHER_REALTIME)
+            return L"多云 20℃";
+        else
+            return L"多云转晴 20℃~20℃";
+    }
     return L"";
 }
 
@@ -38,7 +54,8 @@ int CWeatherProItem::GetItemWidthEx(void* hDC) const
 
     auto icon_width = CDataManager::Instance().GetConfig().m_show_weather_icon ? CDataManager::Instance().DPI(20) : 0;
 
-    return icon_width + pDC->GetTextExtent(CDataManager::Instance().GetWeatherTemperature().c_str()).cx;
+    return icon_width + std::max(pDC->GetTextExtent(CDataManager::Instance().GetWeatherTemperature().c_str()).cx,
+                                 pDC->GetTextExtent(GetItemValueSampleText()).cx);
 }
 
 void CWeatherProItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_mode)
