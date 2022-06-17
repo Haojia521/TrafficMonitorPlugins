@@ -181,7 +181,7 @@ void COptionsDlg::OnBnClickedBtnApiSettings()
 {
     if (static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel()) == DataApiType::API_HefengWeather)
     {
-        OptionsHfwDlg dlg;
+        OptionsHfwDlg dlg(this);
         dlg.m_api = CDataManager::Instance().m_api_hfw;
 
         dlg.DoModal();
