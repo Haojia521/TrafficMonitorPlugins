@@ -16,6 +16,9 @@
     <Filter Include="PomodoroTimer">
       <UniqueIdentifier>{b7722364-c212-4d7d-84bd-4e4ba20e3903}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Item">
+      <UniqueIdentifier>{c9a86f2b-2fbd-4baa-a26b-a9f63c019796}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -23,6 +26,9 @@
     </ClCompile>
     <ClCompile Include="PomodoroTimer.cpp">
       <Filter>PomodoroTimer</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +54,9 @@
     </ClInclude>
     <ClInclude Include="PomodoroTimer.h">
       <Filter>PomodoroTimer</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Item</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

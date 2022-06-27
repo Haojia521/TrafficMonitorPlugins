@@ -16,6 +16,9 @@ public:
     OptionReturn ShowOptionsDialog(void* hParent) override;
     const wchar_t* GetInfo(PluginInfoIndex index) override;
     void OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data) override;
+
+private:
+    static CPomodoroTimer m_instance;
 };
 
 #ifdef __cplusplus
