@@ -19,6 +19,9 @@
     <Filter Include="Item">
       <UniqueIdentifier>{c9a86f2b-2fbd-4baa-a26b-a9f63c019796}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{7c934f2b-bd5d-4581-9a1f-1f1cd9ad98ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -29,6 +32,9 @@
     </ClCompile>
     <ClCompile Include="Item.cpp">
       <Filter>Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.cpp">
+      <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,10 +64,18 @@
     <ClInclude Include="Item.h">
       <Filter>Item</Filter>
     </ClInclude>
+    <ClInclude Include="Data.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PomodoroTimer.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\PT-logo.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

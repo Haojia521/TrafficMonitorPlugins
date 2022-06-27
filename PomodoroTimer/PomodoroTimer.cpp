@@ -17,14 +17,22 @@ CPomodoroTimer& CPomodoroTimer::Instance()
 
 IPluginItem* CPomodoroTimer::GetItem(int index)
 {
-    // todo
+    switch (index)
+    {
+    case 0:
+        return &m_item;
+
+    default:
+        break;
+    }
+
     return nullptr;
 }
 
 const wchar_t* CPomodoroTimer::GetTooltipInfo()
 {
     // todo
-    return nullptr;
+    return L"";
 }
 
 void CPomodoroTimer::DataRequired()
@@ -35,7 +43,7 @@ void CPomodoroTimer::DataRequired()
 ITMPlugin::OptionReturn CPomodoroTimer::ShowOptionsDialog(void* hParent)
 {
     // todo
-    return ITMPlugin::OR_OPTION_UNCHANGED;
+    return ITMPlugin::OR_OPTION_NOT_PROVIDED;
 }
 
 const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
@@ -74,4 +82,10 @@ void CPomodoroTimer::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data)
     default:
         break;
     }
+}
+
+ITMPlugin* TMPluginGetInstance()
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+    return &CPomodoroTimer::Instance();
 }

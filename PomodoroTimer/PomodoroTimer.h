@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <PluginInterface.h>
+#include "Item.h"
 
 class CPomodoroTimer : public ITMPlugin
 {
@@ -19,6 +20,7 @@ public:
 
 private:
     static CPomodoroTimer m_instance;
+    CPtItem m_item;
 };
 
 #ifdef __cplusplus
