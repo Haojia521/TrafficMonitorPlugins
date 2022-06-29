@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
+#include "Resource.h"
 #include "PomodoroTimer.h"
+#include "Data.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -81,6 +83,61 @@ void CPomodoroTimer::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data)
         break;
     default:
         break;
+    }
+}
+
+void CPomodoroTimer::ShowContextMenu(CWnd *wnd)
+{
+    static CMenu menu;
+    if (menu.m_hMenu == nullptr)
+    {
+        AFX_MANAGE_STATE(AfxGetStaticModuleState());
+        menu.LoadMenu(IDR_MENU_MAIN);
+    }
+
+    CMenu *context_menu = menu.GetSubMenu(0);
+    if (context_menu == nullptr) return;
+    
+    auto &data_manager = CDataManager::Instance();
+    auto prog_state = data_manager.GetProgramState();
+
+    // initialize menu item
+    if (prog_state == EProgramState::PS_RUNNING)
+        context_menu->EnableMenuItem(ID_FUNC_START, MF_DISABLED);
+    else
+        context_menu->EnableMenuItem(ID_FUNC_START, MF_ENABLED);
+
+    if (data_manager.GetProgramState() == EProgramState::PS_RUNNING)
+        context_menu->EnableMenuItem(ID_FUNC_PAUSE, MF_ENABLED);
+    else
+        context_menu->EnableMenuItem(ID_FUNC_PAUSE, MF_DISABLED);
+
+    if (data_manager.GetProgramState() == EProgramState::PS_STOPPED)
+        context_menu->EnableMenuItem(ID_FUNC_SKIP, MF_DISABLED);
+    else
+        context_menu->EnableMenuItem(ID_FUNC_SKIP, MF_ENABLED);
+
+    if (data_manager.GetProgramState() == EProgramState::PS_STOPPED)
+        context_menu->EnableMenuItem(ID_FUNC_STOP, MF_DISABLED);
+    else
+        context_menu->EnableMenuItem(ID_FUNC_STOP, MF_ENABLED);
+
+    // show menu
+    CPoint point;
+    GetCursorPos(&point);
+    auto id = context_menu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, point.x, point.y, wnd);
+
+    if (id == ID_FUNC_START)
+        data_manager.StartPomodoroTimer();
+    else if (id == ID_FUNC_PAUSE)
+        data_manager.PausePomodoroTimer();
+    else if (id == ID_FUNC_SKIP)
+        data_manager.SkipCurrentPomodoroTimerState();
+    else if (id == ID_FUNC_STOP)
+        data_manager.StopPomodoroTimer();
+    else if (id == ID_FUNC_OPTIONS)
+    {
+        // todo: show options dialog
     }
 }
 

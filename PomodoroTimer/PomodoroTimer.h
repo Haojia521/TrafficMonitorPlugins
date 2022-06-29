@@ -18,6 +18,8 @@ public:
     const wchar_t* GetInfo(PluginInfoIndex index) override;
     void OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data) override;
 
+    void ShowContextMenu(CWnd *wnd);
+
 private:
     static CPomodoroTimer m_instance;
     CPtItem m_item;
