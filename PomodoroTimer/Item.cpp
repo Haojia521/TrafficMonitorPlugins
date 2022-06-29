@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Item.h"
 #include "Data.h"
 
@@ -42,7 +42,7 @@ const wchar_t* CPtItem::GetItemValueText() const
 
 const wchar_t* CPtItem::GetItemValueSampleText() const
 {
-    return L"¹¤×÷ÖÐ (25min)";
+    return L"å·¥ä½œä¸­ (25min)";
 }
 
 bool CPtItem::IsCustomDraw() const
