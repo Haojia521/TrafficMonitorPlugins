@@ -22,6 +22,9 @@
     <Filter Include="Data">
       <UniqueIdentifier>{7c934f2b-bd5d-4581-9a1f-1f1cd9ad98ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DLG">
+      <UniqueIdentifier>{c6af3756-e543-481d-8854-eafb366e294a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -35,6 +38,9 @@
     </ClCompile>
     <ClCompile Include="Data.cpp">
       <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsDlg.cpp">
+      <Filter>DLG</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +72,9 @@
     </ClInclude>
     <ClInclude Include="Data.h">
       <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsDlg.h">
+      <Filter>DLG</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

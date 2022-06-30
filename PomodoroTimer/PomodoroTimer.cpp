@@ -2,6 +2,7 @@
 #include "Resource.h"
 #include "PomodoroTimer.h"
 #include "Data.h"
+#include "OptionsDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -137,7 +138,9 @@ void CPomodoroTimer::ShowContextMenu(CWnd *wnd)
         data_manager.StopPomodoroTimer();
     else if (id == ID_FUNC_OPTIONS)
     {
-        // todo: show options dialog
+        AFX_MANAGE_STATE(AfxGetStaticModuleState());
+        COptionsDlg dlg(wnd);
+        dlg.DoModal();
     }
 }
 

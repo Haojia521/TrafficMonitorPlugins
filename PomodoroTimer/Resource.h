@@ -1,11 +1,20 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ÁîüÊàêÁöÑÂåÖÂê´Êñá‰ª∂„ÄÇ
-// ‰æõ PomodoroTimer.rc ‰ΩøÁî®
+// Microsoft Visual C++ …˙≥…µƒ∞¸∫¨Œƒº˛°£
+// π© PomodoroTimer.rc  π”√
 //
 #define IDI_ICON_LOGO                   1000
+#define IDC_EDIT_TIME_SPAN_WORK         1000
 #define IDR_MENU_MAIN                   1001
+#define IDC_SPIN_TIME_SPAN_WORK         1001
 #define IDI_ICON_LOGO_STOP              1002
+#define IDC_EDIT_TIME_SPAN_SHORT_BREAK  1002
 #define IDI_ICON_LOGO_BREAK             1003
+#define IDC_SPIN_TIME_SPAN_SHORT_BREAK  1003
+#define IDD_DLG_OPTIONS                 1004
+#define IDC_CHECK_AUTO_LOOP             1004
+#define IDC_EDIT_NUM_LOOPS              1005
+#define IDC_SPIN3                       1006
+#define IDC_SPIN_NUM_LOOPS              1006
 #define ID_FUNC_32771                   32771
 #define ID_FUNC_32772                   32772
 #define ID_FUNC_32773                   32773
@@ -21,9 +30,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1004
+#define _APS_NEXT_RESOURCE_VALUE        1006
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif
