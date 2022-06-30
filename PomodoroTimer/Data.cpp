@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <thread>
+#include <memory>
 
 namespace dm
 {
@@ -16,13 +17,11 @@ namespace dm
 
     SStateData state_data;
 
-    bool signal_terminate_update_thread{ false };
-
-    void update_trigger()
+    void update_func(std::shared_ptr<bool> signal_stop)
     {
         auto &data_madager = CDataManager::Instance();
 
-        while (!signal_terminate_update_thread)
+        while (signal_stop != nullptr && !(*signal_stop))
         {
             data_madager.Update();
 
@@ -31,6 +30,31 @@ namespace dm
             std::this_thread::sleep_for(std::chrono::seconds(sleep_time));
         }
     }
+
+    class UpdateThreadHelper
+    {
+    public:
+        void start()
+        {
+            // if current thread is still running, do nothing
+            if (_signal_stop != nullptr && !(*_signal_stop))
+                return;
+
+            _signal_stop = std::make_shared<bool>(false);
+
+            std::thread update_thread(update_func, _signal_stop);
+            update_thread.detach();
+        }
+
+        void stop()
+        {
+            *_signal_stop = true;
+        }
+    private:
+        std::shared_ptr<bool> _signal_stop{ nullptr };
+    };
+
+    UpdateThreadHelper thread_helper;
 }
 
 CDataManager CDataManager::m_instance;
@@ -75,16 +99,15 @@ void CDataManager::StartPomodoroTimer()
     m_program_state = EProgramState::PS_RUNNING;
 
     dm::state_data.m_last_update_timestamp = std::time(nullptr);
-    
-    std::thread update_thread(dm::update_trigger);
-    update_thread.detach();
+
+    dm::thread_helper.start();
 }
 
 void CDataManager::PausePomodoroTimer()
 {
     m_program_state = EProgramState::PS_PAUSED;
 
-    dm::signal_terminate_update_thread = true;
+    dm::thread_helper.stop();
 }
 
 void CDataManager::StopPomodoroTimer()
@@ -95,12 +118,12 @@ void CDataManager::StopPomodoroTimer()
     dm::state_data.m_running_time = 0;
     dm::state_data.completed_loops = 0;
 
-    dm::signal_terminate_update_thread = true;
+    dm::thread_helper.stop();
 }
 
 void CDataManager::SkipCurrentPomodoroTimerState()
 {
-    if (m_program_state != EProgramState::PS_RUNNING)
+    if (m_program_state == EProgramState::PS_STOPPED)
         return;
 
     auto t = std::time(nullptr);
@@ -117,8 +140,14 @@ void CDataManager::SkipCurrentPomodoroTimerState()
 
         dm::state_data.completed_loops += 1;
         if (dm::state_data.completed_loops >= m_config.max_loops)
+        {
             StopPomodoroTimer();
+            return;
+        }
     }
+
+    if (m_program_state == EProgramState::PS_PAUSED)
+        StartPomodoroTimer();
 }
 
 EProgramState CDataManager::GetProgramState() const
@@ -137,9 +166,9 @@ int CDataManager::GetRemaningTime() const
         return 0;
 
     if (m_pt_state == EPomodoroTimerState::PTS_IN_WORK)
-        return m_config.working_time_span - dm::state_data.m_running_time;
+        return static_cast<int>(m_config.working_time_span - dm::state_data.m_running_time);
     else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
-        return m_config.break_time_span - dm::state_data.m_running_time;
+        return static_cast<int>(m_config.break_time_span - dm::state_data.m_running_time);
     else
         return 0;
 }
