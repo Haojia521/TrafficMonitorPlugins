@@ -215,6 +215,8 @@
     <ResourceCompile Include="PomodoroTimer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\PT-logo-break.ico" />
+    <Image Include="res\PT-logo-stop.ico" />
     <Image Include="res\PT-logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

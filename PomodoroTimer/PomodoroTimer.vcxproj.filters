@@ -77,5 +77,11 @@
     <Image Include="res\PT-logo.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\PT-logo-stop.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\PT-logo-break.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>
