@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Resource.h"
+#include <string>
 
 struct SConfig
 {
@@ -39,6 +40,8 @@ public:
     int RDPI(int pixel);
 
     SConfig& GetConfig();
+    void LoadConfig(const std::wstring &cfg_dir);
+    void SaveConfig() const;
 
     void StartPomodoroTimer();
     void PausePomodoroTimer();
@@ -61,4 +64,6 @@ private:
 
     EProgramState m_program_state;
     EPomodoroTimerState m_pt_state;
+
+    std::wstring m_config_file_path;
 };

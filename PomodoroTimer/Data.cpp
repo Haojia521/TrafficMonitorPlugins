@@ -94,6 +94,62 @@ SConfig& CDataManager::GetConfig()
     return m_config;
 }
 
+void CDataManager::LoadConfig(const std::wstring &cfg_dir)
+{
+    const auto &ch = cfg_dir.back();
+    if (ch == L'\\' || ch == L'/')
+        m_config_file_path = cfg_dir + L"PomodoroTimer.ini";
+    else
+        m_config_file_path = cfg_dir + L"\\PomodoroTimer.ini";
+
+    auto cfg_int_val_getter = [this](const wchar_t *section, const wchar_t *key, int default_val) {
+        int val = GetPrivateProfileInt(section, key, default_val, m_config_file_path.c_str());
+        return val;
+    };
+
+    auto cfg_bool_val_getter = [cfg_int_val_getter](const wchar_t *section, const wchar_t *key, int default_val) {
+        return cfg_int_val_getter(section, key, default_val) != 0;
+    };
+
+    auto timespan_work = cfg_int_val_getter(L"config", L"timespan_work", 1500);
+    if (timespan_work < 60) timespan_work = 60;
+    m_config.working_time_span = timespan_work / 60 * 60;
+
+    auto timespan_break = cfg_int_val_getter(L"config", L"timespan_break", 300);
+    if (timespan_break < 60) timespan_break = 60;
+    m_config.break_time_span = timespan_break / 60 * 60;
+
+    m_config.auto_loop = cfg_bool_val_getter(L"config", L"auto_loop", 0);
+
+    auto num_loops = cfg_int_val_getter(L"config", L"num_loops", 3);
+    if (num_loops < 1) num_loops = 1;
+    if (num_loops > 10) num_loops = 10;
+    m_config.max_loops = num_loops;
+
+    // todo: load other options
+}
+
+void CDataManager::SaveConfig() const
+{
+    auto cfg_int_val_writter = [this](const wchar_t *section, const wchar_t *key, int value) {
+        wchar_t buffer[64]{ 0 };
+
+        swprintf_s(buffer, L"%d", value);
+        WritePrivateProfileString(section, key, buffer, m_config_file_path.c_str());
+    };
+
+    auto cfg_bool_val_writter = [cfg_int_val_writter](const wchar_t *section, const wchar_t *key, bool value) {
+        cfg_int_val_writter(section, key, value ? 1 : 0);
+    };
+
+    cfg_int_val_writter(L"config", L"timespan_work", m_config.working_time_span);
+    cfg_int_val_writter(L"config", L"timespan_break", m_config.break_time_span);
+    cfg_bool_val_writter(L"config", L"auto_loop", m_config.auto_loop);
+    cfg_int_val_writter(L"config", L"num_loops", m_config.max_loops);
+
+    // todo: save other options
+}
+
 void CDataManager::StartPomodoroTimer()
 {
     m_program_state = EProgramState::PS_RUNNING;

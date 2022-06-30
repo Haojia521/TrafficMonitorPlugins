@@ -34,19 +34,23 @@ IPluginItem* CPomodoroTimer::GetItem(int index)
 
 const wchar_t* CPomodoroTimer::GetTooltipInfo()
 {
-    // todo
     return L"";
 }
 
 void CPomodoroTimer::DataRequired()
 {
-    // todo
 }
 
 ITMPlugin::OptionReturn CPomodoroTimer::ShowOptionsDialog(void* hParent)
 {
-    // todo
-    return ITMPlugin::OR_OPTION_NOT_PROVIDED;
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+    CWnd* pParent = CWnd::FromHandle((HWND)hParent);
+
+    COptionsDlg dlg(pParent);
+    if (dlg.DoModal() == IDOK)
+        return ITMPlugin::OR_OPTION_CHANGED;
+    
+    return ITMPlugin::OR_OPTION_UNCHANGED;
 }
 
 const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
@@ -76,11 +80,11 @@ const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
 
 void CPomodoroTimer::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data)
 {
-    // todo: load config info
     switch (index)
     {
     case ITMPlugin::EI_CONFIG_DIR:
-        //从配置文件读取配置
+        // 从配置文件读取配置
+        CDataManager::Instance().LoadConfig(data);
         break;
     default:
         break;

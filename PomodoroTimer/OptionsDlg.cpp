@@ -66,7 +66,10 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctrlSpinNumLoops.SetPos(cfg.max_loops);
 
 	// enable/disenable controls about loops
+	m_boolAutoLoop = cfg.auto_loop ? TRUE : FALSE;
 	EnableControlsAboutLoops(cfg.auto_loop ? TRUE : FALSE);
+
+	UpdateData(FALSE);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
@@ -84,6 +87,7 @@ void COptionsDlg::OnOK()
 	// cannot update options if timer is still running
 	if (CDataManager::Instance().GetProgramState() != EProgramState::PS_STOPPED)
 	{
+		// todo: use string resources
 		MessageBox(L"番茄钟正在运行，无法保存设置", L"选项");
 		return;
 	}
@@ -98,8 +102,9 @@ void COptionsDlg::OnOK()
 	cfg.auto_loop = m_boolAutoLoop == TRUE;
 	cfg.max_loops = m_ctrlSpinNumLoops.GetPos();
 
-	// todo: complete other options
-	// todo: save config to file
+	// todo: update other options
+	
+	CDataManager::Instance().SaveConfig();
 
 	CDialogEx::OnOK();
 }
