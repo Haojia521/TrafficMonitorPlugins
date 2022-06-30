@@ -206,7 +206,7 @@ void CDataManager::Update()
             // todo: play sound and or meaasge to inform user
 
             dm::state_data.completed_loops += 1;
-            if (dm::state_data.completed_loops >= m_config.max_loops)
+            if (!m_config.auto_loop || dm::state_data.completed_loops >= m_config.max_loops)
             {
                 StopPomodoroTimer();
                 return;
