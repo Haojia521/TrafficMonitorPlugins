@@ -139,7 +139,7 @@ void CDataManager::SkipCurrentPomodoroTimerState()
         m_pt_state = EPomodoroTimerState::PTS_IN_WORK;
 
         dm::state_data.completed_loops += 1;
-        if (dm::state_data.completed_loops >= m_config.max_loops)
+        if (!m_config.auto_loop || dm::state_data.completed_loops >= m_config.max_loops)
         {
             StopPomodoroTimer();
             return;
