@@ -1,21 +1,91 @@
 ﻿#include "pch.h"
 #include "Item.h"
 #include "Data.h"
+#include "PomodoroTimer.h"
+
+#include <string>
+#include <map>
 
 namespace item
 {
-    HICON _logo = nullptr;
-
-    HICON get_logo()
+    class LogoHelper
     {
-        if (_logo == nullptr)
+    public:
+        LogoHelper()
         {
-            AFX_MANAGE_STATE(AfxGetStaticModuleState());
-            _logo = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_LOGO), IMAGE_ICON,
-                CDataManager::Instance().DPI(16), CDataManager::Instance().DPI(16), 0);
+            size = CDataManager::Instance().DPI(16);
         }
 
-        return _logo;
+        HICON get_logo()
+        {
+            auto &dm = CDataManager::Instance();
+
+            if (dm.GetProgramState() == EProgramState::PS_STOPPED)
+                return _get_logo_by_id(IDI_ICON_LOGO_STOP);
+            else
+            {
+                if (dm.GetPomodoroTimerState() == EPomodoroTimerState::PTS_IN_WORK)
+                    return _get_logo_by_id(IDI_ICON_LOGO);
+                else
+                    return _get_logo_by_id(IDI_ICON_LOGO_BREAK);
+            }
+        }
+
+    private:
+        HICON _get_logo_by_id(int id)
+        {
+            if (_icon_map.count(id) == 0)
+            {
+                AFX_MANAGE_STATE(AfxGetStaticModuleState());
+                _icon_map[id] = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(id), IMAGE_ICON, size, size, 0);
+            }
+
+            return _icon_map[id];
+        }
+
+        int size;
+        std::map<int, HICON> _icon_map;
+    };
+
+    LogoHelper logo_helper;
+
+    std::wstring get_label_text()
+    {
+        auto &data_manager = CDataManager::Instance();
+        auto prog_state = data_manager.GetProgramState();
+        auto pt_state = data_manager.GetPomodoroTimerState();
+        const auto &cfg = data_manager.GetConfig();
+
+        if (prog_state == EProgramState::PS_RUNNING)
+        {
+            auto t = data_manager.GetRemaningTime();
+            std::wstring str;
+
+            if (!cfg.show_logo)
+            {
+                if (pt_state == EPomodoroTimerState::PTS_IN_WORK)
+                    str += L"工作中 ";
+                else
+                    str += L"休息中 ";
+            }
+
+            int target_time = 0;
+            if (pt_state == EPomodoroTimerState::PTS_IN_WORK)
+                target_time = cfg.working_time_span;
+            else
+                target_time = cfg.break_time_span;
+
+            int m = t / 60;
+            if (t != target_time)
+                m += 1;
+
+            str += std::to_wstring(m) + L"分钟";
+            return str;
+        }
+        else if (prog_state == EProgramState::PS_PAUSED)
+            return L"暂停";
+        else
+            return L"未启动";
     }
 }
 
@@ -42,7 +112,10 @@ const wchar_t* CPtItem::GetItemValueText() const
 
 const wchar_t* CPtItem::GetItemValueSampleText() const
 {
-    return L"工作中 (25min)";
+    if (CDataManager::Instance().GetConfig().show_logo)
+        return L"25分钟";
+    else
+        return L"工作中 25分钟";
 }
 
 bool CPtItem::IsCustomDraw() const
@@ -69,7 +142,7 @@ void CPtItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_mode)
     if (CDataManager::Instance().GetConfig().show_logo)
     {
         auto icon_size = CDataManager::Instance().DPI(16);
-        auto logo_icon = item::get_logo();
+        auto logo_icon = item::logo_helper.get_logo();
 
         CPoint icon_pos{ rect.TopLeft() };
         icon_pos.x += CDataManager::Instance().DPI(2);
@@ -80,15 +153,15 @@ void CPtItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_mode)
     }
 
     // todo: get real state text from data manager
-    pDC->DrawText(GetItemValueSampleText(), rect, DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+    pDC->DrawText(item::get_label_text().c_str(), rect, DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 }
 
 int CPtItem::OnMouseEvent(MouseEventType type, int x, int y, void* hWnd, int flag)
 {
-    // todo: show menu
     CWnd* pWnd = CWnd::FromHandle((HWND)hWnd);
     if (type == IPluginItem::MT_RCLICKED)
     {
+        CPomodoroTimer::Instance().ShowContextMenu(pWnd);
         return 1;
     }
 
