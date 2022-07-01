@@ -60,9 +60,9 @@ const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
     switch (index)
     {
     case TMI_NAME:
-        return L"PomodoroTimer";
+        return CDataManager::Instance().StringRes(IDS_PLUGIN_NAME);
     case TMI_DESCRIPTION:
-        return L"A pomodoro timer plugin of TrafficMonitor";
+        return CDataManager::Instance().StringRes(IDS_PLUGIN_DESCRIPTION);
     case TMI_AUTHOR:
         return L"Haojia521";
     case TMI_COPYRIGHT:

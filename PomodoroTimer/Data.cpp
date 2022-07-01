@@ -113,6 +113,17 @@ int CDataManager::RDPI(int pixel)
     return pixel * 96 / m_dpi;
 }
 
+const CString& CDataManager::StringRes(UINT id)
+{
+    if (m_string_res_map.count(id) == 0)
+    {
+        AFX_MANAGE_STATE(AfxGetStaticModuleState());
+        m_string_res_map[id].LoadString(id);
+    }
+
+    return m_string_res_map[id];
+}
+
 SConfig& CDataManager::GetConfig()
 {
     return m_config;
@@ -277,7 +288,7 @@ void CDataManager::Update()
             dm::state_data.m_running_time = 0;
             m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
 
-            if (m_config.play_sound) PlaySound(m_config.sound_id);
+            if (m_config.play_sound) PlaySoundById(m_config.sound_id);
         }
     }
     else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
@@ -287,7 +298,7 @@ void CDataManager::Update()
             dm::state_data.m_running_time = 0;
             m_pt_state = EPomodoroTimerState::PTS_IN_WORK;
 
-            if (m_config.play_sound) PlaySound(m_config.sound_id);
+            if (m_config.play_sound) PlaySoundById(m_config.sound_id);
 
             dm::state_data.completed_loops += 1;
             if (!m_config.auto_loop || dm::state_data.completed_loops >= m_config.max_loops)
@@ -301,7 +312,7 @@ void CDataManager::Update()
     dm::state_data.m_last_update_timestamp = t;
 }
 
-void CDataManager::PlaySound(int id) const
+void CDataManager::PlaySoundById(int id) const
 {
     dm::play_sound(id);
 }

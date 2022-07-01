@@ -64,9 +64,9 @@ namespace item
             if (!cfg.show_logo)
             {
                 if (pt_state == EPomodoroTimerState::PTS_IN_WORK)
-                    str += L"工作中 ";
+                    str += data_manager.StringRes(IDS_PTS_WORK).GetString();
                 else
-                    str += L"休息中 ";
+                    str += data_manager.StringRes(IDS_PTS_BREAK).GetString();
             }
 
             int target_time = 0;
@@ -79,13 +79,13 @@ namespace item
             if (t != target_time)
                 m += 1;
 
-            str += std::to_wstring(m) + L"分钟";
+            str += std::to_wstring(m) + data_manager.StringRes(IDS_MINUTE).GetString();
             return str;
         }
         else if (prog_state == EProgramState::PS_PAUSED)
-            return L"暂停";
+            return data_manager.StringRes(IDS_PS_PAUSE).GetString();
         else
-            return L"未启动";
+            return data_manager.StringRes(IDS_PS_STOP).GetString();
     }
 }
 
@@ -135,7 +135,6 @@ int CPtItem::GetItemWidthEx(void* hDC) const
 
 void CPtItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_mode)
 {
-    // todo
     CDC* pDC = CDC::FromHandle((HDC)hDC);
 
     CRect rect(CPoint(x, y), CSize(w, h));
@@ -152,7 +151,6 @@ void CPtItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_mode)
         rect.left += CDataManager::Instance().DPI(20);
     }
 
-    // todo: get real state text from data manager
     pDC->DrawText(item::get_label_text().c_str(), rect, DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 }
 

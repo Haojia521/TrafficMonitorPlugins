@@ -105,11 +105,15 @@ void COptionsDlg::EnableControlsAboutSound(BOOL enable /* = TRUE */)
 
 void COptionsDlg::OnOK()
 {
+	auto &data_manager = CDataManager::Instance();
+
 	// cannot update options if timer is still running
-	if (CDataManager::Instance().GetProgramState() != EProgramState::PS_STOPPED)
+	if (data_manager.GetProgramState() != EProgramState::PS_STOPPED)
 	{
 		// todo: use string resources
-		MessageBox(L"番茄钟正在运行，无法保存设置", L"选项");
+		MessageBox(data_manager.StringRes(IDS_OPT_DLG_CANNOT_SAVE),
+			data_manager.StringRes(IDS_OPT_DLG_TITLE),
+			MB_OK | MB_ICONERROR);
 		return;
 	}
 
@@ -150,5 +154,5 @@ void COptionsDlg::OnBnClickedCheckPlaySound()
 
 void COptionsDlg::OnBnClickedBtnSoundTest()
 {
-	CDataManager::Instance().PlaySound(m_ctrlSoundList.GetCurSel());
+	CDataManager::Instance().PlaySoundById(m_ctrlSoundList.GetCurSel());
 }

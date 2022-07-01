@@ -2,6 +2,7 @@
 
 #include "Resource.h"
 #include <string>
+#include <map>
 
 struct SConfig
 {
@@ -40,6 +41,8 @@ public:
     float DPIF(float pixel);
     int RDPI(int pixel);
 
+    const CString& StringRes(UINT id);
+
     SConfig& GetConfig();
     void LoadConfig(const std::wstring &cfg_dir);
     void SaveConfig() const;
@@ -57,9 +60,9 @@ public:
 
     void Update();
 
-    void PlaySound(int id) const;
-private:
+    void PlaySoundById(int id) const;
 
+private:
     static CDataManager m_instance;
 
     int m_dpi;
@@ -69,4 +72,6 @@ private:
     EPomodoroTimerState m_pt_state;
 
     std::wstring m_config_file_path;
+
+    std::map<UINT, CString> m_string_res_map;
 };
