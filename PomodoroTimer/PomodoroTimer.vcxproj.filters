@@ -93,4 +93,15 @@
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\Alarm02.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="res\Alarm05.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="res\Alarm06.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+  </ItemGroup>
 </Project>

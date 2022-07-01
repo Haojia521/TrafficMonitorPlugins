@@ -11,6 +11,7 @@ struct SConfig
     bool auto_loop{ false };
     int max_loops{ 3 };
 
+    bool play_sound{ true };
     int sound_id{ 0 };
 
     bool show_logo{ true };
@@ -55,6 +56,8 @@ public:
     int GetRemaningTime() const;
 
     void Update();
+
+    void PlaySound(int id) const;
 private:
 
     static CDataManager m_instance;

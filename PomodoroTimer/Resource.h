@@ -15,6 +15,13 @@
 #define IDC_EDIT_NUM_LOOPS              1005
 #define IDC_SPIN3                       1006
 #define IDC_SPIN_NUM_LOOPS              1006
+#define IDR_WAVE1                       1006
+#define IDR_WAVE2                       1007
+#define IDC_CHECK_PLAY_SOUND            1007
+#define IDR_WAVE3                       1008
+#define IDC_COMBO_SOUND_LIST            1008
+#define IDC_BUTTON1                     1009
+#define IDC_BTN_SOUND_TEST              1009
 #define ID_FUNC_32771                   32771
 #define ID_FUNC_32772                   32772
 #define ID_FUNC_32773                   32773
@@ -30,9 +37,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1006
+#define _APS_NEXT_RESOURCE_VALUE        1009
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1007
+#define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

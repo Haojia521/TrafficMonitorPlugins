@@ -55,6 +55,30 @@ namespace dm
     };
 
     UpdateThreadHelper thread_helper;
+
+    int get_sound_resource_id(int id)
+    {
+        switch (id)
+        {
+        default:
+        case 0:
+            return IDR_WAVE1;
+
+        case 1:
+            return IDR_WAVE2;
+
+        case 2:
+            return IDR_WAVE3;
+        }
+    }
+
+    void play_sound(int id)
+    {
+        auto sound_res_id = get_sound_resource_id(id);
+
+        AFX_MANAGE_STATE(AfxGetStaticModuleState());
+        PlaySound(MAKEINTRESOURCE(sound_res_id), AfxGetResourceHandle(), SND_ASYNC | SND_RESOURCE);
+    }
 }
 
 CDataManager CDataManager::m_instance;
@@ -126,7 +150,11 @@ void CDataManager::LoadConfig(const std::wstring &cfg_dir)
     if (num_loops > 10) num_loops = 10;
     m_config.max_loops = num_loops;
 
-    // todo: load other options
+    m_config.play_sound = cfg_bool_val_getter(L"config", L"play_sound", 1);
+
+    auto sound_id = cfg_int_val_getter(L"config", L"sound_id", 0);
+    if (sound_id < 0 || sound_id >= 3) sound_id = 0;
+    m_config.sound_id = sound_id;
 }
 
 void CDataManager::SaveConfig() const
@@ -146,8 +174,8 @@ void CDataManager::SaveConfig() const
     cfg_int_val_writter(L"config", L"timespan_break", m_config.break_time_span);
     cfg_bool_val_writter(L"config", L"auto_loop", m_config.auto_loop);
     cfg_int_val_writter(L"config", L"num_loops", m_config.max_loops);
-
-    // todo: save other options
+    cfg_bool_val_writter(L"config", L"play_sound", m_config.play_sound);
+    cfg_int_val_writter(L"config", L"sound_id", m_config.sound_id);
 }
 
 void CDataManager::StartPomodoroTimer()
@@ -249,7 +277,7 @@ void CDataManager::Update()
             dm::state_data.m_running_time = 0;
             m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
 
-            // todo: play sound and or meaasge to inform user
+            if (m_config.play_sound) PlaySound(m_config.sound_id);
         }
     }
     else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
@@ -259,7 +287,7 @@ void CDataManager::Update()
             dm::state_data.m_running_time = 0;
             m_pt_state = EPomodoroTimerState::PTS_IN_WORK;
 
-            // todo: play sound and or meaasge to inform user
+            if (m_config.play_sound) PlaySound(m_config.sound_id);
 
             dm::state_data.completed_loops += 1;
             if (!m_config.auto_loop || dm::state_data.completed_loops >= m_config.max_loops)
@@ -271,4 +299,9 @@ void CDataManager::Update()
     }
 
     dm::state_data.m_last_update_timestamp = t;
+}
+
+void CDataManager::PlaySound(int id) const
+{
+    dm::play_sound(id);
 }

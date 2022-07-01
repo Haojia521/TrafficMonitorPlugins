@@ -16,6 +16,7 @@ IMPLEMENT_DYNAMIC(COptionsDlg, CDialogEx)
 COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DLG_OPTIONS, pParent)
 	, m_boolAutoLoop(FALSE)
+	, m_boolPlaySound(FALSE)
 {
 
 }
@@ -31,11 +32,15 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN_TIME_SPAN_SHORT_BREAK, m_ctrlSpinTimeSpanShortBreak);
 	DDX_Control(pDX, IDC_SPIN_NUM_LOOPS, m_ctrlSpinNumLoops);
 	DDX_Check(pDX, IDC_CHECK_AUTO_LOOP, m_boolAutoLoop);
+	DDX_Check(pDX, IDC_CHECK_PLAY_SOUND, m_boolPlaySound);
+	DDX_Control(pDX, IDC_COMBO_SOUND_LIST, m_ctrlSoundList);
 }
 
 
 BEGIN_MESSAGE_MAP(COptionsDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_AUTO_LOOP, &COptionsDlg::OnBnClickedCheckAutoLoop)
+	ON_BN_CLICKED(IDC_CHECK_PLAY_SOUND, &COptionsDlg::OnBnClickedCheckPlaySound)
+	ON_BN_CLICKED(IDC_BTN_SOUND_TEST, &COptionsDlg::OnBnClickedBtnSoundTest)
 END_MESSAGE_MAP()
 
 
@@ -65,9 +70,19 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctrlSpinNumLoops.SetRange(1, 10);
 	m_ctrlSpinNumLoops.SetPos(cfg.max_loops);
 
-	// enable/disenable controls about loops
+	// enable/disable controls about loops
 	m_boolAutoLoop = cfg.auto_loop ? TRUE : FALSE;
-	EnableControlsAboutLoops(cfg.auto_loop ? TRUE : FALSE);
+	EnableControlsAboutLoops(m_boolAutoLoop);
+
+	// enable/disable controls about sound
+	m_boolPlaySound = cfg.play_sound ? TRUE : FALSE;
+	EnableControlsAboutSound(m_boolPlaySound);
+
+	// init sound list combobox
+	m_ctrlSoundList.AddString(L"Sound-1");
+	m_ctrlSoundList.AddString(L"Sound-2");
+	m_ctrlSoundList.AddString(L"Sound-3");
+	m_ctrlSoundList.SetCurSel(cfg.sound_id);
 
 	UpdateData(FALSE);
 
@@ -79,6 +94,12 @@ void COptionsDlg::EnableControlsAboutLoops(BOOL enable /* = TRUE */)
 {
     GetDlgItem(IDC_EDIT_NUM_LOOPS)->EnableWindow(enable);
     GetDlgItem(IDC_SPIN_NUM_LOOPS)->EnableWindow(enable);
+}
+
+void COptionsDlg::EnableControlsAboutSound(BOOL enable /* = TRUE */)
+{
+	GetDlgItem(IDC_COMBO_SOUND_LIST)->EnableWindow(enable);
+	GetDlgItem(IDC_BTN_SOUND_TEST)->EnableWindow(enable);
 }
 
 
@@ -102,8 +123,9 @@ void COptionsDlg::OnOK()
 	cfg.auto_loop = m_boolAutoLoop == TRUE;
 	cfg.max_loops = m_ctrlSpinNumLoops.GetPos();
 
-	// todo: update other options
-	
+	cfg.play_sound = m_boolPlaySound == TRUE;
+	cfg.sound_id = m_ctrlSoundList.GetCurSel();
+
 	CDataManager::Instance().SaveConfig();
 
 	CDialogEx::OnOK();
@@ -115,4 +137,18 @@ void COptionsDlg::OnBnClickedCheckAutoLoop()
 	UpdateData(TRUE);
 
 	EnableControlsAboutLoops(m_boolAutoLoop);
+}
+
+
+void COptionsDlg::OnBnClickedCheckPlaySound()
+{
+	UpdateData(TRUE);
+
+	EnableControlsAboutSound(m_boolPlaySound);
+}
+
+
+void COptionsDlg::OnBnClickedBtnSoundTest()
+{
+	CDataManager::Instance().PlaySound(m_ctrlSoundList.GetCurSel());
 }

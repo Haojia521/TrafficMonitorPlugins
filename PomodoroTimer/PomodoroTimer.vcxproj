@@ -106,6 +106,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>.\PomodoroTimer.def</ModuleDefinitionFile>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -176,6 +177,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>.\PomodoroTimer.def</ModuleDefinitionFile>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -220,6 +222,11 @@
     <Image Include="res\PT-logo-break.ico" />
     <Image Include="res\PT-logo-stop.ico" />
     <Image Include="res\PT-logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\Alarm02.wav" />
+    <Media Include="res\Alarm05.wav" />
+    <Media Include="res\Alarm06.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
