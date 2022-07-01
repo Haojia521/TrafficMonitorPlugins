@@ -71,7 +71,7 @@ const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
         return L"https://github.com/Haojia521/TrafficMonitorPlugins";
         break;
     case TMI_VERSION:
-        return L"0.1";
+        return L"1.0";
     default:
         break;
     }
