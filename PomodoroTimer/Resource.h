@@ -25,8 +25,13 @@
 #define IDS_PLUGIN_DESCRIPTION          1010
 #define IDC_CHECK1                      1010
 #define IDC_CHECK_AUTO_START            1010
+#define IDB_BITMAP_QR_ALIPAY            1010
 #define IDS_PS_RUNNING                  1011
+#define IDB_BITMAP_QR_WECHAT            1011
+#define IDC_BUTTON1                     1011
+#define IDC_BTN_DONATE                  1011
 #define IDS_PS_PAUSE                    1012
+#define IDD_DLG_DONATE                  1012
 #define IDS_PS_STOP                     1013
 #define IDS_PTS_WORK                    1014
 #define IDS_PTS_BREAK                   1015
@@ -48,9 +53,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1010
+#define _APS_NEXT_RESOURCE_VALUE        1014
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

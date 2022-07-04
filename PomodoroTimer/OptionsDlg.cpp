@@ -49,6 +49,7 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT_TIME_SPAN_WORK, &COptionsDlg::OnEnChangeEditTimeSpanWork)
 	ON_EN_CHANGE(IDC_EDIT_TIME_SPAN_SHORT_BREAK, &COptionsDlg::OnEnChangeEditTimeSpanShortBreak)
 	ON_EN_CHANGE(IDC_EDIT_NUM_LOOPS, &COptionsDlg::OnEnChangeEditNumLoops)
+	ON_BN_CLICKED(IDC_BTN_DONATE, &COptionsDlg::OnBnClickedBtnDonate)
 END_MESSAGE_MAP()
 
 
@@ -198,4 +199,11 @@ void COptionsDlg::OnEnChangeEditTimeSpanShortBreak()
 void COptionsDlg::OnEnChangeEditNumLoops()
 {
 	VerifyNumberEditValue(m_ctrlEditNumLoops, m_ctrlSpinNumLoops);
+}
+
+
+void COptionsDlg::OnBnClickedBtnDonate()
+{
+	CDialogEx dlg(IDD_DLG_DONATE, this);
+	dlg.DoModal();
 }

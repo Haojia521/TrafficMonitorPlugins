@@ -223,6 +223,8 @@
     <Image Include="res\PT-logo-break.ico" />
     <Image Include="res\PT-logo-stop.ico" />
     <Image Include="res\PT-logo.ico" />
+    <Image Include="res\QR_AliPay.bmp" />
+    <Image Include="res\QR_WeChat.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="res\Alarm02.wav" />

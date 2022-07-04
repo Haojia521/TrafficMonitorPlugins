@@ -35,6 +35,7 @@ public:
 	afx_msg void OnBnClickedCheckAutoLoop();
 	afx_msg void OnBnClickedCheckPlaySound();
 	afx_msg void OnBnClickedBtnSoundTest();
+	afx_msg void OnBnClickedBtnDonate();
 
 	CEdit m_ctrlEditTimeSpanWork;
 	CEdit m_ctrlEditTimeSpanShortBreak;
