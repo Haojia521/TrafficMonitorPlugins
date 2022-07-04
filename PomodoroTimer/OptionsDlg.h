@@ -24,13 +24,21 @@ protected:
 
 	void EnableControlsAboutLoops(BOOL enable = TRUE);
 	void EnableControlsAboutSound(BOOL enable = TRUE);
+
+	afx_msg void VerifyNumberEditValue(CEdit &edit, CSpinButtonCtrl &editBuddy);
 public:
 	virtual BOOL OnInitDialog();
     virtual void OnOK();
+	afx_msg void OnEnChangeEditTimeSpanWork();
+	afx_msg void OnEnChangeEditTimeSpanShortBreak();
+	afx_msg void OnEnChangeEditNumLoops();
 	afx_msg void OnBnClickedCheckAutoLoop();
 	afx_msg void OnBnClickedCheckPlaySound();
 	afx_msg void OnBnClickedBtnSoundTest();
 
+	CEdit m_ctrlEditTimeSpanWork;
+	CEdit m_ctrlEditTimeSpanShortBreak;
+	CEdit m_ctrlEditNumLoops;
 	CSpinButtonCtrl m_ctrlSpinTimeSpanWork;
 	CSpinButtonCtrl m_ctrlSpinTimeSpanShortBreak;
 	CSpinButtonCtrl m_ctrlSpinNumLoops;

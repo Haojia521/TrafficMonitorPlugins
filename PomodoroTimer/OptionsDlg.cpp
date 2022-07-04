@@ -34,6 +34,9 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_AUTO_LOOP, m_boolAutoLoop);
 	DDX_Check(pDX, IDC_CHECK_PLAY_SOUND, m_boolPlaySound);
 	DDX_Control(pDX, IDC_COMBO_SOUND_LIST, m_ctrlSoundList);
+	DDX_Control(pDX, IDC_EDIT_TIME_SPAN_WORK, m_ctrlEditTimeSpanWork);
+	DDX_Control(pDX, IDC_EDIT_TIME_SPAN_SHORT_BREAK, m_ctrlEditTimeSpanShortBreak);
+	DDX_Control(pDX, IDC_EDIT_NUM_LOOPS, m_ctrlEditNumLoops);
 }
 
 
@@ -41,6 +44,9 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_AUTO_LOOP, &COptionsDlg::OnBnClickedCheckAutoLoop)
 	ON_BN_CLICKED(IDC_CHECK_PLAY_SOUND, &COptionsDlg::OnBnClickedCheckPlaySound)
 	ON_BN_CLICKED(IDC_BTN_SOUND_TEST, &COptionsDlg::OnBnClickedBtnSoundTest)
+	ON_EN_CHANGE(IDC_EDIT_TIME_SPAN_WORK, &COptionsDlg::OnEnChangeEditTimeSpanWork)
+	ON_EN_CHANGE(IDC_EDIT_TIME_SPAN_SHORT_BREAK, &COptionsDlg::OnEnChangeEditTimeSpanShortBreak)
+	ON_EN_CHANGE(IDC_EDIT_NUM_LOOPS, &COptionsDlg::OnEnChangeEditNumLoops)
 END_MESSAGE_MAP()
 
 
@@ -110,7 +116,6 @@ void COptionsDlg::OnOK()
 	// cannot update options if timer is still running
 	if (data_manager.GetProgramState() != EProgramState::PS_STOPPED)
 	{
-		// todo: use string resources
 		MessageBox(data_manager.StringRes(IDS_OPT_DLG_CANNOT_SAVE),
 			data_manager.StringRes(IDS_OPT_DLG_TITLE),
 			MB_OK | MB_ICONERROR);
@@ -155,4 +160,35 @@ void COptionsDlg::OnBnClickedCheckPlaySound()
 void COptionsDlg::OnBnClickedBtnSoundTest()
 {
 	CDataManager::Instance().PlaySoundById(m_ctrlSoundList.GetCurSel());
+}
+
+
+void COptionsDlg::VerifyNumberEditValue(CEdit &edit, CSpinButtonCtrl &editBuddy)
+{
+    BOOL err{ FALSE };
+    auto pos = editBuddy.GetPos32(&err);
+
+	if (err)
+	{
+		editBuddy.SetPos(pos);
+		edit.SetSel(0, -1);
+	}
+}
+
+
+void COptionsDlg::OnEnChangeEditTimeSpanWork()
+{
+	VerifyNumberEditValue(m_ctrlEditTimeSpanWork, m_ctrlSpinTimeSpanWork);
+}
+
+
+void COptionsDlg::OnEnChangeEditTimeSpanShortBreak()
+{
+	VerifyNumberEditValue(m_ctrlEditTimeSpanShortBreak, m_ctrlSpinTimeSpanShortBreak);
+}
+
+
+void COptionsDlg::OnEnChangeEditNumLoops()
+{
+	VerifyNumberEditValue(m_ctrlEditNumLoops, m_ctrlSpinNumLoops);
 }
