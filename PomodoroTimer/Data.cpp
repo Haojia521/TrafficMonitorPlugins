@@ -156,9 +156,9 @@ void CDataManager::LoadConfig(const std::wstring &cfg_dir)
 
     m_config.auto_loop = cfg_bool_val_getter(L"config", L"auto_loop", 0);
 
-    auto num_loops = cfg_int_val_getter(L"config", L"num_loops", 3);
-    if (num_loops < 1) num_loops = 1;
-    if (num_loops > 10) num_loops = 10;
+    auto num_loops = cfg_int_val_getter(L"config", L"num_loops", 4);
+    if (num_loops < 0) num_loops = 0;
+    if (num_loops > 100) num_loops = 100;
     m_config.max_loops = num_loops;
 
     m_config.play_sound = cfg_bool_val_getter(L"config", L"play_sound", 1);
@@ -233,12 +233,7 @@ void CDataManager::SkipCurrentPomodoroTimerState()
     {
         m_pt_state = EPomodoroTimerState::PTS_IN_WORK;
 
-        dm::state_data.completed_loops += 1;
-        if (!m_config.auto_loop || dm::state_data.completed_loops >= m_config.max_loops)
-        {
-            StopPomodoroTimer();
-            return;
-        }
+        if (!NextLoop()) return;
     }
 
     if (m_program_state == EProgramState::PS_PAUSED)
@@ -300,12 +295,7 @@ void CDataManager::Update()
 
             if (m_config.play_sound) PlaySoundById(m_config.sound_id);
 
-            dm::state_data.completed_loops += 1;
-            if (!m_config.auto_loop || dm::state_data.completed_loops >= m_config.max_loops)
-            {
-                StopPomodoroTimer();
-                return;
-            }
+            if (!NextLoop()) return;
         }
     }
 
@@ -315,4 +305,19 @@ void CDataManager::Update()
 void CDataManager::PlaySoundById(int id) const
 {
     dm::play_sound(id);
+}
+
+// go to next loop.
+// return true if the timer will continue running into next loop, otherwise false.
+bool CDataManager::NextLoop()
+{
+    dm::state_data.completed_loops += 1;
+    if (!m_config.auto_loop ||
+        (m_config.max_loops > 0 && dm::state_data.completed_loops >= m_config.max_loops))
+    {
+        StopPomodoroTimer();
+        return false;
+    }
+
+    return true;
 }

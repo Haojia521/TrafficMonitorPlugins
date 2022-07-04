@@ -63,6 +63,8 @@ public:
     void PlaySoundById(int id) const;
 
 private:
+    bool NextLoop();
+
     static CDataManager m_instance;
 
     int m_dpi;

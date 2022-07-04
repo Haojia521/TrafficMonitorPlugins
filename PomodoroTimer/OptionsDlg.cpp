@@ -73,7 +73,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctrlSpinTimeSpanShortBreak.SetRange(1, 240);
 	m_ctrlSpinTimeSpanShortBreak.SetPos(time_span_short_break);
 
-	m_ctrlSpinNumLoops.SetRange(1, 10);
+	m_ctrlSpinNumLoops.SetRange(0, 100);
 	m_ctrlSpinNumLoops.SetPos(cfg.max_loops);
 
 	// enable/disable controls about loops
