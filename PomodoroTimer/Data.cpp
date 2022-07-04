@@ -154,6 +154,8 @@ void CDataManager::LoadConfig(const std::wstring &cfg_dir)
     if (timespan_break < 60) timespan_break = 60;
     m_config.break_time_span = timespan_break / 60 * 60;
 
+    m_config.auto_start = cfg_bool_val_getter(L"config", L"auto_start", 0);
+
     m_config.auto_loop = cfg_bool_val_getter(L"config", L"auto_loop", 0);
 
     auto num_loops = cfg_int_val_getter(L"config", L"num_loops", 4);
@@ -183,6 +185,7 @@ void CDataManager::SaveConfig() const
 
     cfg_int_val_writter(L"config", L"timespan_work", m_config.working_time_span);
     cfg_int_val_writter(L"config", L"timespan_break", m_config.break_time_span);
+    cfg_bool_val_writter(L"config", L"auto_start", m_config.auto_start);
     cfg_bool_val_writter(L"config", L"auto_loop", m_config.auto_loop);
     cfg_int_val_writter(L"config", L"num_loops", m_config.max_loops);
     cfg_bool_val_writter(L"config", L"play_sound", m_config.play_sound);

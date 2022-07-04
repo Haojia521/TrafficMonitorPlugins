@@ -17,6 +17,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DLG_OPTIONS, pParent)
 	, m_boolAutoLoop(FALSE)
 	, m_boolPlaySound(FALSE)
+	, m_boolAutoStart(FALSE)
 {
 
 }
@@ -37,6 +38,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_TIME_SPAN_WORK, m_ctrlEditTimeSpanWork);
 	DDX_Control(pDX, IDC_EDIT_TIME_SPAN_SHORT_BREAK, m_ctrlEditTimeSpanShortBreak);
 	DDX_Control(pDX, IDC_EDIT_NUM_LOOPS, m_ctrlEditNumLoops);
+	DDX_Check(pDX, IDC_CHECK_AUTO_START, m_boolAutoStart);
 }
 
 
@@ -75,6 +77,9 @@ BOOL COptionsDlg::OnInitDialog()
 
 	m_ctrlSpinNumLoops.SetRange(0, 100);
 	m_ctrlSpinNumLoops.SetPos(cfg.max_loops);
+
+	// init checkbox about auto start
+	m_boolAutoStart = cfg.auto_start ? TRUE : FALSE;
 
 	// enable/disable controls about loops
 	m_boolAutoLoop = cfg.auto_loop ? TRUE : FALSE;
@@ -128,6 +133,8 @@ void COptionsDlg::OnOK()
 
 	cfg.working_time_span = m_ctrlSpinTimeSpanWork.GetPos() * 60;
 	cfg.break_time_span = m_ctrlSpinTimeSpanShortBreak.GetPos() * 60;
+
+	cfg.auto_start = m_boolAutoStart == TRUE;
 
 	cfg.auto_loop = m_boolAutoLoop == TRUE;
 	cfg.max_loops = m_ctrlSpinNumLoops.GetPos();

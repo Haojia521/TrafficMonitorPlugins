@@ -9,6 +9,8 @@ struct SConfig
     int working_time_span{ 1500 };  // in seconds
     int break_time_span{ 300 };     // in seconds
 
+    bool auto_start{ false };
+
     bool auto_loop{ false };
     int max_loops{ 3 };
 

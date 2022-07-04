@@ -43,6 +43,7 @@ public:
 	CSpinButtonCtrl m_ctrlSpinTimeSpanShortBreak;
 	CSpinButtonCtrl m_ctrlSpinNumLoops;
 	CComboBox m_ctrlSoundList;
+	BOOL m_boolAutoStart;
 	BOOL m_boolAutoLoop;
 	BOOL m_boolPlaySound;
 };

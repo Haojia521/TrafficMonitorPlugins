@@ -83,8 +83,15 @@ void CPomodoroTimer::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data)
     switch (index)
     {
     case ITMPlugin::EI_CONFIG_DIR:
+    {
+        auto &data_manager = CDataManager::Instance();
         // 从配置文件读取配置
-        CDataManager::Instance().LoadConfig(data);
+        data_manager.LoadConfig(data);
+
+        // start timer if option 'auto_star' is true
+        if (data_manager.GetConfig().auto_start)
+            data_manager.StartPomodoroTimer();
+    }
         break;
     default:
         break;
