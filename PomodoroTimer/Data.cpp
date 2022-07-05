@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Data.h"
 
 #include <ctime>
@@ -186,7 +186,7 @@ void CDataManager::SaveConfig() const
     cfg_int_val_writter(L"config", L"timespan_work", m_config.working_time_span);
     cfg_int_val_writter(L"config", L"timespan_break", m_config.break_time_span);
     cfg_bool_val_writter(L"config", L"auto_start", m_config.auto_start);
-    cfg_bool_val_writter(L"config", L"show_tim_seconds", m_config.show_time_seconds);
+    cfg_bool_val_writter(L"config", L"show_time_seconds", m_config.show_time_seconds);
     cfg_bool_val_writter(L"config", L"auto_loop", m_config.auto_loop);
     cfg_int_val_writter(L"config", L"num_loops", m_config.max_loops);
     cfg_bool_val_writter(L"config", L"play_sound", m_config.play_sound);
