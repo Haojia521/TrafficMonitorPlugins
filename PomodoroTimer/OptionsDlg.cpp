@@ -18,6 +18,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	, m_boolAutoLoop(FALSE)
 	, m_boolPlaySound(FALSE)
 	, m_boolAutoStart(FALSE)
+	, m_boolShowSeconds(FALSE)
 {
 
 }
@@ -39,6 +40,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_TIME_SPAN_SHORT_BREAK, m_ctrlEditTimeSpanShortBreak);
 	DDX_Control(pDX, IDC_EDIT_NUM_LOOPS, m_ctrlEditNumLoops);
 	DDX_Check(pDX, IDC_CHECK_AUTO_START, m_boolAutoStart);
+	DDX_Check(pDX, IDC_CHECK_SHOW_SECONDS, m_boolShowSeconds);
 }
 
 
@@ -79,15 +81,16 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctrlSpinNumLoops.SetRange(0, 100);
 	m_ctrlSpinNumLoops.SetPos(cfg.max_loops);
 
-	// init checkbox about auto start
+	// init checkboxs
 	m_boolAutoStart = cfg.auto_start ? TRUE : FALSE;
+	m_boolShowSeconds = cfg.show_time_seconds ? TRUE : FALSE;
+	m_boolAutoLoop = cfg.auto_loop ? TRUE : FALSE;
+	m_boolPlaySound = cfg.play_sound ? TRUE : FALSE;
 
 	// enable/disable controls about loops
-	m_boolAutoLoop = cfg.auto_loop ? TRUE : FALSE;
 	EnableControlsAboutLoops(m_boolAutoLoop);
 
 	// enable/disable controls about sound
-	m_boolPlaySound = cfg.play_sound ? TRUE : FALSE;
 	EnableControlsAboutSound(m_boolPlaySound);
 
 	// init sound list combobox
@@ -142,6 +145,8 @@ void COptionsDlg::OnOK()
 
 	cfg.play_sound = m_boolPlaySound == TRUE;
 	cfg.sound_id = m_ctrlSoundList.GetCurSel();
+
+	cfg.show_time_seconds = m_boolShowSeconds == TRUE;
 
 	CDataManager::Instance().SaveConfig();
 

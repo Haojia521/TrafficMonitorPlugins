@@ -47,4 +47,5 @@ public:
 	BOOL m_boolAutoStart;
 	BOOL m_boolAutoLoop;
 	BOOL m_boolPlaySound;
+	BOOL m_boolShowSeconds;
 };

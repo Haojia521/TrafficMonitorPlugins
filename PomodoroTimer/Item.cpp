@@ -69,17 +69,30 @@ namespace item
                     str += data_manager.StringRes(IDS_PTS_BREAK).GetString();
             }
 
-            int target_time = 0;
-            if (pt_state == EPomodoroTimerState::PTS_IN_WORK)
-                target_time = cfg.working_time_span;
+            if (!cfg.show_time_seconds)
+            {
+                int target_time = 0;
+                if (pt_state == EPomodoroTimerState::PTS_IN_WORK)
+                    target_time = cfg.working_time_span;
+                else
+                    target_time = cfg.break_time_span;
+
+                int m = t / 60;
+                if (t != target_time)
+                    m += 1;
+
+                str += std::to_wstring(m) + data_manager.StringRes(IDS_MINUTE).GetString();
+            }
             else
-                target_time = cfg.break_time_span;
+            {
+                int m = t / 60;
+                int s = t % 60;
 
-            int m = t / 60;
-            if (t != target_time)
-                m += 1;
+                wchar_t buffer[10]{ 0 };
+                swprintf_s(buffer, L"%02d:%02d", m, s);
 
-            str += std::to_wstring(m) + data_manager.StringRes(IDS_MINUTE).GetString();
+                str += buffer;
+            }
             return str;
         }
         else if (prog_state == EProgramState::PS_PAUSED)
@@ -91,8 +104,7 @@ namespace item
 
 const wchar_t* CPtItem::GetItemName() const
 {
-    // todo: use string resource
-    return L"PomodoroTimer";
+    return CDataManager::Instance().StringRes(IDS_PLUGIN_NAME).GetString();
 }
 
 const wchar_t* CPtItem::GetItemId() const
@@ -112,10 +124,22 @@ const wchar_t* CPtItem::GetItemValueText() const
 
 const wchar_t* CPtItem::GetItemValueSampleText() const
 {
-    if (CDataManager::Instance().GetConfig().show_logo)
-        return L"25分钟";
+    const auto &cfg = CDataManager::Instance().GetConfig();
+
+    if (cfg.show_logo)
+    {
+        if (cfg.show_time_seconds)
+            return L"000:00";
+        else
+            return L"25分钟";
+    }
     else
-        return L"工作中 25分钟";
+    {
+        if (cfg.show_time_seconds)
+            return L"工作中 000:00";
+        else
+            return L"工作中 25分钟";
+    }
 }
 
 bool CPtItem::IsCustomDraw() const

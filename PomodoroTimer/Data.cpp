@@ -25,9 +25,7 @@ namespace dm
         {
             data_madager.Update();
 
-            // 对齐时间，使下次更新时所使用的时间是10的倍数
-            auto sleep_time = 10 - state_data.m_running_time % 10;
-            std::this_thread::sleep_for(std::chrono::seconds(sleep_time));
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 
@@ -156,6 +154,8 @@ void CDataManager::LoadConfig(const std::wstring &cfg_dir)
 
     m_config.auto_start = cfg_bool_val_getter(L"config", L"auto_start", 0);
 
+    m_config.show_time_seconds = cfg_bool_val_getter(L"config", L"show_time_seconds", 0);
+
     m_config.auto_loop = cfg_bool_val_getter(L"config", L"auto_loop", 0);
 
     auto num_loops = cfg_int_val_getter(L"config", L"num_loops", 4);
@@ -186,6 +186,7 @@ void CDataManager::SaveConfig() const
     cfg_int_val_writter(L"config", L"timespan_work", m_config.working_time_span);
     cfg_int_val_writter(L"config", L"timespan_break", m_config.break_time_span);
     cfg_bool_val_writter(L"config", L"auto_start", m_config.auto_start);
+    cfg_bool_val_writter(L"config", L"show_tim_seconds", m_config.show_time_seconds);
     cfg_bool_val_writter(L"config", L"auto_loop", m_config.auto_loop);
     cfg_int_val_writter(L"config", L"num_loops", m_config.max_loops);
     cfg_bool_val_writter(L"config", L"play_sound", m_config.play_sound);
@@ -258,12 +259,16 @@ int CDataManager::GetRemaningTime() const
     if (m_program_state != EProgramState::PS_RUNNING)
         return 0;
 
+    std::time_t time_span = 0;
+
     if (m_pt_state == EPomodoroTimerState::PTS_IN_WORK)
-        return static_cast<int>(m_config.working_time_span - dm::state_data.m_running_time);
+        time_span = m_config.working_time_span;
     else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
-        return static_cast<int>(m_config.break_time_span - dm::state_data.m_running_time);
-    else
-        return 0;
+        time_span = m_config.break_time_span;
+
+    if (time_span >= dm::state_data.m_running_time)
+        return static_cast<int>(time_span - dm::state_data.m_running_time);
+    else return 0;
 }
 
 void CDataManager::Update()

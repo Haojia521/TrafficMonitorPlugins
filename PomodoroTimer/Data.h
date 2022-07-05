@@ -14,6 +14,8 @@ struct SConfig
     bool auto_loop{ false };
     int max_loops{ 3 };
 
+    bool show_time_seconds{ false };
+
     bool play_sound{ true };
     int sound_id{ 0 };
 
