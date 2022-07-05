@@ -31,7 +31,6 @@
 #define IDC_BTN_DONATE                  1011
 #define IDS_PS_PAUSE                    1012
 #define IDD_DLG_DONATE                  1012
-#define IDC_CHECK2                      1012
 #define IDC_CHECK_SHOW_SECONDS          1012
 #define IDS_PS_STOP                     1013
 #define IDS_PTS_WORK                    1014
@@ -39,6 +38,7 @@
 #define IDS_MINUTE                      1016
 #define IDS_OPT_DLG_TITLE               1017
 #define IDS_OPT_DLG_CANNOT_SAVE         1018
+#define IDS_OPT_DLG_SAVING_WARN         1019
 #define ID_FUNC_32771                   32771
 #define ID_FUNC_32772                   32772
 #define ID_FUNC_32773                   32773

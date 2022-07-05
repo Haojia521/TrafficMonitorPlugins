@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Data.h"
 
 #include <ctime>
@@ -11,6 +11,7 @@ namespace dm
     {
         std::time_t m_last_update_timestamp{ 0 };
         std::time_t m_running_time{ 0 };
+        std::time_t m_target_time_span{ 0 };
 
         int completed_loops{ 0 };
     };
@@ -199,6 +200,9 @@ void CDataManager::StartPomodoroTimer()
 
     dm::state_data.m_last_update_timestamp = std::time(nullptr);
 
+    if (dm::state_data.m_target_time_span == 0)
+        dm::state_data.m_target_time_span = m_config.working_time_span;
+
     dm::thread_helper.start();
 }
 
@@ -216,6 +220,7 @@ void CDataManager::StopPomodoroTimer()
 
     dm::state_data.m_running_time = 0;
     dm::state_data.completed_loops = 0;
+    dm::state_data.m_target_time_span = 0;
 
     dm::thread_helper.stop();
 }
@@ -232,10 +237,12 @@ void CDataManager::SkipCurrentPomodoroTimerState()
     if (m_pt_state == EPomodoroTimerState::PTS_IN_WORK)
     {
         m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
+        dm::state_data.m_target_time_span = m_config.break_time_span;
     }
     else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
     {
         m_pt_state = EPomodoroTimerState::PTS_IN_WORK;
+        dm::state_data.m_target_time_span = m_config.working_time_span;
 
         if (!NextLoop()) return;
     }
@@ -259,16 +266,21 @@ int CDataManager::GetRemaningTime() const
     if (m_program_state != EProgramState::PS_RUNNING)
         return 0;
 
-    std::time_t time_span = 0;
+    //std::time_t time_span = 0;
 
-    if (m_pt_state == EPomodoroTimerState::PTS_IN_WORK)
-        time_span = m_config.working_time_span;
-    else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
-        time_span = m_config.break_time_span;
+    //if (m_pt_state == EPomodoroTimerState::PTS_IN_WORK)
+    //    time_span = m_config.working_time_span;
+    //else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
+    //    time_span = m_config.break_time_span;
 
-    if (time_span >= dm::state_data.m_running_time)
-        return static_cast<int>(time_span - dm::state_data.m_running_time);
-    else return 0;
+    //if (time_span >= dm::state_data.m_running_time)
+    //    return static_cast<int>(time_span - dm::state_data.m_running_time);
+    //else return 0;
+
+    if (dm::state_data.m_target_time_span >= dm::state_data.m_running_time)
+        return static_cast<int>(dm::state_data.m_target_time_span - dm::state_data.m_running_time);
+    else
+        return 0;
 }
 
 void CDataManager::Update()
@@ -286,9 +298,10 @@ void CDataManager::Update()
 
     if (m_pt_state == EPomodoroTimerState::PTS_IN_WORK)
     {
-        if (dm::state_data.m_running_time >= m_config.working_time_span)
+        if (dm::state_data.m_running_time >= dm::state_data.m_target_time_span)
         {
             dm::state_data.m_running_time = 0;
+            dm::state_data.m_target_time_span = m_config.break_time_span;
             m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
 
             if (m_config.play_sound) PlaySoundById(m_config.sound_id);
@@ -296,9 +309,10 @@ void CDataManager::Update()
     }
     else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
     {
-        if (dm::state_data.m_running_time >= m_config.break_time_span)
+        if (dm::state_data.m_running_time >= dm::state_data.m_target_time_span)
         {
             dm::state_data.m_running_time = 0;
+            dm::state_data.m_target_time_span = m_config.working_time_span;
             m_pt_state = EPomodoroTimerState::PTS_IN_WORK;
 
             if (m_config.play_sound) PlaySoundById(m_config.sound_id);

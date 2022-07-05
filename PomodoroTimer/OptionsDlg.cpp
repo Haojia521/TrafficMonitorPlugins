@@ -122,18 +122,20 @@ void COptionsDlg::OnOK()
 {
 	auto &data_manager = CDataManager::Instance();
 
-	// cannot update options if timer is still running
+	auto &cfg = CDataManager::Instance().GetConfig();
+
+	// inform user thar time settings will effect in next state if timer is still running
 	if (data_manager.GetProgramState() != EProgramState::PS_STOPPED)
 	{
-		MessageBox(data_manager.StringRes(IDS_OPT_DLG_CANNOT_SAVE),
-			data_manager.StringRes(IDS_OPT_DLG_TITLE),
-			MB_OK | MB_ICONERROR);
-		return;
+		bool time_changed = (cfg.working_time_span != m_ctrlSpinTimeSpanWork.GetPos() * 60) ||
+			(cfg.break_time_span != m_ctrlSpinTimeSpanShortBreak.GetPos() * 60);
+
+		if (time_changed)
+			MessageBox(data_manager.StringRes(IDS_OPT_DLG_SAVING_WARN),
+				data_manager.StringRes(IDS_OPT_DLG_TITLE), MB_OK | MB_ICONWARNING);
 	}
 
 	UpdateData(TRUE);
-
-	auto &cfg = CDataManager::Instance().GetConfig();
 
 	cfg.working_time_span = m_ctrlSpinTimeSpanWork.GetPos() * 60;
 	cfg.break_time_span = m_ctrlSpinTimeSpanShortBreak.GetPos() * 60;
