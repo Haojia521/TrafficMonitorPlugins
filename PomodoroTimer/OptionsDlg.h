@@ -27,6 +27,8 @@ protected:
 
 	afx_msg void VerifyNumberEditValue(CEdit &edit, CSpinButtonCtrl &editBuddy);
 public:
+	static CWnd *m_pInstance;
+
 	virtual BOOL OnInitDialog();
     virtual void OnOK();
 	afx_msg void OnEnChangeEditTimeSpanWork();

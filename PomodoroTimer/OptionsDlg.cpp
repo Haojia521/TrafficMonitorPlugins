@@ -13,6 +13,8 @@
 
 IMPLEMENT_DYNAMIC(COptionsDlg, CDialogEx)
 
+CWnd* COptionsDlg::m_pInstance = nullptr;
+
 COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DLG_OPTIONS, pParent)
 	, m_boolAutoLoop(FALSE)
@@ -20,11 +22,12 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	, m_boolAutoStart(FALSE)
 	, m_boolShowSeconds(FALSE)
 {
-
+	m_pInstance = this;
 }
 
 COptionsDlg::~COptionsDlg()
 {
+	m_pInstance = nullptr;
 }
 
 void COptionsDlg::DoDataExchange(CDataExchange* pDX)
@@ -167,7 +170,7 @@ void COptionsDlg::OnBnClickedCheckAutoLoop()
 void COptionsDlg::OnBnClickedCheckPlaySound()
 {
 	UpdateData(TRUE);
-
+	
 	EnableControlsAboutSound(m_boolPlaySound);
 }
 

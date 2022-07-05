@@ -46,9 +46,14 @@ ITMPlugin::OptionReturn CPomodoroTimer::ShowOptionsDialog(void* hParent)
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
     CWnd* pParent = CWnd::FromHandle((HWND)hParent);
 
-    COptionsDlg dlg(pParent);
-    if (dlg.DoModal() == IDOK)
-        return ITMPlugin::OR_OPTION_CHANGED;
+    if (COptionsDlg::m_pInstance != nullptr)
+        COptionsDlg::m_pInstance->BringWindowToTop();
+    else
+    {
+        COptionsDlg dlg(pParent);
+        if (dlg.DoModal() == IDOK)
+            return ITMPlugin::OR_OPTION_CHANGED;
+    }
     
     return ITMPlugin::OR_OPTION_UNCHANGED;
 }
@@ -150,8 +155,14 @@ void CPomodoroTimer::ShowContextMenu(CWnd *wnd)
     else if (id == ID_FUNC_OPTIONS)
     {
         AFX_MANAGE_STATE(AfxGetStaticModuleState());
-        COptionsDlg dlg(wnd);
-        dlg.DoModal();
+
+        if (COptionsDlg::m_pInstance != nullptr)
+            COptionsDlg::m_pInstance->BringWindowToTop();
+        else
+        {
+            COptionsDlg dlg(wnd);
+            dlg.DoModal();
+        }
     }
 }
 
