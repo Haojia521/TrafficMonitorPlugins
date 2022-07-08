@@ -102,7 +102,13 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
     std::shared_ptr<DataAPI> current_api{ GetCurrentApi() };
     if (current_api != nullptr)
     {
-        current_api->UpdateWeather();
+        for (int i = 0; i < 4; ++i)
+        {
+            if (current_api->UpdateWeather())
+                break;
+
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
 
         RefreshWeatherInfoCache();
 
