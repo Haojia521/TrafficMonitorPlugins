@@ -19,6 +19,7 @@ public:
     void OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data) override;
 
     void ShowContextMenu(CWnd *wnd);
+    INT_PTR ShowOptionsDialog(CWnd *wnd);
 
 private:
     static CPomodoroTimer m_instance;

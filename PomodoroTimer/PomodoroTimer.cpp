@@ -46,16 +46,10 @@ ITMPlugin::OptionReturn CPomodoroTimer::ShowOptionsDialog(void* hParent)
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
     CWnd* pParent = CWnd::FromHandle((HWND)hParent);
 
-    if (COptionsDlg::m_pInstance != nullptr)
-        COptionsDlg::m_pInstance->BringWindowToTop();
+    if (ShowOptionsDialog(pParent) == IDOK)
+        return ITMPlugin::OR_OPTION_CHANGED;
     else
-    {
-        COptionsDlg dlg(pParent);
-        if (dlg.DoModal() == IDOK)
-            return ITMPlugin::OR_OPTION_CHANGED;
-    }
-    
-    return ITMPlugin::OR_OPTION_UNCHANGED;
+        return ITMPlugin::OR_OPTION_UNCHANGED;
 }
 
 const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
@@ -153,16 +147,24 @@ void CPomodoroTimer::ShowContextMenu(CWnd *wnd)
     else if (id == ID_FUNC_STOP)
         data_manager.StopPomodoroTimer();
     else if (id == ID_FUNC_OPTIONS)
-    {
-        AFX_MANAGE_STATE(AfxGetStaticModuleState());
+        ShowOptionsDialog(wnd);
+}
 
-        if (COptionsDlg::m_pInstance != nullptr)
-            COptionsDlg::m_pInstance->BringWindowToTop();
-        else
-        {
-            COptionsDlg dlg(wnd);
-            dlg.DoModal();
-        }
+INT_PTR CPomodoroTimer::ShowOptionsDialog(CWnd *wnd)
+{
+    if (wnd == nullptr) return IDCANCEL;
+
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+    if (COptionsDlg::m_pInstance != nullptr)
+    {
+        COptionsDlg::m_pInstance->BringWindowToTop();
+        return IDCANCEL;
+    }
+    else
+    {
+        COptionsDlg dlg(wnd);
+        return dlg.DoModal();
     }
 }
 

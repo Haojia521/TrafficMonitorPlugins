@@ -186,6 +186,22 @@ int CPtItem::OnMouseEvent(MouseEventType type, int x, int y, void* hWnd, int fla
         CPomodoroTimer::Instance().ShowContextMenu(pWnd);
         return 1;
     }
+    else if (type == IPluginItem::MT_DBCLICKED)
+    {
+        auto &data_manager = CDataManager::Instance();
+
+        if (data_manager.GetConfig().taskbar_dc_action == 0)
+        {
+            if (data_manager.GetProgramState() == EProgramState::PS_RUNNING)
+                data_manager.PausePomodoroTimer();
+            else
+                data_manager.StartPomodoroTimer();
+        }
+        else
+            CPomodoroTimer::Instance().ShowOptionsDialog(pWnd);
+
+        return 1;
+    }
 
     return 0;
 }

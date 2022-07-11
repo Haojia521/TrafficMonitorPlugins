@@ -169,6 +169,10 @@ void CDataManager::LoadConfig(const std::wstring &cfg_dir)
     auto sound_id = cfg_int_val_getter(L"config", L"sound_id", 0);
     if (sound_id < 0 || sound_id >= 3) sound_id = 0;
     m_config.sound_id = sound_id;
+
+    auto dc_func = cfg_int_val_getter(L"config", L"taskbar_dc_action", 1);
+    if (dc_func < 0 || dc_func > 1) dc_func = 1;
+    m_config.taskbar_dc_action = dc_func;
 }
 
 void CDataManager::SaveConfig() const
@@ -192,6 +196,7 @@ void CDataManager::SaveConfig() const
     cfg_int_val_writter(L"config", L"num_loops", m_config.max_loops);
     cfg_bool_val_writter(L"config", L"play_sound", m_config.play_sound);
     cfg_int_val_writter(L"config", L"sound_id", m_config.sound_id);
+    cfg_int_val_writter(L"config", L"taskbar_dc_action", m_config.taskbar_dc_action);
 }
 
 void CDataManager::StartPomodoroTimer()

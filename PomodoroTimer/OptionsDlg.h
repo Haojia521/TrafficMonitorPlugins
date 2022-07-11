@@ -50,4 +50,5 @@ public:
 	BOOL m_boolAutoLoop;
 	BOOL m_boolPlaySound;
 	BOOL m_boolShowSeconds;
+	int m_intRadioDoubleClickAction;
 };

@@ -16,6 +16,10 @@ struct SConfig
 
     bool show_time_seconds{ false };
 
+    // 0 means switch program state between running and pause
+    // 1 means open option dialog
+    int taskbar_dc_action{ 1 };
+
     bool play_sound{ true };
     int sound_id{ 0 };
 

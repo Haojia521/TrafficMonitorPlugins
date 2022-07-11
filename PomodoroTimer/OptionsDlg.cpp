@@ -21,6 +21,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	, m_boolPlaySound(FALSE)
 	, m_boolAutoStart(FALSE)
 	, m_boolShowSeconds(FALSE)
+	, m_intRadioDoubleClickAction(0)
 {
 	m_pInstance = this;
 }
@@ -44,6 +45,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_NUM_LOOPS, m_ctrlEditNumLoops);
 	DDX_Check(pDX, IDC_CHECK_AUTO_START, m_boolAutoStart);
 	DDX_Check(pDX, IDC_CHECK_SHOW_SECONDS, m_boolShowSeconds);
+	DDX_Radio(pDX, IDC_RADIO_DC_SWITCH_TIMER_STATE, m_intRadioDoubleClickAction);
 }
 
 
@@ -90,10 +92,10 @@ BOOL COptionsDlg::OnInitDialog()
 	m_boolAutoLoop = cfg.auto_loop ? TRUE : FALSE;
 	m_boolPlaySound = cfg.play_sound ? TRUE : FALSE;
 
-	// enable/disable controls about loops
+	// enable/disable controls of loops
 	EnableControlsAboutLoops(m_boolAutoLoop);
 
-	// enable/disable controls about sound
+	// enable/disable controls of sound
 	EnableControlsAboutSound(m_boolPlaySound);
 
 	// init sound list combobox
@@ -101,6 +103,9 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctrlSoundList.AddString(L"Sound-2");
 	m_ctrlSoundList.AddString(L"Sound-3");
 	m_ctrlSoundList.SetCurSel(cfg.sound_id);
+
+	// init radio buttons of the action when user double clicked taskbar window
+	m_intRadioDoubleClickAction = cfg.taskbar_dc_action;
 
 	UpdateData(FALSE);
 
@@ -152,6 +157,8 @@ void COptionsDlg::OnOK()
 	cfg.sound_id = m_ctrlSoundList.GetCurSel();
 
 	cfg.show_time_seconds = m_boolShowSeconds == TRUE;
+
+	cfg.taskbar_dc_action = m_intRadioDoubleClickAction;
 
 	CDataManager::Instance().SaveConfig();
 

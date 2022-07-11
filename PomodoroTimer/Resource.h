@@ -33,7 +33,10 @@
 #define IDD_DLG_DONATE                  1012
 #define IDC_CHECK_SHOW_SECONDS          1012
 #define IDS_PS_STOP                     1013
+#define IDC_RADIO_DC_OPEN_OPTIONS_DLG   1013
 #define IDS_PTS_WORK                    1014
+#define IDC_RADIO2                      1014
+#define IDC_RADIO_DC_SWITCH_TIMER_STATE 1014
 #define IDS_PTS_BREAK                   1015
 #define IDS_MINUTE                      1016
 #define IDS_OPT_DLG_TITLE               1017
@@ -56,7 +59,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1014
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1013
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif
