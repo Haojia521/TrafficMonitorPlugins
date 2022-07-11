@@ -198,7 +198,7 @@ int CPtItem::OnMouseEvent(MouseEventType type, int x, int y, void* hWnd, int fla
                 data_manager.StartPomodoroTimer();
         }
         else
-            CPomodoroTimer::Instance().ShowOptionsDialog(pWnd);
+            CPomodoroTimer::Instance().ShowOptionsDialog();
 
         return 1;
     }

@@ -43,10 +43,7 @@ void CPomodoroTimer::DataRequired()
 
 ITMPlugin::OptionReturn CPomodoroTimer::ShowOptionsDialog(void* hParent)
 {
-    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-    CWnd* pParent = CWnd::FromHandle((HWND)hParent);
-
-    if (ShowOptionsDialog(pParent) == IDOK)
+    if (ShowOptionsDialog() == IDOK)
         return ITMPlugin::OR_OPTION_CHANGED;
     else
         return ITMPlugin::OR_OPTION_UNCHANGED;
@@ -147,13 +144,11 @@ void CPomodoroTimer::ShowContextMenu(CWnd *wnd)
     else if (id == ID_FUNC_STOP)
         data_manager.StopPomodoroTimer();
     else if (id == ID_FUNC_OPTIONS)
-        ShowOptionsDialog(wnd);
+        ShowOptionsDialog();
 }
 
-INT_PTR CPomodoroTimer::ShowOptionsDialog(CWnd *wnd)
+INT_PTR CPomodoroTimer::ShowOptionsDialog()
 {
-    if (wnd == nullptr) return IDCANCEL;
-
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
     if (COptionsDlg::m_pInstance != nullptr)
@@ -163,7 +158,7 @@ INT_PTR CPomodoroTimer::ShowOptionsDialog(CWnd *wnd)
     }
     else
     {
-        COptionsDlg dlg(wnd);
+        COptionsDlg dlg;
         return dlg.DoModal();
     }
 }
