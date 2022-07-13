@@ -51,7 +51,6 @@ ITMPlugin::OptionReturn CPomodoroTimer::ShowOptionsDialog(void* hParent)
 
 const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
 {
-    // todo: complete the string resources
     static CString str;
     switch (index)
     {
@@ -67,7 +66,7 @@ const wchar_t* CPomodoroTimer::GetInfo(PluginInfoIndex index)
         return L"https://github.com/Haojia521/TrafficMonitorPlugins";
         break;
     case TMI_VERSION:
-        return L"1.2";
+        return CDataManager::Instance().StringRes(IDS_VERSION);
     default:
         break;
     }
