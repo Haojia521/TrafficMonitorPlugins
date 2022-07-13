@@ -42,6 +42,7 @@
 #define IDS_OPT_DLG_TITLE               1017
 #define IDS_OPT_DLG_CANNOT_SAVE         1018
 #define IDS_OPT_DLG_SAVING_WARN         1019
+#define IDS_VERSION                     1020
 #define ID_FUNC_32771                   32771
 #define ID_FUNC_32772                   32772
 #define ID_FUNC_32773                   32773

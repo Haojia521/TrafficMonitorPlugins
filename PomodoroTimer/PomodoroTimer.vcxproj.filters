@@ -42,6 +42,9 @@
     <ClCompile Include="OptionsDlg.cpp">
       <Filter>DLG</Filter>
     </ClCompile>
+    <ClCompile Include="UpdateHelper.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="PomodoroTimer.def">
@@ -75,6 +78,9 @@
     </ClInclude>
     <ClInclude Include="OptionsDlg.h">
       <Filter>DLG</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateHelper.h">
+      <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

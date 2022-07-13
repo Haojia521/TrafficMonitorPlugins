@@ -201,6 +201,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PomodoroTimer.cpp" />
+    <ClCompile Include="UpdateHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PomodoroTimer.def" />
@@ -215,6 +216,7 @@
     <ClInclude Include="PomodoroTimer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="UpdateHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PomodoroTimer.rc" />
