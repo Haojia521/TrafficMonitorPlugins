@@ -9,6 +9,10 @@ struct SConfig
     int working_time_span{ 1500 };  // in seconds
     int break_time_span{ 300 };     // in seconds
 
+    int break_time_span_long{ 600 };// in seconds
+    int long_break_interval{ 4 };
+    bool use_long_break{ false };
+
     bool auto_start{ false };
 
     bool auto_loop{ false };
@@ -37,6 +41,7 @@ enum class EPomodoroTimerState
 {
     PTS_IN_WORK,
     PTS_SHORT_BREAK,
+    PTS_LONG_BREAK,
 };
 
 class CDataManager

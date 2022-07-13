@@ -38,10 +38,16 @@
 #define IDC_RADIO2                      1014
 #define IDC_RADIO_DC_SWITCH_TIMER_STATE 1014
 #define IDS_PTS_BREAK                   1015
+#define IDC_CHECK_USE_LONG_BREAK        1015
 #define IDS_MINUTE                      1016
+#define IDC_EDIT_TIME_SPAN_LONG_BREAK   1016
 #define IDS_OPT_DLG_TITLE               1017
+#define IDC_SPIN_TIME_SPAN_LONG_BREAK   1017
 #define IDS_OPT_DLG_CANNOT_SAVE         1018
+#define IDC_EDIT_LONG_BREAK_INTERVAL    1018
 #define IDS_OPT_DLG_SAVING_WARN         1019
+#define IDC_SPIN2                       1019
+#define IDC_SPIN_LONG_BREAK_INTERVAL    1019
 #define IDS_VERSION                     1020
 #define ID_FUNC_32771                   32771
 #define ID_FUNC_32772                   32772
@@ -60,7 +66,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1014
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

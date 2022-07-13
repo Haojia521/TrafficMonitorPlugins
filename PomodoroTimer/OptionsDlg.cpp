@@ -22,6 +22,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	, m_boolAutoStart(FALSE)
 	, m_boolShowSeconds(FALSE)
 	, m_intRadioDoubleClickAction(0)
+	, m_boolUseLongBreak(FALSE)
 {
 	m_pInstance = this;
 }
@@ -46,6 +47,11 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_AUTO_START, m_boolAutoStart);
 	DDX_Check(pDX, IDC_CHECK_SHOW_SECONDS, m_boolShowSeconds);
 	DDX_Radio(pDX, IDC_RADIO_DC_SWITCH_TIMER_STATE, m_intRadioDoubleClickAction);
+	DDX_Check(pDX, IDC_CHECK_USE_LONG_BREAK, m_boolUseLongBreak);
+	DDX_Control(pDX, IDC_EDIT_TIME_SPAN_LONG_BREAK, m_ctrlEditTimeSpanLongBreak);
+	DDX_Control(pDX, IDC_SPIN_TIME_SPAN_LONG_BREAK, m_ctrlSpinTimeSpanLongBreak);
+	DDX_Control(pDX, IDC_EDIT_LONG_BREAK_INTERVAL, m_ctrlEditLongBreakInterval);
+	DDX_Control(pDX, IDC_SPIN_LONG_BREAK_INTERVAL, m_ctrlSpinLongBreakInterval);
 }
 
 
@@ -57,6 +63,9 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT_TIME_SPAN_SHORT_BREAK, &COptionsDlg::OnEnChangeEditTimeSpanShortBreak)
 	ON_EN_CHANGE(IDC_EDIT_NUM_LOOPS, &COptionsDlg::OnEnChangeEditNumLoops)
 	ON_BN_CLICKED(IDC_BTN_DONATE, &COptionsDlg::OnBnClickedBtnDonate)
+	ON_EN_CHANGE(IDC_EDIT_TIME_SPAN_LONG_BREAK, &COptionsDlg::OnEnChangeEditTimeSpanLongBreak)
+	ON_EN_CHANGE(IDC_EDIT_LONG_BREAK_INTERVAL, &COptionsDlg::OnEnChangeEditLongBreakInterval)
+	ON_BN_CLICKED(IDC_CHECK_USE_LONG_BREAK, &COptionsDlg::OnBnClickedCheckUseLongBreak)
 END_MESSAGE_MAP()
 
 
@@ -76,6 +85,9 @@ BOOL COptionsDlg::OnInitDialog()
 	auto time_span_short_break = cfg.break_time_span / 60;
 	if (time_span_short_break < 1) time_span_short_break = 1;
 
+	auto time_span_long_break = cfg.break_time_span_long / 60;
+	if (time_span_long_break < 1) time_span_long_break = 1;
+
 	// init spin controls
 	m_ctrlSpinTimeSpanWork.SetRange(1, 240);
 	m_ctrlSpinTimeSpanWork.SetPos(time_span_work);
@@ -83,10 +95,17 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctrlSpinTimeSpanShortBreak.SetRange(1, 240);
 	m_ctrlSpinTimeSpanShortBreak.SetPos(time_span_short_break);
 
+	m_ctrlSpinTimeSpanLongBreak.SetRange(1, 240);
+	m_ctrlSpinTimeSpanLongBreak.SetPos(time_span_long_break);
+
+	m_ctrlSpinLongBreakInterval.SetRange(1, 100);
+	m_ctrlSpinLongBreakInterval.SetPos(cfg.long_break_interval);
+
 	m_ctrlSpinNumLoops.SetRange(0, 100);
 	m_ctrlSpinNumLoops.SetPos(cfg.max_loops);
 
 	// init checkboxs
+	m_boolUseLongBreak = cfg.use_long_break ? TRUE : FALSE;
 	m_boolAutoStart = cfg.auto_start ? TRUE : FALSE;
 	m_boolShowSeconds = cfg.show_time_seconds ? TRUE : FALSE;
 	m_boolAutoLoop = cfg.auto_loop ? TRUE : FALSE;
@@ -97,6 +116,9 @@ BOOL COptionsDlg::OnInitDialog()
 
 	// enable/disable controls of sound
 	EnableControlsAboutSound(m_boolPlaySound);
+
+	// enable/disable controls of long break
+	EnableControlsAboutLongBreak(m_boolUseLongBreak);
 
 	// init sound list combobox
 	m_ctrlSoundList.AddString(L"Sound-1");
@@ -125,6 +147,15 @@ void COptionsDlg::EnableControlsAboutSound(BOOL enable /* = TRUE */)
 	GetDlgItem(IDC_BTN_SOUND_TEST)->EnableWindow(enable);
 }
 
+void COptionsDlg::EnableControlsAboutLongBreak(BOOL enable /* = TRUE */)
+{
+	GetDlgItem(IDC_EDIT_TIME_SPAN_LONG_BREAK)->EnableWindow(enable);
+	GetDlgItem(IDC_SPIN_TIME_SPAN_LONG_BREAK)->EnableWindow(enable);
+
+	GetDlgItem(IDC_EDIT_LONG_BREAK_INTERVAL)->EnableWindow(enable);
+	GetDlgItem(IDC_SPIN_LONG_BREAK_INTERVAL)->EnableWindow(enable);
+}
+
 
 void COptionsDlg::OnOK()
 {
@@ -148,6 +179,10 @@ void COptionsDlg::OnOK()
 	cfg.working_time_span = m_ctrlSpinTimeSpanWork.GetPos() * 60;
 	cfg.break_time_span = m_ctrlSpinTimeSpanShortBreak.GetPos() * 60;
 
+	cfg.break_time_span_long = m_ctrlSpinTimeSpanLongBreak.GetPos() * 60;
+	cfg.long_break_interval = m_ctrlSpinLongBreakInterval.GetPos();
+	cfg.use_long_break = m_boolUseLongBreak == TRUE;
+
 	cfg.auto_start = m_boolAutoStart == TRUE;
 
 	cfg.auto_loop = m_boolAutoLoop == TRUE;
@@ -163,6 +198,14 @@ void COptionsDlg::OnOK()
 	CDataManager::Instance().SaveConfig();
 
 	CDialogEx::OnOK();
+}
+
+
+void COptionsDlg::OnBnClickedCheckUseLongBreak()
+{
+	UpdateData(TRUE);
+
+	EnableControlsAboutLongBreak(m_boolUseLongBreak);
 }
 
 
@@ -210,6 +253,18 @@ void COptionsDlg::OnEnChangeEditTimeSpanWork()
 void COptionsDlg::OnEnChangeEditTimeSpanShortBreak()
 {
 	VerifyNumberEditValue(m_ctrlEditTimeSpanShortBreak, m_ctrlSpinTimeSpanShortBreak);
+}
+
+
+void COptionsDlg::OnEnChangeEditTimeSpanLongBreak()
+{
+	VerifyNumberEditValue(m_ctrlEditTimeSpanLongBreak, m_ctrlSpinTimeSpanLongBreak);
+}
+
+
+void COptionsDlg::OnEnChangeEditLongBreakInterval()
+{
+	VerifyNumberEditValue(m_ctrlEditLongBreakInterval, m_ctrlSpinLongBreakInterval);
 }
 
 

@@ -24,6 +24,7 @@ protected:
 
 	void EnableControlsAboutLoops(BOOL enable = TRUE);
 	void EnableControlsAboutSound(BOOL enable = TRUE);
+	void EnableControlsAboutLongBreak(BOOL enable = TRUE);
 
 	afx_msg void VerifyNumberEditValue(CEdit &edit, CSpinButtonCtrl &editBuddy);
 public:
@@ -33,6 +34,8 @@ public:
     virtual void OnOK();
 	afx_msg void OnEnChangeEditTimeSpanWork();
 	afx_msg void OnEnChangeEditTimeSpanShortBreak();
+    afx_msg void OnEnChangeEditTimeSpanLongBreak();
+    afx_msg void OnEnChangeEditLongBreakInterval();
 	afx_msg void OnEnChangeEditNumLoops();
 	afx_msg void OnBnClickedCheckAutoLoop();
 	afx_msg void OnBnClickedCheckPlaySound();
@@ -41,9 +44,13 @@ public:
 
 	CEdit m_ctrlEditTimeSpanWork;
 	CEdit m_ctrlEditTimeSpanShortBreak;
+	CEdit m_ctrlEditTimeSpanLongBreak;
+	CEdit m_ctrlEditLongBreakInterval;
 	CEdit m_ctrlEditNumLoops;
 	CSpinButtonCtrl m_ctrlSpinTimeSpanWork;
 	CSpinButtonCtrl m_ctrlSpinTimeSpanShortBreak;
+	CSpinButtonCtrl m_ctrlSpinTimeSpanLongBreak;
+	CSpinButtonCtrl m_ctrlSpinLongBreakInterval;
 	CSpinButtonCtrl m_ctrlSpinNumLoops;
 	CComboBox m_ctrlSoundList;
 	BOOL m_boolAutoStart;
@@ -51,4 +58,6 @@ public:
 	BOOL m_boolPlaySound;
 	BOOL m_boolShowSeconds;
 	int m_intRadioDoubleClickAction;
+	BOOL m_boolUseLongBreak;
+	afx_msg void OnBnClickedCheckUseLongBreak();
 };

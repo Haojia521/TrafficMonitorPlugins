@@ -13,6 +13,9 @@ namespace dm
         std::time_t m_running_time{ 0 };
         std::time_t m_target_time_span{ 0 };
 
+        int m_long_break_interval{ 0 };
+        int m_long_break_target_loop{ 0 };
+
         int completed_loops{ 0 };
     };
 
@@ -153,6 +156,16 @@ void CDataManager::LoadConfig(const std::wstring &cfg_dir)
     if (timespan_break < 60) timespan_break = 60;
     m_config.break_time_span = timespan_break / 60 * 60;
 
+    auto timespan_break_long = cfg_int_val_getter(L"config", L"timespan_break_long", 600);
+    if (timespan_break_long < 60) timespan_break_long = 60;
+    m_config.break_time_span_long = timespan_break_long;
+
+    auto lb_interval = cfg_int_val_getter(L"config", L"long_break_interval", 4);
+    if (lb_interval < 1) lb_interval = 1;
+    m_config.long_break_interval = lb_interval;
+
+    m_config.use_long_break = cfg_bool_val_getter(L"config", L"use_long_break", 0);
+
     m_config.auto_start = cfg_bool_val_getter(L"config", L"auto_start", 0);
 
     m_config.show_time_seconds = cfg_bool_val_getter(L"config", L"show_time_seconds", 0);
@@ -190,6 +203,9 @@ void CDataManager::SaveConfig() const
 
     cfg_int_val_writter(L"config", L"timespan_work", m_config.working_time_span);
     cfg_int_val_writter(L"config", L"timespan_break", m_config.break_time_span);
+    cfg_int_val_writter(L"config", L"timespan_break_long", m_config.break_time_span_long);
+    cfg_int_val_writter(L"config", L"long_break_interval", m_config.long_break_interval);
+    cfg_bool_val_writter(L"config", L"use_long_break", m_config.use_long_break);
     cfg_bool_val_writter(L"config", L"auto_start", m_config.auto_start);
     cfg_bool_val_writter(L"config", L"show_time_seconds", m_config.show_time_seconds);
     cfg_bool_val_writter(L"config", L"auto_loop", m_config.auto_loop);
@@ -227,6 +243,9 @@ void CDataManager::StopPomodoroTimer()
     dm::state_data.completed_loops = 0;
     dm::state_data.m_target_time_span = 0;
 
+    dm::state_data.m_long_break_interval = 0;
+    dm::state_data.m_long_break_target_loop = 0;
+
     dm::thread_helper.stop();
 }
 
@@ -241,10 +260,43 @@ void CDataManager::SkipCurrentPomodoroTimerState()
 
     if (m_pt_state == EPomodoroTimerState::PTS_IN_WORK)
     {
-        m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
-        dm::state_data.m_target_time_span = m_config.break_time_span;
+        if (m_config.use_long_break)
+        {
+            // check long break interval first, change long break target loop if interval changed
+            if (dm::state_data.m_long_break_interval != m_config.long_break_interval)
+            {
+                dm::state_data.m_long_break_interval = m_config.long_break_interval;
+                dm::state_data.m_long_break_target_loop = dm::state_data.completed_loops + m_config.long_break_interval;
+            }
+
+            if (dm::state_data.completed_loops + 1 == dm::state_data.m_long_break_target_loop)
+            {
+                // set next state and target timespan of long break
+                dm::state_data.m_target_time_span = m_config.break_time_span_long;
+                m_pt_state = EPomodoroTimerState::PTS_LONG_BREAK;
+
+                // update target loop of next long break
+                dm::state_data.m_long_break_target_loop = dm::state_data.completed_loops + 1 + dm::state_data.m_long_break_interval;
+            }
+            else
+            {
+                // set next state and target timespan of short break
+                dm::state_data.m_target_time_span = m_config.break_time_span;
+                m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
+            }
+        }
+        else
+        {
+            // clear data of long break
+            dm::state_data.m_long_break_interval = 0;
+            dm::state_data.m_long_break_target_loop = 0;
+
+            // set next state and target timespan of short break
+            m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
+            dm::state_data.m_target_time_span = m_config.break_time_span;
+        }
     }
-    else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
+    else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK || m_pt_state == EPomodoroTimerState::PTS_LONG_BREAK)
     {
         m_pt_state = EPomodoroTimerState::PTS_IN_WORK;
         dm::state_data.m_target_time_span = m_config.working_time_span;
@@ -306,13 +358,47 @@ void CDataManager::Update()
         if (dm::state_data.m_running_time >= dm::state_data.m_target_time_span)
         {
             dm::state_data.m_running_time = 0;
-            dm::state_data.m_target_time_span = m_config.break_time_span;
-            m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
+
+            if (m_config.use_long_break)
+            {
+                // check long break interval first, change long break target loop if interval changed
+                if (dm::state_data.m_long_break_interval != m_config.long_break_interval)
+                {
+                    dm::state_data.m_long_break_interval = m_config.long_break_interval;
+                    dm::state_data.m_long_break_target_loop = dm::state_data.completed_loops + m_config.long_break_interval;
+                }
+
+                if (dm::state_data.completed_loops + 1 == dm::state_data.m_long_break_target_loop)
+                {
+                    // set next state and target timespan of long break
+                    dm::state_data.m_target_time_span = m_config.break_time_span_long;
+                    m_pt_state = EPomodoroTimerState::PTS_LONG_BREAK;
+
+                    // update target loop of next long break
+                    dm::state_data.m_long_break_target_loop = dm::state_data.completed_loops + 1 + dm::state_data.m_long_break_interval;
+                }
+                else
+                {
+                    // set next state and target timespan of short break
+                    dm::state_data.m_target_time_span = m_config.break_time_span;
+                    m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
+                }
+            }
+            else
+            {
+                // clear data of long break
+                dm::state_data.m_long_break_interval = 0;
+                dm::state_data.m_long_break_target_loop = 0;
+
+                // set next state and target timespan of short break
+                dm::state_data.m_target_time_span = m_config.break_time_span;
+                m_pt_state = EPomodoroTimerState::PTS_SHORT_BREAK;
+            }
 
             if (m_config.play_sound) PlaySoundById(m_config.sound_id);
         }
     }
-    else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK)
+    else if (m_pt_state == EPomodoroTimerState::PTS_SHORT_BREAK || m_pt_state == EPomodoroTimerState::PTS_LONG_BREAK)
     {
         if (dm::state_data.m_running_time >= dm::state_data.m_target_time_span)
         {
