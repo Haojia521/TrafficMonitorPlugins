@@ -1,0 +1,11 @@
+﻿{
+    "version": "1.2",
+    "github": {
+        "link_x86": "https://github.com/Haojia521/TrafficMonitorPlugins/releases/download/PT-1.2/PomodoroTimer-v1.2-x86.zip",
+        "link_x64": "https://github.com/Haojia521/TrafficMonitorPlugins/releases/download/PT-1.2/PomodoroTimer-v1.2-x64.zip"
+    },
+    "gitee": {
+        "link_x86": "https://gitee.com/Haojia521/TrafficMonitorPlugins/attach_files/1125347/download/PomodoroTimer-v1.2-x86.zip",
+        "link_x64": "https://gitee.com/Haojia521/TrafficMonitorPlugins/attach_files/1125346/download/PomodoroTimer-v1.2-x64.zip"
+    }
+}
