@@ -103,13 +103,25 @@ const wchar_t* CWeatherPro::GetTooltipInfo()
 
 ITMPlugin::OptionReturn CWeatherPro::ShowOptionsDialog(void* hParent)
 {
-    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+    if (COptionsDlg::m_pInstance != nullptr)
+    {
+        COptionsDlg::m_pInstance->BringWindowToTop();
+        return ITMPlugin::OR_OPTION_UNCHANGED;
+    }
+    else
+    {
+        AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-    CWnd *parent = CWnd::FromHandle((HWND)hParent);
-    COptionsDlg dlg(parent);
-    dlg.DoModal();
+        CWnd *parent = nullptr;
+        if (hParent != nullptr)
+            parent = CWnd::FromHandle((HWND)hParent);
 
-    return ITMPlugin::OR_OPTION_CHANGED;
+        COptionsDlg dlg(parent);
+        if (dlg.DoModal() == IDOK)
+            return ITMPlugin::OR_OPTION_CHANGED;
+        else
+            return ITMPlugin::OR_OPTION_UNCHANGED;
+    }
 }
 
 void CWeatherPro::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data)

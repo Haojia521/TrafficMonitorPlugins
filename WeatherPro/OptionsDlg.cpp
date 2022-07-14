@@ -12,6 +12,8 @@
 
 // COptionsDlg 对话框
 
+CWnd* COptionsDlg::m_pInstance = nullptr;
+
 IMPLEMENT_DYNAMIC(COptionsDlg, CDialogEx)
 
 COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
@@ -24,11 +26,12 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
     , m_showBriefRTWeather(FALSE)
     , m_showErrorInfo(FALSE)
 {
-
+    m_pInstance = this;
 }
 
 COptionsDlg::~COptionsDlg()
 {
+    m_pInstance = nullptr;
 }
 
 void COptionsDlg::DoDataExchange(CDataExchange* pDX)

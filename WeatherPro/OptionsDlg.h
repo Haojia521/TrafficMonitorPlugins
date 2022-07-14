@@ -22,6 +22,8 @@ protected:
 
     DECLARE_MESSAGE_MAP()
 public:
+    static CWnd *m_pInstance;
+
     SCityInfo m_selected_city;
     CString m_currentCityName;
 
