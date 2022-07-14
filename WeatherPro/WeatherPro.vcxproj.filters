@@ -215,5 +215,11 @@
     <Image Include="res\weather_icons_blue\n13.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\QR_AliPay.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\QR_WeChat.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

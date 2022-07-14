@@ -240,6 +240,8 @@
     <ResourceCompile Include="WeatherPro.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\QR_AliPay.bmp" />
+    <Image Include="res\QR_WeChat.bmp" />
     <Image Include="res\weather_icons_blue\02.ico" />
     <Image Include="res\weather_icons_blue\04.ico" />
     <Image Include="res\weather_icons_blue\05.ico" />

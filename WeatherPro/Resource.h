@@ -69,6 +69,8 @@
 #define IDC_COMBO1                      1028
 #define IDC_COMBO_UPDATE_FREQUENCY      1028
 #define IDI_ICON_B_A54                  1029
+#define IDC_BUTTON1                     1029
+#define IDC_BTN_DONATE                  1029
 #define IDI_ICON_B_A55                  1030
 #define IDI_ICON_B_A56                  1031
 #define IDI_ICON_B_A99                  1032
@@ -81,14 +83,17 @@
 #define IDI_ICON_B_N03                  1039
 #define IDI_ICON_B_N13                  1040
 #define IDD_OPTIONS_HFW_DLG             1041
+#define IDB_BITMAP_ALIPAY               1043
+#define IDB_BITMAP_WECHAT               1044
+#define IDD_DONATE_DLG                  1045
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1043
+#define _APS_NEXT_RESOURCE_VALUE        1047
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1029
+#define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

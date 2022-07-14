@@ -54,6 +54,7 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_SELECT_CITY, &COptionsDlg::OnBnClickedBtnSelectCity)
     ON_BN_CLICKED(IDC_BTN_UPDATE_MANUALLY, &COptionsDlg::OnBnClickedBtnUpdateManually)
     ON_BN_CLICKED(IDC_BTN_API_SETTINGS, &COptionsDlg::OnBnClickedBtnApiSettings)
+    ON_BN_CLICKED(IDC_BTN_DONATE, &COptionsDlg::OnBnClickedBtnDonate)
 END_MESSAGE_MAP()
 
 
@@ -189,4 +190,11 @@ void COptionsDlg::OnBnClickedBtnApiSettings()
 
         dlg.DoModal();
     }
+}
+
+
+void COptionsDlg::OnBnClickedBtnDonate()
+{
+    CDialogEx dlg(IDD_DONATE_DLG, this);
+    dlg.DoModal();
 }
