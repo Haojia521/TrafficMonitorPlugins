@@ -86,12 +86,45 @@
 #define IDB_BITMAP_ALIPAY               1043
 #define IDB_BITMAP_WECHAT               1044
 #define IDD_DONATE_DLG                  1045
+#define IDI_ICON_W_A02                  1047
+#define IDI_ICON_W_A04                  1048
+#define IDI_ICON_W_A05                  1049
+#define IDI_ICON_W_A06                  1050
+#define IDI_ICON_W_A07                  1051
+#define IDI_ICON_W_A08                  1052
+#define IDI_ICON_W_A09                  1053
+#define IDI_ICON_W_A10                  1054
+#define IDI_ICON_W_A11                  1055
+#define IDI_ICON_W_A12                  1056
+#define IDI_ICON_W_A14                  1057
+#define IDI_ICON_W_A15                  1058
+#define IDI_ICON_W_A16                  1059
+#define IDI_ICON_W_A17                  1060
+#define IDI_ICON_W_A18                  1061
+#define IDI_ICON_W_A19                  1062
+#define IDI_ICON_W_A20                  1063
+#define IDI_ICON_W_A29                  1064
+#define IDI_ICON_W_A30                  1065
+#define IDI_ICON_W_A31                  1066
+#define IDI_ICON_W_A53                  1067
+#define IDI_ICON_W_A54                  1068
+#define IDI_ICON_W_A55                  1069
+#define IDI_ICON_W_A56                  1070
+#define IDI_ICON_W_A99                  1071
+#define IDI_ICON_W_D00                  1072
+#define IDI_ICON_W_D01                  1073
+#define IDI_ICON_W_D03                  1074
+#define IDI_ICON_W_D13                  1075
+#define IDI_ICON_W_N00                  1076
+#define IDI_ICON_W_N01                  1077
+#define IDI_ICON_W_N03                  1078
+#define IDI_ICON_W_N13                  1079
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1047
+#define _APS_NEXT_RESOURCE_VALUE        1080
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           1000
