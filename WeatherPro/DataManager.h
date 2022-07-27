@@ -21,6 +21,14 @@ enum class DataApiType
     API_HefengWeather,
 };
 
+enum class IconType
+{
+    IT_WCC_BULE,
+    IT_WCC_WHITE,
+    IT_HFW_FILL,
+    IT_HFW_HOLLOW,
+};
+
 struct SConfiguration
 {
     SConfiguration();
@@ -28,6 +36,7 @@ struct SConfiguration
     DataApiType m_api_type;
     EWeatherInfoType m_wit;
     UpdateFrequency m_update_frequency;
+    IconType m_icon_type;
     bool m_show_weather_icon;
     bool m_show_weather_in_tooltips;
     bool m_show_brief_rt_weather_info;
@@ -102,6 +111,7 @@ private:
         std::wstring WeatherTemperature;
         std::wstring TooltipInfo;
 
+        IconType IconType{ IconType::IT_WCC_BULE };
         HICON Icon{ nullptr };
     };
 
