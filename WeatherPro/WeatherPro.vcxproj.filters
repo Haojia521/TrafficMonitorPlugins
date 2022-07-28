@@ -320,5 +320,185 @@
     <Image Include="res\weather_icons_white\n13.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\weather_icons_hfw_fill\100.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\101.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\102.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\103.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\104.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\150.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\151.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\152.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\153.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\300.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\301.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\302.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\303.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\304.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\305.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\306.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\307.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\308.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\309.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\310.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\311.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\312.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\313.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\314.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\315.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\316.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\317.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\318.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\350.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\351.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\399.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\400.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\401.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\402.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\403.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\404.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\405.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\406.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\407.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\408.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\409.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\410.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\456.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\457.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\499.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\500.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\501.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\502.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\503.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\504.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\507.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\508.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\509.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\510.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\511.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\512.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\513.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\514.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\515.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\weather_icons_hfw_fill\999.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>
