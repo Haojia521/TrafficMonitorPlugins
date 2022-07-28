@@ -78,77 +78,77 @@ namespace hf
         return succeed;
     }
 
-    std::wstring convert_weather_code(const std::wstring &code)
-    {
-        static const std::unordered_map<std::wstring, std::wstring> dmap{
-            {L"100", L"d00"},
-            {L"101", L"d01"},
-            {L"102", L"d01"},
-            {L"103", L"d01"},
-            {L"104", L"02"},
-            {L"150", L"n00"},
-            {L"151", L"n01"},
-            {L"152", L"n01"},
-            {L"153", L"n01"},
-            {L"154", L"02"},
-            {L"300", L"d03"},
-            {L"301", L"d03"},
-            {L"302", L"04"},
-            {L"303", L"04"},
-            {L"304", L"05"},
-            {L"305", L"07"},
-            {L"306", L"08"},
-            {L"307", L"09"},
-            {L"308", L"12"},
-            {L"309", L"07"},
-            {L"310", L"10"},
-            {L"311", L"11"},
-            {L"312", L"12"},
-            {L"313", L"19"},
-            {L"314", L"21"},
-            {L"315", L"22"},
-            {L"316", L"23"},
-            {L"317", L"24"},
-            {L"318", L"25"},
-            {L"350", L"n03"},
-            {L"351", L"n03"},
-            {L"399", L"97"},
-            {L"400", L"14"},
-            {L"401", L"15"},
-            {L"402", L"16"},
-            {L"403", L"17"},
-            {L"404", L"06"},
-            {L"405", L"06"},
-            {L"406", L"06"},
-            {L"407", L"d13"},
-            {L"408", L"26"},
-            {L"409", L"27"},
-            {L"410", L"28"},
-            {L"456", L"06"},
-            {L"457", L"n13"},
-            {L"499", L"98"},
-            {L"500", L"18"},
-            {L"501", L"18"},
-            {L"502", L"53"},
-            {L"503", L"30"},
-            {L"504", L"29"},
-            {L"507", L"20"},
-            {L"508", L"31"},
-            {L"509", L"32"},
-            {L"510", L"49"},
-            {L"511", L"54"},
-            {L"512", L"55"},
-            {L"513", L"56"},
-            {L"514", L"57"},
-            {L"515", L"58"},
-        };
+    //std::wstring convert_weather_code(const std::wstring &code)
+    //{
+    //    static const std::unordered_map<std::wstring, std::wstring> dmap{
+    //        {L"100", L"d00"},
+    //        {L"101", L"d01"},
+    //        {L"102", L"d01"},
+    //        {L"103", L"d01"},
+    //        {L"104", L"02"},
+    //        {L"150", L"n00"},
+    //        {L"151", L"n01"},
+    //        {L"152", L"n01"},
+    //        {L"153", L"n01"},
+    //        {L"154", L"02"},
+    //        {L"300", L"d03"},
+    //        {L"301", L"d03"},
+    //        {L"302", L"04"},
+    //        {L"303", L"04"},
+    //        {L"304", L"05"},
+    //        {L"305", L"07"},
+    //        {L"306", L"08"},
+    //        {L"307", L"09"},
+    //        {L"308", L"12"},
+    //        {L"309", L"07"},
+    //        {L"310", L"10"},
+    //        {L"311", L"11"},
+    //        {L"312", L"12"},
+    //        {L"313", L"19"},
+    //        {L"314", L"21"},
+    //        {L"315", L"22"},
+    //        {L"316", L"23"},
+    //        {L"317", L"24"},
+    //        {L"318", L"25"},
+    //        {L"350", L"n03"},
+    //        {L"351", L"n03"},
+    //        {L"399", L"97"},
+    //        {L"400", L"14"},
+    //        {L"401", L"15"},
+    //        {L"402", L"16"},
+    //        {L"403", L"17"},
+    //        {L"404", L"06"},
+    //        {L"405", L"06"},
+    //        {L"406", L"06"},
+    //        {L"407", L"d13"},
+    //        {L"408", L"26"},
+    //        {L"409", L"27"},
+    //        {L"410", L"28"},
+    //        {L"456", L"06"},
+    //        {L"457", L"n13"},
+    //        {L"499", L"98"},
+    //        {L"500", L"18"},
+    //        {L"501", L"18"},
+    //        {L"502", L"53"},
+    //        {L"503", L"30"},
+    //        {L"504", L"29"},
+    //        {L"507", L"20"},
+    //        {L"508", L"31"},
+    //        {L"509", L"32"},
+    //        {L"510", L"49"},
+    //        {L"511", L"54"},
+    //        {L"512", L"55"},
+    //        {L"513", L"56"},
+    //        {L"514", L"57"},
+    //        {L"515", L"58"},
+    //    };
 
-        auto itr = dmap.find(code);
-        if (itr != dmap.end())
-            return itr->second;
-        else
-            return L"";
-    }
+    //    auto itr = dmap.find(code);
+    //    if (itr != dmap.end())
+    //        return itr->second;
+    //    else
+    //        return L"";
+    //}
 
     std::wstring get_json_str_value(yyjson_val *j_val, const char *key)
     {
@@ -458,7 +458,8 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
         data.TemperatureFeelsLike = hf::get_json_str_value(now_obj, "feelsLike");
         data.UpdateTime = hf::get_json_str_value(now_obj, "obsTime").substr(11, 5);
         data.WeatherText = hf::get_json_str_value(now_obj, "text");
-        data.WeatherCode = hf::convert_weather_code(hf::get_json_str_value(now_obj, "icon"));
+        //data.WeatherCode = hf::convert_weather_code(hf::get_json_str_value(now_obj, "icon"));
+        data.WeatherCode = hf::get_json_str_value(now_obj, "icon");
         data.WindDirection = hf::get_json_str_value(now_obj, "windDir");
         data.WindScale = hf::get_json_str_value(now_obj, "windScale");
         data.WindSpeed = hf::get_json_str_value(now_obj, "windSpeed");
@@ -521,8 +522,10 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
             w.TemperatureMin = hf::get_json_str_value(j_val, "tempMin");
             w.WeatherDay = hf::get_json_str_value(j_val, "textDay");
             w.WeatherNight = hf::get_json_str_value(j_val, "textNight");
-            w.WeatherCodeDay = hf::convert_weather_code(hf::get_json_str_value(j_val, "iconDay"));
-            w.WeatherCodeNight = hf::convert_weather_code(hf::get_json_str_value(j_val, "iconNight"));
+            //w.WeatherCodeDay = hf::convert_weather_code(hf::get_json_str_value(j_val, "iconDay"));
+            //w.WeatherCodeNight = hf::convert_weather_code(hf::get_json_str_value(j_val, "iconNight"));
+            w.WeatherCodeDay = hf::get_json_str_value(j_val, "iconDay");
+            w.WeatherCodeNight = hf::get_json_str_value(j_val, "iconNight");
             w.UVIndex = hf::get_json_str_value(j_val, "uvIndex");
             w.Humidity = hf::get_json_str_value(j_val, "humidity");
         };

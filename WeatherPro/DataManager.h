@@ -76,7 +76,7 @@ public:
     void LoadConfigs(const std::wstring &cfg_dir);
     void SaveConfigs() const;
 
-    HICON GetIcon() const;
+    HICON GetIcon();
 
     void RefreshWeatherInfoCache();
     
@@ -87,9 +87,9 @@ public:
 private:
     void _updateWeather(WeatherInfoUpdatedCallback callback = nullptr);
     HICON _getIcon();
-    HICON _getIconByID(UINT id);
-    HICON _getIconByCode(const std::wstring& w_code);
-    UINT _getIconIdBlue(const std::wstring &code) const;
+    //HICON _getIconByID(UINT id);
+    //HICON _getIconByCode(const std::wstring& w_code);
+    //UINT _getIconIdBlue(const std::wstring &code) const;
 
 
     std::wstring _getWeatherTemperature() const;
@@ -111,7 +111,7 @@ private:
         std::wstring WeatherTemperature;
         std::wstring TooltipInfo;
 
-        IconType IconType{ IconType::IT_WCC_BULE };
+        IconType CurrentIconType{ IconType::IT_WCC_BULE };
         HICON Icon{ nullptr };
     };
 

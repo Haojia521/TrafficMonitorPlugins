@@ -47,6 +47,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Check(pDX, IDC_CHECK_SHOW_ERROR_INFO, m_showErrorInfo);
     DDX_Control(pDX, IDC_COMBO_DATA_API_TYPE, m_ctrlDataApiType);
     DDX_Control(pDX, IDC_COMBO_UPDATE_FREQUENCY, m_ctrlUpdateFrequency);
+    DDX_Control(pDX, IDC_COMBO_ICON_TYPE, m_ctrlIconType);
 }
 
 
@@ -85,6 +86,10 @@ BOOL COptionsDlg::OnInitDialog()
     m_ctrlUpdateFrequency.AddString(L"每2小时1次");
     m_ctrlUpdateFrequency.AddString(L"每3小时1次");
     m_ctrlUpdateFrequency.SetCurSel(static_cast<int>(config.m_update_frequency));
+
+    m_ctrlIconType.AddString(L"经典图标-蓝色");
+    m_ctrlIconType.AddString(L"经典图标-白色");
+    m_ctrlIconType.SetCurSel(static_cast<int>(config.m_icon_type));
 
     m_showWeatherIcon = config.m_show_weather_icon ? TRUE : FALSE;
     m_showWeatherInTooltip = config.m_show_weather_in_tooltips ? TRUE : FALSE;
@@ -133,6 +138,7 @@ void COptionsDlg::OnOK()
 
     config.m_wit = static_cast<EWeatherInfoType>(m_ctrlInfoType.GetCurSel());
     config.m_update_frequency = static_cast<UpdateFrequency>(m_ctrlUpdateFrequency.GetCurSel());
+    config.m_icon_type = static_cast<IconType>(m_ctrlIconType.GetCurSel());
     config.m_show_weather_icon = m_showWeatherIcon == TRUE;
     config.m_show_weather_in_tooltips = m_showWeatherInTooltip == TRUE;
     config.m_show_brief_rt_weather_info = m_showBriefRTWeather == TRUE;
