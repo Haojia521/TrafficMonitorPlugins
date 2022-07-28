@@ -87,10 +87,6 @@ public:
 private:
     void _updateWeather(WeatherInfoUpdatedCallback callback = nullptr);
     HICON _getIcon();
-    //HICON _getIconByID(UINT id);
-    //HICON _getIconByCode(const std::wstring& w_code);
-    //UINT _getIconIdBlue(const std::wstring &code) const;
-
 
     std::wstring _getWeatherTemperature() const;
     std::wstring _getTooptipInfo() const;
