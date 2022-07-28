@@ -75,6 +75,7 @@ namespace icon
             {L"513", L"56"},
             {L"514", L"57"},
             {L"515", L"58"},
+            {L"999", L"99"},
         };
 
         auto itr = dmap.find(code);
@@ -292,6 +293,310 @@ namespace icon
         }
     };
 
+    class IconSetHfwFill : public IconSet
+    {
+    public:
+        UINT get_icon_id_by_basic_code(const std::wstring &code) override
+        {
+            static const std::map<std::wstring, UINT> dmap{
+                {L"d00", IDI_ICON_HFW_FILL_100},
+                {L"d01", IDI_ICON_HFW_FILL_101},
+                {L"d03", IDI_ICON_HFW_FILL_300},
+                {L"d13", IDI_ICON_HFW_FILL_407},
+                {L"n00", IDI_ICON_HFW_FILL_150},
+                {L"n01", IDI_ICON_HFW_FILL_151},
+                {L"n03", IDI_ICON_HFW_FILL_350},
+                {L"n13", IDI_ICON_HFW_FILL_457},
+                {L"02", IDI_ICON_HFW_FILL_104},
+                {L"04", IDI_ICON_HFW_FILL_302},
+                {L"05", IDI_ICON_HFW_FILL_304},
+                {L"06", IDI_ICON_HFW_FILL_404},
+                {L"07", IDI_ICON_HFW_FILL_305},
+                {L"08", IDI_ICON_HFW_FILL_306},
+                {L"09", IDI_ICON_HFW_FILL_307},
+                {L"10", IDI_ICON_HFW_FILL_310},
+                {L"11", IDI_ICON_HFW_FILL_311},
+                {L"12", IDI_ICON_HFW_FILL_312},
+                {L"14", IDI_ICON_HFW_FILL_400},
+                {L"15", IDI_ICON_HFW_FILL_401},
+                {L"16", IDI_ICON_HFW_FILL_402},
+                {L"17", IDI_ICON_HFW_FILL_403},
+                {L"18", IDI_ICON_HFW_FILL_501},
+                {L"19", IDI_ICON_HFW_FILL_313},
+                {L"20", IDI_ICON_HFW_FILL_507},
+                {L"29", IDI_ICON_HFW_FILL_504},
+                {L"30", IDI_ICON_HFW_FILL_503},
+                {L"31", IDI_ICON_HFW_FILL_508},
+                {L"53", IDI_ICON_HFW_FILL_502},
+                {L"54", IDI_ICON_HFW_FILL_511},
+                {L"55", IDI_ICON_HFW_FILL_512},
+                {L"56", IDI_ICON_HFW_FILL_513},
+                {L"99", IDI_ICON_HFW_FILL_999},
+                {L"21", IDI_ICON_HFW_FILL_314},
+                {L"22", IDI_ICON_HFW_FILL_315},
+                {L"23", IDI_ICON_HFW_FILL_316},
+                {L"24", IDI_ICON_HFW_FILL_317},
+                {L"25", IDI_ICON_HFW_FILL_318},
+                {L"26", IDI_ICON_HFW_FILL_408},
+                {L"27", IDI_ICON_HFW_FILL_409},
+                {L"28", IDI_ICON_HFW_FILL_410},
+                {L"32", IDI_ICON_HFW_FILL_509},
+                {L"49", IDI_ICON_HFW_FILL_510},
+                {L"57", IDI_ICON_HFW_FILL_514},
+                {L"58", IDI_ICON_HFW_FILL_515},
+                {L"97", IDI_ICON_HFW_FILL_399},
+                {L"98", IDI_ICON_HFW_FILL_499},
+                {L"301", IDI_ICON_HFW_FILL_399},
+                {L"302", IDI_ICON_HFW_FILL_499},
+            };
+
+            auto itr = dmap.find(code);
+            if (itr != dmap.end())
+                return itr->second;
+            else if (code.size() > 1)
+            {
+                auto itr2 = dmap.find(code.substr(1));
+                if (itr2 != dmap.end())
+                    return itr2->second;
+            }
+
+            return IDI_ICON_HFW_FILL_999;
+        }
+
+        UINT get_icon_id_by_hfw_code(const std::wstring &code)
+        {
+            static const std::map<std::wstring, UINT> dmap{
+                {L"100", IDI_ICON_HFW_FILL_100},
+                {L"101", IDI_ICON_HFW_FILL_101},
+                {L"102", IDI_ICON_HFW_FILL_102},
+                {L"103", IDI_ICON_HFW_FILL_103},
+                {L"104", IDI_ICON_HFW_FILL_104},
+                {L"150", IDI_ICON_HFW_FILL_150},
+                {L"151", IDI_ICON_HFW_FILL_151},
+                {L"152", IDI_ICON_HFW_FILL_152},
+                {L"153", IDI_ICON_HFW_FILL_153},
+                {L"154", IDI_ICON_HFW_FILL_104},
+                {L"300", IDI_ICON_HFW_FILL_300},
+                {L"301", IDI_ICON_HFW_FILL_301},
+                {L"302", IDI_ICON_HFW_FILL_302},
+                {L"303", IDI_ICON_HFW_FILL_303},
+                {L"304", IDI_ICON_HFW_FILL_304},
+                {L"305", IDI_ICON_HFW_FILL_305},
+                {L"306", IDI_ICON_HFW_FILL_306},
+                {L"307", IDI_ICON_HFW_FILL_307},
+                {L"308", IDI_ICON_HFW_FILL_308},
+                {L"309", IDI_ICON_HFW_FILL_309},
+                {L"310", IDI_ICON_HFW_FILL_310},
+                {L"311", IDI_ICON_HFW_FILL_311},
+                {L"312", IDI_ICON_HFW_FILL_312},
+                {L"313", IDI_ICON_HFW_FILL_313},
+                {L"314", IDI_ICON_HFW_FILL_314},
+                {L"315", IDI_ICON_HFW_FILL_315},
+                {L"316", IDI_ICON_HFW_FILL_316},
+                {L"317", IDI_ICON_HFW_FILL_317},
+                {L"318", IDI_ICON_HFW_FILL_318},
+                {L"350", IDI_ICON_HFW_FILL_350},
+                {L"351", IDI_ICON_HFW_FILL_351},
+                {L"399", IDI_ICON_HFW_FILL_399},
+                {L"400", IDI_ICON_HFW_FILL_400},
+                {L"401", IDI_ICON_HFW_FILL_401},
+                {L"402", IDI_ICON_HFW_FILL_402},
+                {L"403", IDI_ICON_HFW_FILL_403},
+                {L"404", IDI_ICON_HFW_FILL_404},
+                {L"405", IDI_ICON_HFW_FILL_405},
+                {L"406", IDI_ICON_HFW_FILL_406},
+                {L"407", IDI_ICON_HFW_FILL_407},
+                {L"408", IDI_ICON_HFW_FILL_408},
+                {L"409", IDI_ICON_HFW_FILL_409},
+                {L"410", IDI_ICON_HFW_FILL_410},
+                {L"456", IDI_ICON_HFW_FILL_456},
+                {L"457", IDI_ICON_HFW_FILL_457},
+                {L"499", IDI_ICON_HFW_FILL_499},
+                {L"500", IDI_ICON_HFW_FILL_500},
+                {L"501", IDI_ICON_HFW_FILL_501},
+                {L"502", IDI_ICON_HFW_FILL_502},
+                {L"503", IDI_ICON_HFW_FILL_503},
+                {L"504", IDI_ICON_HFW_FILL_504},
+                {L"507", IDI_ICON_HFW_FILL_507},
+                {L"508", IDI_ICON_HFW_FILL_508},
+                {L"509", IDI_ICON_HFW_FILL_509},
+                {L"510", IDI_ICON_HFW_FILL_510},
+                {L"511", IDI_ICON_HFW_FILL_511},
+                {L"512", IDI_ICON_HFW_FILL_512},
+                {L"513", IDI_ICON_HFW_FILL_513},
+                {L"514", IDI_ICON_HFW_FILL_514},
+                {L"515", IDI_ICON_HFW_FILL_515},
+                {L"999", IDI_ICON_HFW_FILL_999},
+            };
+
+            auto itr = dmap.find(code);
+            if (itr != dmap.end())
+                return itr->second;
+
+            return IDI_ICON_HFW_FILL_999;
+        }
+
+        UINT get_icon_id(DataApiType api_type, const std::wstring &code) override
+        {
+            if (api_type == DataApiType::API_HefengWeather)
+                return get_icon_id_by_hfw_code(code);
+            else
+                return get_icon_id_by_basic_code(to_basic_code(api_type, code));
+        }
+    };
+
+    class IconSetHfwHollow : public IconSet
+    {
+    public:
+        UINT get_icon_id_by_basic_code(const std::wstring &code) override
+        {
+            static const std::map<std::wstring, UINT> dmap{
+                {L"d00", IDI_ICON_HFW_HOLLOW_100},
+                {L"d01", IDI_ICON_HFW_HOLLOW_101},
+                {L"d03", IDI_ICON_HFW_HOLLOW_300},
+                {L"d13", IDI_ICON_HFW_HOLLOW_407},
+                {L"n00", IDI_ICON_HFW_HOLLOW_150},
+                {L"n01", IDI_ICON_HFW_HOLLOW_151},
+                {L"n03", IDI_ICON_HFW_HOLLOW_350},
+                {L"n13", IDI_ICON_HFW_HOLLOW_457},
+                {L"02", IDI_ICON_HFW_HOLLOW_104},
+                {L"04", IDI_ICON_HFW_HOLLOW_302},
+                {L"05", IDI_ICON_HFW_HOLLOW_304},
+                {L"06", IDI_ICON_HFW_HOLLOW_404},
+                {L"07", IDI_ICON_HFW_HOLLOW_305},
+                {L"08", IDI_ICON_HFW_HOLLOW_306},
+                {L"09", IDI_ICON_HFW_HOLLOW_307},
+                {L"10", IDI_ICON_HFW_HOLLOW_310},
+                {L"11", IDI_ICON_HFW_HOLLOW_311},
+                {L"12", IDI_ICON_HFW_HOLLOW_312},
+                {L"14", IDI_ICON_HFW_HOLLOW_400},
+                {L"15", IDI_ICON_HFW_HOLLOW_401},
+                {L"16", IDI_ICON_HFW_HOLLOW_402},
+                {L"17", IDI_ICON_HFW_HOLLOW_403},
+                {L"18", IDI_ICON_HFW_HOLLOW_501},
+                {L"19", IDI_ICON_HFW_HOLLOW_313},
+                {L"20", IDI_ICON_HFW_HOLLOW_507},
+                {L"29", IDI_ICON_HFW_HOLLOW_504},
+                {L"30", IDI_ICON_HFW_HOLLOW_503},
+                {L"31", IDI_ICON_HFW_HOLLOW_508},
+                {L"53", IDI_ICON_HFW_HOLLOW_502},
+                {L"54", IDI_ICON_HFW_HOLLOW_511},
+                {L"55", IDI_ICON_HFW_HOLLOW_512},
+                {L"56", IDI_ICON_HFW_HOLLOW_513},
+                {L"99", IDI_ICON_HFW_HOLLOW_999},
+                {L"21", IDI_ICON_HFW_HOLLOW_314},
+                {L"22", IDI_ICON_HFW_HOLLOW_315},
+                {L"23", IDI_ICON_HFW_HOLLOW_316},
+                {L"24", IDI_ICON_HFW_HOLLOW_317},
+                {L"25", IDI_ICON_HFW_HOLLOW_318},
+                {L"26", IDI_ICON_HFW_HOLLOW_408},
+                {L"27", IDI_ICON_HFW_HOLLOW_409},
+                {L"28", IDI_ICON_HFW_HOLLOW_410},
+                {L"32", IDI_ICON_HFW_HOLLOW_509},
+                {L"49", IDI_ICON_HFW_HOLLOW_510},
+                {L"57", IDI_ICON_HFW_HOLLOW_514},
+                {L"58", IDI_ICON_HFW_HOLLOW_515},
+                {L"97", IDI_ICON_HFW_HOLLOW_399},
+                {L"98", IDI_ICON_HFW_HOLLOW_499},
+                {L"301", IDI_ICON_HFW_HOLLOW_399},
+                {L"302", IDI_ICON_HFW_HOLLOW_499},
+            };
+
+            auto itr = dmap.find(code);
+            if (itr != dmap.end())
+                return itr->second;
+            else if (code.size() > 1)
+            {
+                auto itr2 = dmap.find(code.substr(1));
+                if (itr2 != dmap.end())
+                    return itr2->second;
+            }
+
+            return IDI_ICON_HFW_HOLLOW_999;
+        }
+
+        UINT get_icon_id_by_hfw_code(const std::wstring &code)
+        {
+            static const std::map<std::wstring, UINT> dmap{
+                {L"100", IDI_ICON_HFW_HOLLOW_100},
+                {L"101", IDI_ICON_HFW_HOLLOW_101},
+                {L"102", IDI_ICON_HFW_HOLLOW_102},
+                {L"103", IDI_ICON_HFW_HOLLOW_103},
+                {L"104", IDI_ICON_HFW_HOLLOW_104},
+                {L"150", IDI_ICON_HFW_HOLLOW_150},
+                {L"151", IDI_ICON_HFW_HOLLOW_151},
+                {L"152", IDI_ICON_HFW_HOLLOW_152},
+                {L"153", IDI_ICON_HFW_HOLLOW_153},
+                {L"154", IDI_ICON_HFW_HOLLOW_104},
+                {L"300", IDI_ICON_HFW_HOLLOW_300},
+                {L"301", IDI_ICON_HFW_HOLLOW_301},
+                {L"302", IDI_ICON_HFW_HOLLOW_302},
+                {L"303", IDI_ICON_HFW_HOLLOW_303},
+                {L"304", IDI_ICON_HFW_HOLLOW_304},
+                {L"305", IDI_ICON_HFW_HOLLOW_305},
+                {L"306", IDI_ICON_HFW_HOLLOW_306},
+                {L"307", IDI_ICON_HFW_HOLLOW_307},
+                {L"308", IDI_ICON_HFW_HOLLOW_308},
+                {L"309", IDI_ICON_HFW_HOLLOW_309},
+                {L"310", IDI_ICON_HFW_HOLLOW_310},
+                {L"311", IDI_ICON_HFW_HOLLOW_311},
+                {L"312", IDI_ICON_HFW_HOLLOW_312},
+                {L"313", IDI_ICON_HFW_HOLLOW_313},
+                {L"314", IDI_ICON_HFW_HOLLOW_314},
+                {L"315", IDI_ICON_HFW_HOLLOW_315},
+                {L"316", IDI_ICON_HFW_HOLLOW_316},
+                {L"317", IDI_ICON_HFW_HOLLOW_317},
+                {L"318", IDI_ICON_HFW_HOLLOW_318},
+                {L"350", IDI_ICON_HFW_HOLLOW_350},
+                {L"351", IDI_ICON_HFW_HOLLOW_351},
+                {L"399", IDI_ICON_HFW_HOLLOW_399},
+                {L"400", IDI_ICON_HFW_HOLLOW_400},
+                {L"401", IDI_ICON_HFW_HOLLOW_401},
+                {L"402", IDI_ICON_HFW_HOLLOW_402},
+                {L"403", IDI_ICON_HFW_HOLLOW_403},
+                {L"404", IDI_ICON_HFW_HOLLOW_404},
+                {L"405", IDI_ICON_HFW_HOLLOW_405},
+                {L"406", IDI_ICON_HFW_HOLLOW_406},
+                {L"407", IDI_ICON_HFW_HOLLOW_407},
+                {L"408", IDI_ICON_HFW_HOLLOW_408},
+                {L"409", IDI_ICON_HFW_HOLLOW_409},
+                {L"410", IDI_ICON_HFW_HOLLOW_410},
+                {L"456", IDI_ICON_HFW_HOLLOW_456},
+                {L"457", IDI_ICON_HFW_HOLLOW_457},
+                {L"499", IDI_ICON_HFW_HOLLOW_499},
+                {L"500", IDI_ICON_HFW_HOLLOW_500},
+                {L"501", IDI_ICON_HFW_HOLLOW_501},
+                {L"502", IDI_ICON_HFW_HOLLOW_502},
+                {L"503", IDI_ICON_HFW_HOLLOW_503},
+                {L"504", IDI_ICON_HFW_HOLLOW_504},
+                {L"507", IDI_ICON_HFW_HOLLOW_507},
+                {L"508", IDI_ICON_HFW_HOLLOW_508},
+                {L"509", IDI_ICON_HFW_HOLLOW_509},
+                {L"510", IDI_ICON_HFW_HOLLOW_510},
+                {L"511", IDI_ICON_HFW_HOLLOW_511},
+                {L"512", IDI_ICON_HFW_HOLLOW_512},
+                {L"513", IDI_ICON_HFW_HOLLOW_513},
+                {L"514", IDI_ICON_HFW_HOLLOW_514},
+                {L"515", IDI_ICON_HFW_HOLLOW_515},
+                {L"999", IDI_ICON_HFW_HOLLOW_999},
+            };
+
+            auto itr = dmap.find(code);
+            if (itr != dmap.end())
+                return itr->second;
+
+            return IDI_ICON_HFW_HOLLOW_999;
+        }
+
+        UINT get_icon_id(DataApiType api_type, const std::wstring &code) override
+        {
+            if (api_type == DataApiType::API_HefengWeather)
+                return get_icon_id_by_hfw_code(code);
+            else
+                return get_icon_id_by_basic_code(to_basic_code(api_type, code));
+        }
+    };
+
     //std::wstring code_converting_wcc2hfw(const std::wstring &code)
     //{
     //    static const std::map<std::wstring, std::wstring> dmap{
@@ -366,6 +671,10 @@ namespace icon
             return std::make_shared<IconSetWccBlue>();
         case IconType::IT_WCC_WHITE:
             return std::make_shared<IconSetWccWhite>();
+        case IconType::IT_HFW_FILL:
+            return std::make_shared<IconSetHfwFill>();
+        case IconType::IT_HFW_HOLLOW:
+            return std::make_shared<IconSetHfwHollow>();
 
         default:
             return nullptr;

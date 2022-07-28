@@ -87,8 +87,10 @@ BOOL COptionsDlg::OnInitDialog()
     m_ctrlUpdateFrequency.AddString(L"每3小时1次");
     m_ctrlUpdateFrequency.SetCurSel(static_cast<int>(config.m_update_frequency));
 
-    m_ctrlIconType.AddString(L"经典图标-蓝色");
-    m_ctrlIconType.AddString(L"经典图标-白色");
+    m_ctrlIconType.AddString(L"经典蓝色");
+    m_ctrlIconType.AddString(L"经典白色");
+    m_ctrlIconType.AddString(L"和风天气-填充");
+    m_ctrlIconType.AddString(L"和风天气-镂空");
     m_ctrlIconType.SetCurSel(static_cast<int>(config.m_icon_type));
 
     m_showWeatherIcon = config.m_show_weather_icon ? TRUE : FALSE;
