@@ -100,8 +100,6 @@ private:
 
     SCityInfo m_currentCityInfo;
 
-    std::map<UINT, HICON> m_icons;
-
     struct SWeatherInfoCache
     {
         std::wstring WeatherTemperature;

@@ -609,7 +609,7 @@ std::mutex g_weather_update_nutex;
 SConfiguration::SConfiguration() :
     m_api_type(DataApiType::API_HefengWeather),
     m_wit(EWeatherInfoType::WEATHER_REALTIME),
-    m_update_frequency(UpdateFrequency::UF_1T2H),
+    m_update_frequency(UpdateFrequency::UF_2T1H),
     m_icon_type(IconType::IT_WCC_BULE),
     m_show_weather_icon(true),
     m_show_weather_in_tooltips(true),
