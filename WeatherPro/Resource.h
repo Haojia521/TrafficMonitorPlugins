@@ -38,9 +38,12 @@
 #define IDS_DAY_AFTER_TOMORROW          1012
 #define IDI_ICON_B_A08                  1013
 #define IDC_CHECK_SHOW_ERROR_INFO       1013
+#define IDS_HFW_ERROR_CODE              1013
 #define IDI_ICON_B_A09                  1014
+#define IDS_HFW_INVALID_JSON            1014
 #define IDI_ICON_B_A10                  1015
 #define IDC_EDIT_HFW_APP_KEY            1015
+#define IDS_HFW_NO_INTERNET             1015
 #define IDI_ICON_B_A11                  1016
 #define IDC_CHECK_HFW_RT_TEMP_FEELS     1016
 #define IDI_ICON_B_A12                  1017

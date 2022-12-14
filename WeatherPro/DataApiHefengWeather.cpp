@@ -178,15 +178,18 @@ namespace hf
                     func(root);
                 }
                 else
-                    error = L"Error code: " + code;
+                    //error = L"Error code: " + code;
+                    error = CDataManager::Instance().StringRes(IDS_HFW_ERROR_CODE) + code.c_str();
             }
             else
-                error = L"Invalid json contents.";
+                //error = L"Invalid json contents.";
+                error = CDataManager::Instance().StringRes(IDS_HFW_INVALID_JSON);
 
             yyjson_doc_free(doc);
         }
         else
-            error = L"Failed to access the Internet.";
+            //error = L"Failed to access the Internet.";
+            error = CDataManager::Instance().StringRes(IDS_HFW_NO_INTERNET);
 
         return error;
     }
