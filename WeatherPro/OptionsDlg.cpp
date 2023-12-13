@@ -66,31 +66,33 @@ BOOL COptionsDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    m_selected_city = CDataManager::Instance().GetCurrentCityInfo();
+    const auto &dm = CDataManager::Instance();
+
+    m_selected_city = dm.GetCurrentCityInfo();
     m_currentCityName = m_selected_city.CityName.c_str();
 
-    const auto &config = CDataManager::Instance().GetConfig();
+    const auto &config = dm.GetConfig();
 
-    m_ctrlInfoType.AddString(CDataManager::Instance().StringRes(IDS_WIT_REAL_TIME));
-    m_ctrlInfoType.AddString(CDataManager::Instance().StringRes(IDS_WIT_24H));
-    m_ctrlInfoType.AddString(CDataManager::Instance().StringRes(IDS_WIT_48H));
+    m_ctrlInfoType.AddString(dm.StringRes(IDS_WIT_REAL_TIME));
+    m_ctrlInfoType.AddString(dm.StringRes(IDS_WIT_24H));
+    m_ctrlInfoType.AddString(dm.StringRes(IDS_WIT_48H));
     m_ctrlInfoType.SetCurSel(static_cast<int>(config.m_wit));
 
-    m_ctrlDataApiType.AddString(L"Weather.com.cn(抓取)");
-    m_ctrlDataApiType.AddString(L"和风天气Api");
+    m_ctrlDataApiType.AddString(dm.StringRes(IDS_CFG_WND_DATA_SOURCE_WCCS));
+    m_ctrlDataApiType.AddString(dm.StringRes(IDS_CFG_WND_DATA_SOURCE_HFW));
     m_ctrlDataApiType.SetCurSel(static_cast<int>(config.m_api_type));
 
-    m_ctrlUpdateFrequency.AddString(L"每1小时3次");
-    m_ctrlUpdateFrequency.AddString(L"每1小时2次");
-    m_ctrlUpdateFrequency.AddString(L"每1小时1次");
-    m_ctrlUpdateFrequency.AddString(L"每2小时1次");
-    m_ctrlUpdateFrequency.AddString(L"每3小时1次");
+    m_ctrlUpdateFrequency.AddString(dm.StringRes(IDS_CFG_WND_UPDATE_FREQ_1H3T));
+    m_ctrlUpdateFrequency.AddString(dm.StringRes(IDS_CFG_WND_UPDATE_FREQ_1H2T));
+    m_ctrlUpdateFrequency.AddString(dm.StringRes(IDS_CFG_WND_UPDATE_FREQ_1H1T));
+    m_ctrlUpdateFrequency.AddString(dm.StringRes(IDS_CFG_WND_UPDATE_FREQ_2H1T));
+    m_ctrlUpdateFrequency.AddString(dm.StringRes(IDS_CFG_WND_UPDATE_FREQ_3H1T));
     m_ctrlUpdateFrequency.SetCurSel(static_cast<int>(config.m_update_frequency));
 
-    m_ctrlIconType.AddString(L"经典蓝色");
-    m_ctrlIconType.AddString(L"经典白色");
-    m_ctrlIconType.AddString(L"和风天气-填充");
-    m_ctrlIconType.AddString(L"和风天气-镂空");
+    m_ctrlIconType.AddString(dm.StringRes(IDS_CFG_WND_ICON_CLASSIC_BLUE));
+    m_ctrlIconType.AddString(dm.StringRes(IDS_CFG_WND_ICON_CLASSIC_WHITE));
+    m_ctrlIconType.AddString(dm.StringRes(IDS_CFG_WND_ICON_HFW_FILLED));
+    m_ctrlIconType.AddString(dm.StringRes(IDS_CFG_WND_ICON_HFW_HOLLOW));
     m_ctrlIconType.SetCurSel(static_cast<int>(config.m_icon_type));
 
     m_showWeatherIcon = config.m_show_weather_icon ? TRUE : FALSE;

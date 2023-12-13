@@ -101,8 +101,10 @@ void CSelectCityDlg::OnCancel()
 
 void CSelectCityDlg::OnBnClickedSearchBtn()
 {
+    const auto &dm = CDataManager::Instance();
+
     if (data_api == nullptr)
-        MessageBox(L"无效的数据API", CDataManager::Instance().StringRes(IDS_WEATHER_PRO));
+        MessageBox(dm.StringRes(IDS_SC_WND_INVALID_API), dm.StringRes(IDS_WEATHER_PRO));
 
     UpdateData(TRUE);
     if (m_cityNameQuery.IsEmpty()) return;
@@ -127,7 +129,7 @@ void CSelectCityDlg::OnBnClickedSearchBtn()
     {
         auto err = data_api->GetLastError();
         CString info;
-        info.Format(L"%s\r\n%s", CDataManager::Instance().StringRes(IDS_QUERY_ERR), err.c_str());
-        MessageBox(info, CDataManager::Instance().StringRes(IDS_WEATHER_PRO));
+        info.Format(L"%s\r\n%s", dm.StringRes(IDS_QUERY_ERR).GetString(), err.c_str());
+        MessageBox(info, dm.StringRes(IDS_WEATHER_PRO));
     }
 }

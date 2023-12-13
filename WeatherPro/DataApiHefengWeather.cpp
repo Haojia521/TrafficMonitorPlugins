@@ -78,78 +78,6 @@ namespace hf
         return succeed;
     }
 
-    //std::wstring convert_weather_code(const std::wstring &code)
-    //{
-    //    static const std::unordered_map<std::wstring, std::wstring> dmap{
-    //        {L"100", L"d00"},
-    //        {L"101", L"d01"},
-    //        {L"102", L"d01"},
-    //        {L"103", L"d01"},
-    //        {L"104", L"02"},
-    //        {L"150", L"n00"},
-    //        {L"151", L"n01"},
-    //        {L"152", L"n01"},
-    //        {L"153", L"n01"},
-    //        {L"154", L"02"},
-    //        {L"300", L"d03"},
-    //        {L"301", L"d03"},
-    //        {L"302", L"04"},
-    //        {L"303", L"04"},
-    //        {L"304", L"05"},
-    //        {L"305", L"07"},
-    //        {L"306", L"08"},
-    //        {L"307", L"09"},
-    //        {L"308", L"12"},
-    //        {L"309", L"07"},
-    //        {L"310", L"10"},
-    //        {L"311", L"11"},
-    //        {L"312", L"12"},
-    //        {L"313", L"19"},
-    //        {L"314", L"21"},
-    //        {L"315", L"22"},
-    //        {L"316", L"23"},
-    //        {L"317", L"24"},
-    //        {L"318", L"25"},
-    //        {L"350", L"n03"},
-    //        {L"351", L"n03"},
-    //        {L"399", L"97"},
-    //        {L"400", L"14"},
-    //        {L"401", L"15"},
-    //        {L"402", L"16"},
-    //        {L"403", L"17"},
-    //        {L"404", L"06"},
-    //        {L"405", L"06"},
-    //        {L"406", L"06"},
-    //        {L"407", L"d13"},
-    //        {L"408", L"26"},
-    //        {L"409", L"27"},
-    //        {L"410", L"28"},
-    //        {L"456", L"06"},
-    //        {L"457", L"n13"},
-    //        {L"499", L"98"},
-    //        {L"500", L"18"},
-    //        {L"501", L"18"},
-    //        {L"502", L"53"},
-    //        {L"503", L"30"},
-    //        {L"504", L"29"},
-    //        {L"507", L"20"},
-    //        {L"508", L"31"},
-    //        {L"509", L"32"},
-    //        {L"510", L"49"},
-    //        {L"511", L"54"},
-    //        {L"512", L"55"},
-    //        {L"513", L"56"},
-    //        {L"514", L"57"},
-    //        {L"515", L"58"},
-    //    };
-
-    //    auto itr = dmap.find(code);
-    //    if (itr != dmap.end())
-    //        return itr->second;
-    //    else
-    //        return L"";
-    //}
-
     std::wstring get_json_str_value(yyjson_val *j_val, const char *key)
     {
         auto *obj = yyjson_obj_get(j_val, key);
@@ -159,6 +87,8 @@ namespace hf
 
     std::wstring query_func_frame(const CString &url, std::function<void(yyjson_val*)> func)
     {
+        const auto &dm = CDataManager::Instance();
+
         std::wstring error;
 
         std::wstring content;
@@ -179,17 +109,17 @@ namespace hf
                 }
                 else
                     //error = L"Error code: " + code;
-                    error = CDataManager::Instance().StringRes(IDS_HFW_ERROR_CODE) + code.c_str();
+                    error = dm.StringRes(IDS_HFW_ERROR_CODE) + code.c_str();
             }
             else
                 //error = L"Invalid json contents.";
-                error = CDataManager::Instance().StringRes(IDS_HFW_INVALID_JSON);
+                error = dm.StringRes(IDS_HFW_INVALID_JSON);
 
             yyjson_doc_free(doc);
         }
         else
             //error = L"Failed to access the Internet.";
-            error = CDataManager::Instance().StringRes(IDS_HFW_NO_INTERNET);
+            error = dm.StringRes(IDS_HFW_NO_INTERNET);
 
         return error;
     }
@@ -199,12 +129,17 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
 {
     CHECK_KEY;
 
+    const auto &dm = CDataManager::Instance();
+
     info.clear();
 
     auto queryEncoded = CCommon::URLEncode(query);
 
     CString url;
-    url.Format(L"https://geoapi.qweather.com/v2/city/lookup?key=%s&location=%s", config.AppKey.c_str(), queryEncoded.c_str());
+    url.Format(L"https://geoapi.qweather.com/v2/city/lookup?key=%s&location=%s&lang=%s",
+               config.AppKey.c_str(),
+               queryEncoded.c_str(),
+               dm.StringRes(IDS_HFW_LANG).GetString());
 
     CityInfoList cities;
     auto func = [&cities](yyjson_val *j_val) {
@@ -253,6 +188,9 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
 
     _lastError = oss_err.str();
 
+    const auto &dm = CDataManager::Instance();
+    CString tmp_str;
+
     std::wostringstream oss;
 
     // format realtime weather information
@@ -263,21 +201,28 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
     {
         if (config.ShowRealtimeWind)
         {
-            oss << L" " << _realtimeWeather.WindDirection;
+            tmp_str.Format(dm.StringRes(IDS_HFW_FMT_WIND_DIRECTION), _realtimeWeather.WindDirection.c_str());
+            oss << L" " << tmp_str.GetString();
+            //oss << L" " << _realtimeWeather.WindDirection;
             if (config.ShowRealtimeWindScale)
-                oss << _realtimeWeather.WindScale << L"级";
+            {
+                tmp_str.Format(dm.StringRes(IDS_HFW_FMT_WIND_SCALE), _realtimeWeather.WindScale.c_str());
+                oss << tmp_str.GetString();
+                //oss << _realtimeWeather.WindScale << L"级";
+            }
             else
                 oss << _realtimeWeather.WindSpeed << L"km/h";
         }
 
         if (config.ShowRealtimeHumidity)
-            oss << L" 相对湿度 " << _realtimeWeather.Humidity << L"%";
+            oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _realtimeWeather.Humidity << L"%";
+            //oss << L" 相对湿度 " << _realtimeWeather.Humidity << L"%";
 
 
         // format realtime air quality information
         if (config.ShowAirQuality)
         {
-            oss << std::endl << L"空气质量: " << _realtimeAirQuality.Category;
+            oss << std::endl << dm.StringRes(IDS_HFW_FMT_AIR_QUALITY).GetString() << _realtimeAirQuality.Category;
 
             if (config.ShowAirQualityAQI)
                 oss << L" AQI: " << _realtimeAirQuality.AQI;
@@ -304,28 +249,28 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
 
     // format forcast weather information
     // - today
-    oss << L"今天: " << GetWeatherText(EWeatherInfoType::WEATHER_TODAY)
+    oss << dm.StringRes(IDS_TODAY).GetString() << L": " << GetWeatherText(EWeatherInfoType::WEATHER_TODAY)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_TODAY);
     if (config.ShowForecastUVIdex)
-        oss << L" 紫外线强度: " << _forcastWeatherTD.UVIndex;
+        oss << dm.StringRes(IDS_HFW_FMT_UVI).GetString() << _forcastWeatherTD.UVIndex;
     if (config.showForecastHumidity)
-        oss << L" 相对湿度: " << _forcastWeatherTD.Humidity << L"%";
+        oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _forcastWeatherTD.Humidity << L"%";
     oss << std::endl;
     // - tomorrow
-    oss << L"明天: " << GetWeatherText(EWeatherInfoType::WEATHER_TOMMROW)
+    oss << dm.StringRes(IDS_TOMORROW).GetString() << L": " << GetWeatherText(EWeatherInfoType::WEATHER_TOMMROW)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_TOMMROW);
     if (config.ShowForecastUVIdex)
-        oss << L" 紫外线强度: " << _forcastWeatherTM.UVIndex;
+        oss << dm.StringRes(IDS_HFW_FMT_UVI).GetString() << _forcastWeatherTM.UVIndex;
     if (config.showForecastHumidity)
-        oss << L" 相对湿度: " << _forcastWeatherTM.Humidity << L"%";
+        oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _forcastWeatherTM.Humidity << L"%";
     oss << std::endl;
     // - day after tomorrow
-    oss << L"后天: " << GetWeatherText(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW)
+    oss << dm.StringRes(IDS_DAY_AFTER_TOMORROW).GetString() << L": " << GetWeatherText(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW)
         << L" " << GetTemprature(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW);
     if (config.ShowForecastUVIdex)
-        oss << L" 紫外线强度: " << _forcastWeatherDATM.UVIndex;
+        oss << dm.StringRes(IDS_HFW_FMT_UVI).GetString() << _forcastWeatherDATM.UVIndex;
     if (config.showForecastHumidity)
-        oss << L" 相对湿度: " << _forcastWeatherDATM.Humidity << L"%";
+        oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _forcastWeatherDATM.Humidity << L"%";
     oss << std::endl;
 
     // end
@@ -380,20 +325,20 @@ std::wstring DataApiHefengWeather::GetWeatherText(EWeatherInfoType type)
         if (_forcastWeatherTD.WeatherDay == _forcastWeatherTD.WeatherNight)
             oss << _forcastWeatherTD.WeatherDay;
         else
-            oss << _forcastWeatherTD.WeatherDay << L"转" << _forcastWeatherTD.WeatherNight;
+            oss << _forcastWeatherTD.WeatherDay << L"~" << _forcastWeatherTD.WeatherNight;
         break;
 
     case EWeatherInfoType::WEATHER_TOMMROW:
         if (_forcastWeatherTM.WeatherDay == _forcastWeatherTM.WeatherNight)
             oss << _forcastWeatherTM.WeatherDay;
         else
-            oss << _forcastWeatherTM.WeatherDay << L"转" << _forcastWeatherTM.WeatherNight;
+            oss << _forcastWeatherTM.WeatherDay << L"~" << _forcastWeatherTM.WeatherNight;
         break;
     case EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW:
         if (_forcastWeatherDATM.WeatherDay == _forcastWeatherDATM.WeatherNight)
             oss << _forcastWeatherDATM.WeatherDay;
         else
-            oss << _forcastWeatherDATM.WeatherDay << L"转" << _forcastWeatherDATM.WeatherNight;
+            oss << _forcastWeatherDATM.WeatherDay << L"~" << _forcastWeatherDATM.WeatherNight;
         break;
     }
 
@@ -450,8 +395,13 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
 {
     CHECK_KEY;
 
+    const auto &dm = CDataManager::Instance();
+
     CString url;
-    url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
+    url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s&lang=%s",
+               config.AppKey.c_str(),
+               query.c_str(),
+               dm.StringRes(IDS_HFW_LANG).GetString());
 
     RealtimeWeather data;
     auto func = [&data](yyjson_val *j_val) {
@@ -482,8 +432,13 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
 {
     CHECK_KEY;
 
+    const auto &dm = CDataManager::Instance();
+
     CString url;
-    url.Format(L"https://devapi.qweather.com/v7/air/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
+    url.Format(L"https://devapi.qweather.com/v7/air/now?key=%s&location=%s&lang=%s",
+               config.AppKey.c_str(),
+               query.c_str(),
+               dm.StringRes(IDS_HFW_LANG).GetString());
 
     RealtimeAirQuality data;
     auto func = [&data](yyjson_val *j_val) {
@@ -513,8 +468,13 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
 {
     CHECK_KEY;
 
+    const auto &dm = CDataManager::Instance();
+
     CString url;
-    url.Format(L"https://devapi.qweather.com/v7/weather/3d?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
+    url.Format(L"https://devapi.qweather.com/v7/weather/3d?key=%s&location=%s&lang=%s",
+               config.AppKey.c_str(),
+               query.c_str(),
+               dm.StringRes(IDS_HFW_LANG).GetString());
 
     ForcastWeather td, tm, datm;
     auto func = [&td, &tm, &datm](yyjson_val *j_val) {
@@ -555,8 +515,13 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
 {
     CHECK_KEY;
 
+    const auto &dm = CDataManager::Instance();
+
     CString url;
-    url.Format(L"https://devapi.qweather.com/v7/warning/now?key=%s&location=%s", config.AppKey.c_str(), query.c_str());
+    url.Format(L"https://devapi.qweather.com/v7/warning/now?key=%s&location=%s&lang=%s",
+               config.AppKey.c_str(),
+               query.c_str(),
+               dm.StringRes(IDS_HFW_LANG).GetString());
 
     WeatherAlertList data;
     auto func = [&data](yyjson_val *j_val) {
