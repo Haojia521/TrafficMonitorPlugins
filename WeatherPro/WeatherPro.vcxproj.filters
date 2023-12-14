@@ -25,6 +25,9 @@
     <Filter Include="Data">
       <UniqueIdentifier>{cee30953-b5aa-4e82-8470-aa88ca2df320}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{c779ef32-08a5-41fe-ac16-3d3dde6dd882}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -108,6 +111,9 @@
     </ClInclude>
     <ClInclude Include="OptionsHfwDlg.h">
       <Filter>DLG</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleIni.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

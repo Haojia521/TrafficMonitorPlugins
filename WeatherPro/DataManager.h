@@ -91,6 +91,8 @@ private:
     std::wstring _getWeatherTemperature() const;
     std::wstring _getTooptipInfo() const;
 
+    void _setLangID(const std::wstring &cfg_dir);
+
     static CDataManager m_instance;
     int m_dpi;
     mutable std::map<UINT, CString> m_string_resources;
@@ -110,4 +112,6 @@ private:
     };
 
     SWeatherInfoCache m_weather_info_cache;
+
+    unsigned short m_lang_id;
 };

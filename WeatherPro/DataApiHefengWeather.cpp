@@ -47,6 +47,14 @@ namespace hf
 
                 httpFile->Seek(0, CFile::begin);
                 httpFile->Read(http_content_buffer, static_cast<UINT>(http_content_len + 1));
+
+                // decompress
+                if (CCommon::GZipDecompress((Byte*)http_content_buffer, (uLong)http_content_len,
+                    contents_buffer, &contents_len) == 0)
+                {
+                    content = CCommon::StrToUnicode((char*)contents_buffer, true);
+                    succeed = true;
+                }
             }
 
             httpFile->Close();
@@ -60,14 +68,12 @@ namespace hf
             succeed = false;
             e->Delete();
         }
-
-
-        // decompress
-        if (CCommon::GZipDecompress((Byte*)http_content_buffer, (uLong)http_content_len,
-            contents_buffer, &contents_len) == 0)
+        catch (...)
         {
-            content = CCommon::StrToUnicode((char*)contents_buffer, true);
-            succeed = true;
+            if (httpFile != nullptr) httpFile->Close();
+            if (session != nullptr) session->Close();
+
+            succeed = false;
         }
 
         delete[] http_content_buffer;
@@ -203,21 +209,17 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
         {
             tmp_str.Format(dm.StringRes(IDS_HFW_FMT_WIND_DIRECTION), _realtimeWeather.WindDirection.c_str());
             oss << L" " << tmp_str.GetString();
-            //oss << L" " << _realtimeWeather.WindDirection;
             if (config.ShowRealtimeWindScale)
             {
                 tmp_str.Format(dm.StringRes(IDS_HFW_FMT_WIND_SCALE), _realtimeWeather.WindScale.c_str());
                 oss << tmp_str.GetString();
-                //oss << _realtimeWeather.WindScale << L"级";
             }
             else
                 oss << _realtimeWeather.WindSpeed << L"km/h";
         }
 
         if (config.ShowRealtimeHumidity)
-            oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _realtimeWeather.Humidity << L"%";
-            //oss << L" 相对湿度 " << _realtimeWeather.Humidity << L"%";
-
+            oss << L" " << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _realtimeWeather.Humidity << L"%";
 
         // format realtime air quality information
         if (config.ShowAirQuality)
@@ -248,30 +250,19 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
     }
 
     // format forcast weather information
-    // - today
-    oss << dm.StringRes(IDS_TODAY).GetString() << L": " << GetWeatherText(EWeatherInfoType::WEATHER_TODAY)
-        << L" " << GetTemprature(EWeatherInfoType::WEATHER_TODAY);
-    if (config.ShowForecastUVIdex)
-        oss << dm.StringRes(IDS_HFW_FMT_UVI).GetString() << _forcastWeatherTD.UVIndex;
-    if (config.showForecastHumidity)
-        oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _forcastWeatherTD.Humidity << L"%";
-    oss << std::endl;
-    // - tomorrow
-    oss << dm.StringRes(IDS_TOMORROW).GetString() << L": " << GetWeatherText(EWeatherInfoType::WEATHER_TOMMROW)
-        << L" " << GetTemprature(EWeatherInfoType::WEATHER_TOMMROW);
-    if (config.ShowForecastUVIdex)
-        oss << dm.StringRes(IDS_HFW_FMT_UVI).GetString() << _forcastWeatherTM.UVIndex;
-    if (config.showForecastHumidity)
-        oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _forcastWeatherTM.Humidity << L"%";
-    oss << std::endl;
-    // - day after tomorrow
-    oss << dm.StringRes(IDS_DAY_AFTER_TOMORROW).GetString() << L": " << GetWeatherText(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW)
-        << L" " << GetTemprature(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW);
-    if (config.ShowForecastUVIdex)
-        oss << dm.StringRes(IDS_HFW_FMT_UVI).GetString() << _forcastWeatherDATM.UVIndex;
-    if (config.showForecastHumidity)
-        oss << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << _forcastWeatherDATM.Humidity << L"%";
-    oss << std::endl;
+    auto forcast_formatter = [&dm, &oss, this](EWeatherInfoType weather_type, ForcastWeather &weather, UINT date_res_id) {
+        oss << dm.StringRes(date_res_id).GetString() << L": " << GetWeatherText(weather_type)
+            << L" " << GetTemprature(weather_type);
+        if (config.ShowForecastUVIdex)
+            oss << L" " << dm.StringRes(IDS_HFW_FMT_UVI).GetString() << weather.UVIndex;
+        if (config.showForecastHumidity)
+            oss << L" " << dm.StringRes(IDS_HFW_FMT_HUMIDITY).GetString() << weather.Humidity << L"%";
+        oss << std::endl;
+        };
+
+    forcast_formatter(EWeatherInfoType::WEATHER_TODAY, _forcastWeatherTD, IDS_TODAY);
+    forcast_formatter(EWeatherInfoType::WEATHER_TOMMROW, _forcastWeatherTM, IDS_TOMORROW);
+    forcast_formatter(EWeatherInfoType::WEATHER_DAY_AFTER_TOMMROW, _forcastWeatherDATM, IDS_DAY_AFTER_TOMORROW);
 
     // end
 
@@ -411,7 +402,6 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
         data.TemperatureFeelsLike = hf::get_json_str_value(now_obj, "feelsLike");
         data.UpdateTime = hf::get_json_str_value(now_obj, "obsTime").substr(11, 5);
         data.WeatherText = hf::get_json_str_value(now_obj, "text");
-        //data.WeatherCode = hf::convert_weather_code(hf::get_json_str_value(now_obj, "icon"));
         data.WeatherCode = hf::get_json_str_value(now_obj, "icon");
         data.WindDirection = hf::get_json_str_value(now_obj, "windDir");
         data.WindScale = hf::get_json_str_value(now_obj, "windScale");
@@ -485,8 +475,6 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
             w.TemperatureMin = hf::get_json_str_value(j_val, "tempMin");
             w.WeatherDay = hf::get_json_str_value(j_val, "textDay");
             w.WeatherNight = hf::get_json_str_value(j_val, "textNight");
-            //w.WeatherCodeDay = hf::convert_weather_code(hf::get_json_str_value(j_val, "iconDay"));
-            //w.WeatherCodeNight = hf::convert_weather_code(hf::get_json_str_value(j_val, "iconNight"));
             w.WeatherCodeDay = hf::get_json_str_value(j_val, "iconDay");
             w.WeatherCodeNight = hf::get_json_str_value(j_val, "iconNight");
             w.UVIndex = hf::get_json_str_value(j_val, "uvIndex");

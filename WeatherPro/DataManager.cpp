@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "DataManager.h"
 #include "resource.h"
+#include "SimpleIni.h"
 
 #include <sstream>
 #include <chrono>
@@ -629,6 +630,8 @@ CDataManager::CDataManager()
 
     m_api_wccs = std::make_shared<DataApiWeatherComCnSpider>();
     m_api_hfw = std::make_shared<DataApiHefengWeather>();
+
+    m_lang_id = GetThreadUILanguage();  // 默认为系统语言
 }
 
 CDataManager::~CDataManager()
@@ -650,6 +653,9 @@ const CString& CDataManager::StringRes(UINT id) const
 {
     if (m_string_resources.count(id) == 0)
     {
+        if (m_lang_id != GetThreadUILanguage())
+            SetThreadUILanguage(m_lang_id);
+
         AFX_MANAGE_STATE(AfxGetStaticModuleState());
         m_string_resources[id].LoadString(id);
     }
@@ -742,103 +748,118 @@ const SConfiguration& CDataManager::GetConfig() const
     return m_config;
 }
 
+void CDataManager::_setLangID(const std::wstring &cfg_dir)
+{
+    static const WORD langid_en_us = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+    static const WORD langid_zh_cn = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
+
+    // 插件配置文件所在文件夹的上一级为主程序配置文件路径
+    auto pos = cfg_dir.rfind(L"plugins");
+    if (pos == std::wstring::npos)
+        return;
+
+    auto tm_cfg_dir = cfg_dir.substr(0, pos);
+    auto tm_cfg_file = tm_cfg_dir + L"config.ini";
+
+    CSimpleIni tm_ini;
+    tm_ini.SetUnicode();
+    tm_ini.LoadFile(tm_cfg_file.c_str());
+
+    auto tm_lang_id = tm_ini.GetLongValue(L"general", L"language", 0);
+    if (tm_lang_id == 0)  // 跟随系统
+    {
+        auto p_lang_id = PRIMARYLANGID(m_lang_id);
+        if (p_lang_id != LANG_CHINESE)
+            m_lang_id = langid_en_us;
+        else
+            m_lang_id = langid_zh_cn;
+    } else if (tm_lang_id == 1)  // 英语
+        m_lang_id = langid_en_us;
+    else if (tm_lang_id == 2 || tm_lang_id == 3)  // 汉语
+        m_lang_id = langid_zh_cn;
+    else  // 处理意外值
+        m_lang_id = langid_en_us;
+}
+
 void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
 {
+    _setLangID(cfg_dir);
+
     const auto &ch = cfg_dir.back();
     if (ch == L'\\' || ch == L'/')
         m_config_file_path = cfg_dir + L"WeatherPro.ini";
     else
         m_config_file_path = cfg_dir + L"\\WeatherPro.ini";
 
-    auto cfg_int_val_getter = [this](const wchar_t *section, const wchar_t *key, int default_val) {
-        int val = GetPrivateProfileInt(section, key, default_val, m_config_file_path.c_str());
-        return val;
-    };
+    CSimpleIni ini;
+    ini.SetUnicode();
+    ini.LoadFile(m_config_file_path.c_str());
 
-    auto cfg_str_val_getter = [this](const wchar_t *section, const wchar_t *key, const wchar_t *default_val) {
-        wchar_t buffer[64]{ 0 };
-        GetPrivateProfileString(section, key, default_val, buffer, 64, m_config_file_path.c_str());
-        return std::wstring{ buffer };
-    };
+    m_currentCityInfo.CityNO = ini.GetValue(L"config", L"city_no", L"101010100");
+    m_currentCityInfo.CityName = ini.GetValue(L"config", L"city_name", L"北京");
 
-    auto cfg_bool_val_getter = [cfg_int_val_getter](const wchar_t *section, const wchar_t *key, int default_val) {
-        return cfg_int_val_getter(section, key, default_val) != 0;
-    };
-
-    m_currentCityInfo.CityNO = cfg_str_val_getter(L"config", L"city_no", L"101010100");
-    m_currentCityInfo.CityName = cfg_str_val_getter(L"config", L"city_name", L"北京");
-
-    m_config.m_api_type = static_cast<DataApiType>(cfg_int_val_getter(L"config", L"api_type", 1));
-    m_config.m_wit = static_cast<EWeatherInfoType>(cfg_int_val_getter(L"config", L"wit", 0));
-    m_config.m_update_frequency = static_cast<UpdateFrequency>(cfg_int_val_getter(L"config", L"update_freq", 1));
-    m_config.m_icon_type = static_cast<IconType>(cfg_int_val_getter(L"config", L"icon_type", 0));
-    m_config.m_show_weather_icon = cfg_bool_val_getter(L"config", L"show_weather_icon", 1);
-    m_config.m_show_weather_in_tooltips = cfg_bool_val_getter(L"config", L"show_weather_in_tooltips", 1);
-    m_config.m_show_brief_rt_weather_info = cfg_bool_val_getter(L"config", L"show_brief_rt_weather_info", 0);
-    m_config.m_show_weather_alerts = cfg_bool_val_getter(L"config", L"show_weather_alerts", 1);
-    m_config.m_show_brief_weather_alert_info = cfg_bool_val_getter(L"config", L"show_brief_weather_alert_info", 1);
-    m_config.m_show_error_info = cfg_bool_val_getter(L"config", L"show_error_info", 0);
+    m_config.m_api_type = static_cast<DataApiType>(ini.GetLongValue(L"config", L"api_type", 1));
+    m_config.m_wit = static_cast<EWeatherInfoType>(ini.GetLongValue(L"config", L"wit", 0));
+    m_config.m_update_frequency = static_cast<UpdateFrequency>(ini.GetLongValue(L"config", L"update_freq", 1));
+    m_config.m_icon_type = static_cast<IconType>(ini.GetLongValue(L"config", L"icon_type", 0));
+    m_config.m_show_weather_icon = ini.GetBoolValue(L"config", L"show_weather_icon", 1);
+    m_config.m_show_weather_in_tooltips = ini.GetBoolValue(L"config", L"show_weather_in_tooltips", 1);
+    m_config.m_show_brief_rt_weather_info = ini.GetBoolValue(L"config", L"show_brief_rt_weather_info", 0);
+    m_config.m_show_weather_alerts = ini.GetBoolValue(L"config", L"show_weather_alerts", 1);
+    m_config.m_show_brief_weather_alert_info = ini.GetBoolValue(L"config", L"show_brief_weather_alert_info", 1);
+    m_config.m_show_error_info = ini.GetBoolValue(L"config", L"show_error_info", 0);
 
     auto &hf_cfg = m_api_hfw->config;
-    hf_cfg.AppKey = cfg_str_val_getter(L"hfw", L"AppKey", L"");
-    hf_cfg.ShowRealtimeTemperatureFeelsLike = cfg_bool_val_getter(L"hfw", L"show_rt_temp_feels_like", 0);
-    hf_cfg.ShowRealtimeWind = cfg_bool_val_getter(L"hfw", L"show_rt_wind", 1);
-    hf_cfg.ShowRealtimeWindScale = cfg_bool_val_getter(L"hfw", L"show_rt_wind_scale", 1);
-    hf_cfg.ShowRealtimeHumidity = cfg_bool_val_getter(L"hfw", L"show_rt_humidity", 1);
-    hf_cfg.ShowForecastUVIdex = cfg_bool_val_getter(L"hfw", L"show_fc_uv_index", 0);
-    hf_cfg.showForecastHumidity = cfg_bool_val_getter(L"hfw", L"show_fc_humidity", 0);
-    hf_cfg.ShowAirQuality = cfg_bool_val_getter(L"hfw", L"show_rt_air_quality", 1);
-    hf_cfg.ShowAirQualityAQI = cfg_bool_val_getter(L"hfw", L"show_rt_air_quality_aqi", 1);
-    hf_cfg.ShowAirQualityPM2p5 = cfg_bool_val_getter(L"hfw", L"show_rt_air_quality_pm2p5", 1);
-    hf_cfg.ShowAirQualityPM10 = cfg_bool_val_getter(L"hfw", L"show_rt_air_quality_pm10", 0);
-    hf_cfg.ShowWeatherAlert = cfg_bool_val_getter(L"hfw", L"show_weather_alert", 1);
+    hf_cfg.AppKey = ini.GetValue(L"hfw", L"AppKey", L"");
+    hf_cfg.ShowRealtimeTemperatureFeelsLike = ini.GetBoolValue(L"hfw", L"show_rt_temp_feels_like", 0);
+    hf_cfg.ShowRealtimeWind = ini.GetBoolValue(L"hfw", L"show_rt_wind", 1);
+    hf_cfg.ShowRealtimeWindScale = ini.GetBoolValue(L"hfw", L"show_rt_wind_scale", 1);
+    hf_cfg.ShowRealtimeHumidity = ini.GetBoolValue(L"hfw", L"show_rt_humidity", 1);
+    hf_cfg.ShowForecastUVIdex = ini.GetBoolValue(L"hfw", L"show_fc_uv_index", 0);
+    hf_cfg.showForecastHumidity = ini.GetBoolValue(L"hfw", L"show_fc_humidity", 0);
+    hf_cfg.ShowAirQuality = ini.GetBoolValue(L"hfw", L"show_rt_air_quality", 1);
+    hf_cfg.ShowAirQualityAQI = ini.GetBoolValue(L"hfw", L"show_rt_air_quality_aqi", 1);
+    hf_cfg.ShowAirQualityPM2p5 = ini.GetBoolValue(L"hfw", L"show_rt_air_quality_pm2p5", 1);
+    hf_cfg.ShowAirQualityPM10 = ini.GetBoolValue(L"hfw", L"show_rt_air_quality_pm10", 0);
+    hf_cfg.ShowWeatherAlert = ini.GetBoolValue(L"hfw", L"show_weather_alert", 1);
 }
 
 void CDataManager::SaveConfigs() const
 {
-    auto cfg_int_val_writter = [this](const wchar_t *section, const wchar_t *key, int value) {
-        wchar_t buffer[64]{ 0 };
+    CSimpleIni ini;
+    ini.SetUnicode();
+    ini.LoadFile(m_config_file_path.c_str());
 
-        swprintf_s(buffer, L"%d", value);
-        WritePrivateProfileString(section, key, buffer, m_config_file_path.c_str());
-    };
+    ini.SetValue(L"config", L"city_no", m_currentCityInfo.CityNO.c_str());
+    ini.SetValue(L"config", L"city_name", m_currentCityInfo.CityName.c_str());
 
-    auto cfg_str_val_writter = [this](const wchar_t *section, const wchar_t *key, const wchar_t *value) {
-        WritePrivateProfileString(section, key, value, m_config_file_path.c_str());
-    };
-
-    auto cfg_bool_val_writter = [cfg_int_val_writter](const wchar_t *section, const wchar_t *key, bool value) {
-        cfg_int_val_writter(section, key, value ? 1 : 0);
-    };
-
-    cfg_str_val_writter(L"config", L"city_no", m_currentCityInfo.CityNO.c_str());
-    cfg_str_val_writter(L"config", L"city_name", m_currentCityInfo.CityName.c_str());
-
-    cfg_int_val_writter(L"config", L"api_type", static_cast<int>(m_config.m_api_type));
-    cfg_int_val_writter(L"config", L"wit", static_cast<int>(m_config.m_wit));
-    cfg_int_val_writter(L"config", L"update_freq", static_cast<int>(m_config.m_update_frequency));
-    cfg_int_val_writter(L"config", L"icon_type", static_cast<int>(m_config.m_icon_type));
-    cfg_bool_val_writter(L"config", L"show_weather_icon", m_config.m_show_weather_icon);
-    cfg_bool_val_writter(L"config", L"show_weather_icon", m_config.m_show_weather_icon);
-    cfg_bool_val_writter(L"config", L"show_weather_in_tooltips", m_config.m_show_weather_in_tooltips);
-    cfg_bool_val_writter(L"config", L"show_brief_rt_weather_info", m_config.m_show_brief_rt_weather_info);
-    cfg_bool_val_writter(L"config", L"show_weather_alerts", m_config.m_show_weather_alerts);
-    cfg_bool_val_writter(L"config", L"show_brief_weather_alert_info", m_config.m_show_brief_weather_alert_info);
-    cfg_bool_val_writter(L"config", L"show_error_info", m_config.m_show_error_info);
+    ini.SetLongValue(L"config", L"api_type", static_cast<int>(m_config.m_api_type));
+    ini.SetLongValue(L"config", L"wit", static_cast<int>(m_config.m_wit));
+    ini.SetLongValue(L"config", L"update_freq", static_cast<int>(m_config.m_update_frequency));
+    ini.SetLongValue(L"config", L"icon_type", static_cast<int>(m_config.m_icon_type));
+    ini.SetBoolValue(L"config", L"show_weather_icon", m_config.m_show_weather_icon);
+    ini.SetBoolValue(L"config", L"show_weather_icon", m_config.m_show_weather_icon);
+    ini.SetBoolValue(L"config", L"show_weather_in_tooltips", m_config.m_show_weather_in_tooltips);
+    ini.SetBoolValue(L"config", L"show_brief_rt_weather_info", m_config.m_show_brief_rt_weather_info);
+    ini.SetBoolValue(L"config", L"show_weather_alerts", m_config.m_show_weather_alerts);
+    ini.SetBoolValue(L"config", L"show_brief_weather_alert_info", m_config.m_show_brief_weather_alert_info);
+    ini.SetBoolValue(L"config", L"show_error_info", m_config.m_show_error_info);
 
     auto &hf_cfg = m_api_hfw->config;
-    cfg_str_val_writter(L"hfw", L"AppKey", hf_cfg.AppKey.c_str());
-    cfg_bool_val_writter(L"hfw", L"show_rt_temp_feels_like", hf_cfg.ShowRealtimeTemperatureFeelsLike);
-    cfg_bool_val_writter(L"hfw", L"show_rt_wind", hf_cfg.ShowRealtimeWind);
-    cfg_bool_val_writter(L"hfw", L"show_rt_wind_scale", hf_cfg.ShowRealtimeWindScale);
-    cfg_bool_val_writter(L"hfw", L"show_rt_humidity", hf_cfg.ShowRealtimeHumidity);
-    cfg_bool_val_writter(L"hfw", L"show_fc_uv_index", hf_cfg.ShowForecastUVIdex);
-    cfg_bool_val_writter(L"hfw", L"show_fc_humidity", hf_cfg.showForecastHumidity);
-    cfg_bool_val_writter(L"hfw", L"show_rt_air_quality", hf_cfg.ShowAirQuality);
-    cfg_bool_val_writter(L"hfw", L"show_rt_air_quality_aqi", hf_cfg.ShowAirQualityAQI);
-    cfg_bool_val_writter(L"hfw", L"show_rt_air_quality_pm2p5", hf_cfg.ShowAirQualityPM2p5);
-    cfg_bool_val_writter(L"hfw", L"show_rt_air_quality_pm10", hf_cfg.ShowAirQualityPM10);
-    cfg_bool_val_writter(L"hfw", L"show_weather_alert", hf_cfg.ShowWeatherAlert);
+    ini.SetValue(L"hfw", L"AppKey", hf_cfg.AppKey.c_str());
+    ini.SetBoolValue(L"hfw", L"show_rt_temp_feels_like", hf_cfg.ShowRealtimeTemperatureFeelsLike);
+    ini.SetBoolValue(L"hfw", L"show_rt_wind", hf_cfg.ShowRealtimeWind);
+    ini.SetBoolValue(L"hfw", L"show_rt_wind_scale", hf_cfg.ShowRealtimeWindScale);
+    ini.SetBoolValue(L"hfw", L"show_rt_humidity", hf_cfg.ShowRealtimeHumidity);
+    ini.SetBoolValue(L"hfw", L"show_fc_uv_index", hf_cfg.ShowForecastUVIdex);
+    ini.SetBoolValue(L"hfw", L"show_fc_humidity", hf_cfg.showForecastHumidity);
+    ini.SetBoolValue(L"hfw", L"show_rt_air_quality", hf_cfg.ShowAirQuality);
+    ini.SetBoolValue(L"hfw", L"show_rt_air_quality_aqi", hf_cfg.ShowAirQualityAQI);
+    ini.SetBoolValue(L"hfw", L"show_rt_air_quality_pm2p5", hf_cfg.ShowAirQualityPM2p5);
+    ini.SetBoolValue(L"hfw", L"show_rt_air_quality_pm10", hf_cfg.ShowAirQualityPM10);
+    ini.SetBoolValue(L"hfw", L"show_weather_alert", hf_cfg.ShowWeatherAlert);
+
+    ini.SaveFile(m_config_file_path.c_str());
 }
 
 HICON CDataManager::GetIcon()

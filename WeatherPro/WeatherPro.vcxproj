@@ -232,6 +232,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectCityDlg.h" />
+    <ClInclude Include="SimpleIni.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WeatherPro.h" />
     <ClInclude Include="WeatherProItem.h" />
