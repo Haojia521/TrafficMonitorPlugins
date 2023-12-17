@@ -25,6 +25,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
     , m_showBriefWeatherAlertInfo(FALSE)
     , m_showBriefRTWeather(FALSE)
     , m_showErrorInfo(FALSE)
+    , m_intRadioDoubleClickAction(0)
 {
     m_pInstance = this;
 }
@@ -48,6 +49,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_COMBO_DATA_API_TYPE, m_ctrlDataApiType);
     DDX_Control(pDX, IDC_COMBO_UPDATE_FREQUENCY, m_ctrlUpdateFrequency);
     DDX_Control(pDX, IDC_COMBO_ICON_TYPE, m_ctrlIconType);
+    DDX_Radio(pDX, IDC_RADIO_DC_TB_WND_ACT_OPEN_OPTIONS, m_intRadioDoubleClickAction);
 }
 
 
@@ -102,6 +104,8 @@ BOOL COptionsDlg::OnInitDialog()
     m_showBriefRTWeather = config.m_show_brief_rt_weather_info ? TRUE : FALSE;
     m_showErrorInfo = config.m_show_error_info ? TRUE : FALSE;
 
+    m_intRadioDoubleClickAction = config.m_double_click_action;
+
     UpdateData(FALSE);
 
     return TRUE;  // return TRUE unless you set the focus to a control
@@ -120,7 +124,8 @@ void COptionsDlg::OnBnClickedBtnSelectCity()
 
     if (dlg.DoModal() == IDOK)
     {
-        if (!dlg.m_selectedCityInfo.CityName.empty() && dlg.m_selectedCityInfo.CityNO != m_selected_city.CityNO)
+        if (!dlg.m_selectedCityInfo.CityName.empty() &&
+            (dlg.m_selectedCityInfo.CityName != m_selected_city.CityName || dlg.m_selectedCityInfo.CityNO != m_selected_city.CityNO))
         {
             m_selected_city = dlg.m_selectedCityInfo;
             m_currentCityName = m_selected_city.CityName.c_str();
@@ -135,7 +140,9 @@ void COptionsDlg::OnOK()
     // 更新设置
     UpdateData(TRUE);
 
-    auto &config = CDataManager::InstanceRef().GetConfig();
+    auto &dm_ref = CDataManager::InstanceRef();
+
+    auto &config = dm_ref.GetConfig();
 
     bool api_changed = config.m_api_type != static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel());
     config.m_api_type = static_cast<DataApiType>(m_ctrlDataApiType.GetCurSel());
@@ -150,9 +157,12 @@ void COptionsDlg::OnOK()
     config.m_show_brief_weather_alert_info = m_showBriefWeatherAlertInfo == TRUE;
     config.m_show_error_info = m_showErrorInfo == TRUE;
 
-    if (m_selected_city.CityNO != CDataManager::Instance().GetCurrentCityInfo().CityNO)
+    config.m_double_click_action = m_intRadioDoubleClickAction;
+
+    if (m_selected_city.CityName != dm_ref.GetCurrentCityInfo().CityName ||
+        m_selected_city.CityNO != dm_ref.GetCurrentCityInfo().CityNO)
     {
-        CDataManager::InstanceRef().SetCurrentCityInfo(m_selected_city);
+        dm_ref.SetCurrentCityInfo(m_selected_city);
         CWeatherPro::Instance().UpdateWeatherInfo(true);
     }
     else if (api_changed)
@@ -160,12 +170,12 @@ void COptionsDlg::OnOK()
     else
     {
         // 更新tooltip
-        CDataManager::InstanceRef().RefreshWeatherInfoCache();
-        CWeatherPro::Instance().UpdateTooltip(CDataManager::Instance().GetTooptipInfo());
+        dm_ref.RefreshWeatherInfoCache();
+        CWeatherPro::Instance().UpdateTooltip(dm_ref.GetTooptipInfo());
     }
 
     // 保存配置文件
-    CDataManager::Instance().SaveConfigs();
+    dm_ref.SaveConfigs();
 
     CDialogEx::OnOK();
 }

@@ -808,6 +808,7 @@ void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
     m_config.m_show_weather_alerts = ini.GetBoolValue(L"config", L"show_weather_alerts", 1);
     m_config.m_show_brief_weather_alert_info = ini.GetBoolValue(L"config", L"show_brief_weather_alert_info", 1);
     m_config.m_show_error_info = ini.GetBoolValue(L"config", L"show_error_info", 0);
+    m_config.m_double_click_action = ini.GetLongValue(L"config", L"double_click_action", 0);
 
     auto &hf_cfg = m_api_hfw->config;
     hf_cfg.AppKey = ini.GetValue(L"hfw", L"AppKey", L"");
@@ -844,6 +845,7 @@ void CDataManager::SaveConfigs() const
     ini.SetBoolValue(L"config", L"show_weather_alerts", m_config.m_show_weather_alerts);
     ini.SetBoolValue(L"config", L"show_brief_weather_alert_info", m_config.m_show_brief_weather_alert_info);
     ini.SetBoolValue(L"config", L"show_error_info", m_config.m_show_error_info);
+    ini.SetLongValue(L"config", L"double_click_action", m_config.m_double_click_action);
 
     auto &hf_cfg = m_api_hfw->config;
     ini.SetValue(L"hfw", L"AppKey", hf_cfg.AppKey.c_str());

@@ -97,9 +97,12 @@
 #define IDS_CFG_WND_ICON_HFW_HOLLOW     1032
 #define IDI_ICON_B_D00                  1033
 #define IDS_SC_WND_INVALID_API          1033
+#define IDC_RADIO_DC_TB_WND_ACT_OPEN_OPTIONS 1033
 #define IDI_ICON_B_D01                  1034
+#define IDC_RADIO_DC_TB_WND_ACT_UPDATE  1034
 #define IDI_ICON_B_D03                  1035
 #define IDI_ICON_B_D13                  1036
+#define IDC_RADIO2                      1036
 #define IDI_ICON_B_N00                  1037
 #define IDI_ICON_B_N01                  1038
 #define IDI_ICON_B_N03                  1039
@@ -268,7 +271,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1200
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1033
+#define _APS_NEXT_CONTROL_VALUE         1037
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

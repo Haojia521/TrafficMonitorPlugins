@@ -43,6 +43,7 @@ struct SConfiguration
     bool m_show_weather_alerts;
     bool m_show_brief_weather_alert_info;
     bool m_show_error_info;
+    int m_double_click_action;
 };
 
 using WeatherInfoUpdatedCallback = std::function<void(const std::wstring & info)>;

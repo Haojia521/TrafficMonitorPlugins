@@ -1,4 +1,5 @@
 ﻿#include "pch.h"
+#include "WeatherPro.h"
 #include "WeatherProItem.h"
 #include "DataManager.h"
 #include <algorithm>
@@ -77,4 +78,21 @@ void CWeatherProItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_
     }
 
     pDC->DrawText(CDataManager::Instance().GetWeatherTemperature().c_str(), rect, DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+}
+
+int CWeatherProItem::OnMouseEvent(MouseEventType type, int x, int y, void* hWnd, int flag)
+{
+    if (type == IPluginItem::MT_DBCLICKED)
+    {
+        const auto &dm = CDataManager::Instance();
+
+        if (dm.GetConfig().m_double_click_action == 0)
+            CWeatherPro::Instance().ShowOptionsDialog(hWnd);
+        else
+            CWeatherPro::Instance().UpdateWeatherInfo(true);
+
+        return 1;
+    }
+
+    return 0;
 }

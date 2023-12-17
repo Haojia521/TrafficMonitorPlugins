@@ -37,6 +37,7 @@ public:
     CComboBox m_ctrlDataApiType;
     CComboBox m_ctrlUpdateFrequency;
     CComboBox m_ctrlIconType;
+    int m_intRadioDoubleClickAction;
 
     afx_msg void OnBnClickedBtnSelectCity();
     virtual BOOL OnInitDialog();
