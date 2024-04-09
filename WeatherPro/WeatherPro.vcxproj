@@ -204,6 +204,7 @@
     <ClCompile Include="DataApiHefengWeather.cpp" />
     <ClCompile Include="DataApiWeatherComCnSpider.cpp" />
     <ClCompile Include="DataManager.cpp" />
+    <ClCompile Include="Locator.cpp" />
     <ClCompile Include="OptionsDlg.cpp" />
     <ClCompile Include="OptionsHfwDlg.cpp" />
     <ClCompile Include="pch.cpp">
@@ -227,6 +228,7 @@
     <ClInclude Include="DataApiWeatherComCnSpider.h" />
     <ClInclude Include="DataManager.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Locator.h" />
     <ClInclude Include="OptionsDlg.h" />
     <ClInclude Include="OptionsHfwDlg.h" />
     <ClInclude Include="pch.h" />
