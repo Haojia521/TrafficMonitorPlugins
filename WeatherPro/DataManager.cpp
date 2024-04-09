@@ -2,6 +2,7 @@
 #include "DataManager.h"
 #include "resource.h"
 #include "SimpleIni.h"
+#include "Locator.h"
 
 #include <sstream>
 #include <chrono>
@@ -617,7 +618,11 @@ SConfiguration::SConfiguration() :
     m_show_brief_rt_weather_info(false),
     m_show_weather_alerts(true),
     m_show_brief_weather_alert_info(true),
-    m_show_error_info(false)
+    m_show_error_info(false),
+    m_double_click_action(0),
+    m_auto_locating(false),
+    m_loc_method(LocatingMethod::LM_IP_IPIPNET),
+    m_loc_timestamp(0)
 {}
 
 CDataManager CDataManager::m_instance;
@@ -701,6 +706,19 @@ DataApiPtr CDataManager::GetCurrentApi() const
 void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
 {
     std::lock_guard<std::mutex> guard(g_weather_update_nutex);
+
+    // locating
+    if (m_config.m_auto_locating)
+    {
+        auto copy_ip = m_config.m_loc_ip;
+        auto copy_name = m_config.m_loc_name;
+
+        if (_queryGeoLocation())
+        {
+            // check ip first
+            
+        }
+    }
 
     std::shared_ptr<DataAPI> current_api{ GetCurrentApi() };
     if (current_api != nullptr)
@@ -942,4 +960,32 @@ void CDataManager::RefreshWeatherInfoCache()
     m_weather_info_cache.WeatherTemperature = _getWeatherTemperature();
     m_weather_info_cache.TooltipInfo = _getTooptipInfo();
     m_weather_info_cache.Icon = _getIcon();
+}
+
+/*****************************************************************************/
+
+bool CDataManager::_queryGeoLocation()
+{
+    std::unique_ptr<Locator> locator;
+    std::wstringstream wss;
+
+    if (m_config.m_loc_method == LocatingMethod::LM_IP_IPIPNET)
+        locator.reset(new IpLocatorIPIPNET);
+    else
+        wss << L"invalid locating method: " << static_cast<int>(m_config.m_loc_method) << std::endl;
+
+    if (locator != nullptr)
+    {
+        if (locator->GetLocation())
+        {
+            m_config.m_loc_ip = locator->ip;
+            m_config.m_loc_name = locator->location_name;
+        }
+        else
+            wss << locator->err_message << std::endl;
+    }
+
+    auto err = wss.str();
+    // todo: save err info
+    return err.empty();
 }

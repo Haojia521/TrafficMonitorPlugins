@@ -106,6 +106,8 @@ private:
 
     void _setLangID(const std::wstring &cfg_dir);
 
+    bool _queryGeoLocation();
+
     static CDataManager m_instance;
     int m_dpi;
     mutable std::map<UINT, CString> m_string_resources;
