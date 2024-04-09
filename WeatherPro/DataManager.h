@@ -29,6 +29,11 @@ enum class IconType
     IT_HFW_HOLLOW,
 };
 
+enum class LocatingMethod
+{
+    LM_IP_IPIPNET = 0
+};
+
 struct SConfiguration
 {
     SConfiguration();
@@ -44,6 +49,13 @@ struct SConfiguration
     bool m_show_brief_weather_alert_info;
     bool m_show_error_info;
     int m_double_click_action;
+
+    // geo-locating
+    bool m_auto_locating;
+    LocatingMethod m_loc_method;
+    std::wstring m_loc_ip;
+    std::wstring m_loc_name;
+    int m_loc_timestamp;
 };
 
 using WeatherInfoUpdatedCallback = std::function<void(const std::wstring & info)>;

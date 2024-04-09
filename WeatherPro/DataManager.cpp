@@ -810,6 +810,13 @@ void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
     m_config.m_show_error_info = ini.GetBoolValue(L"config", L"show_error_info", 0);
     m_config.m_double_click_action = ini.GetLongValue(L"config", L"double_click_action", 0);
 
+    // geo-locating
+    m_config.m_auto_locating = ini.GetBoolValue(L"loc", L"auto_locating", false);
+    m_config.m_loc_method = static_cast<LocatingMethod>(ini.GetLongValue(L"loc", L"method", 0));
+    m_config.m_loc_ip = ini.GetValue(L"loc", L"ip", L"");
+    m_config.m_loc_name = ini.GetValue(L"loc", L"name", L"");
+    m_config.m_loc_timestamp = ini.GetLongValue(L"loc", L"timestamp");
+
     auto &hf_cfg = m_api_hfw->config;
     hf_cfg.AppKey = ini.GetValue(L"hfw", L"AppKey", L"");
     hf_cfg.ShowRealtimeTemperatureFeelsLike = ini.GetBoolValue(L"hfw", L"show_rt_temp_feels_like", 0);
@@ -846,6 +853,13 @@ void CDataManager::SaveConfigs() const
     ini.SetBoolValue(L"config", L"show_brief_weather_alert_info", m_config.m_show_brief_weather_alert_info);
     ini.SetBoolValue(L"config", L"show_error_info", m_config.m_show_error_info);
     ini.SetLongValue(L"config", L"double_click_action", m_config.m_double_click_action);
+
+    // geo-locating
+    ini.SetBoolValue(L"loc", L"auto_locating", m_config.m_auto_locating);
+    ini.SetLongValue(L"loc", L"method", static_cast<int>(m_config.m_loc_method));
+    ini.SetValue(L"loc", L"ip", m_config.m_loc_ip.c_str());
+    ini.SetValue(L"loc", L"name", m_config.m_loc_name.c_str());
+    ini.SetLongValue(L"loc", L"timestamp", m_config.m_loc_timestamp);
 
     auto &hf_cfg = m_api_hfw->config;
     ini.SetValue(L"hfw", L"AppKey", hf_cfg.AppKey.c_str());
