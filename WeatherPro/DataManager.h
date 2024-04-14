@@ -5,6 +5,7 @@
 
 #include "DataApiWeatherComCnSpider.h"
 #include "DataApiHefengWeather.h"
+#include "Locator.h"
 
 enum class UpdateFrequency
 {
@@ -106,7 +107,7 @@ private:
 
     void _setLangID(const std::wstring &cfg_dir);
 
-    bool _queryGeoLocation();
+    bool _queryGeoLocation(LocationData &loc);
 
     static CDataManager m_instance;
     int m_dpi;

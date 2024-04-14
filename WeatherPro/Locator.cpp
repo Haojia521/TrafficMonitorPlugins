@@ -74,13 +74,14 @@ namespace loc
     }
 }
 
-bool IpLocatorIPIPNET::GetLocation()
+bool IpLocatorIPIPNET::GetLocation(LocationData &loc)
 {
+    loc = LocationData();
+
     CString url(L"https://myip.ipip.net/json");
 
     std::wstring content;
-
-    if (loc::call_internet(url, content, this->err_message))
+    if (loc::call_internet(url, content, loc.err_message))
     {
         auto json = CCommon::UnicodeToStr(content.c_str(), true);
         std::unique_ptr<yyjson_doc, void(*)(yyjson_doc*)> json_doc(
@@ -99,21 +100,21 @@ bool IpLocatorIPIPNET::GetLocation()
                 auto *data = yyjson_obj_get(root, "data");
 
                 auto ip = loc::get_json_str_value(data, "ip");
-                this->ip = CCommon::StrToUnicode(ip.c_str(), true);
+                loc.ip = CCommon::StrToUnicode(ip.c_str(), true);
 
                 auto *location = yyjson_obj_get(data, "location");
                 std::string prov = yyjson_get_str(yyjson_arr_get(location, 1));
                 std::string city = yyjson_get_str(yyjson_arr_get(location, 2));
 
-                this->location = CCommon::StrToUnicode((prov + city).c_str(), true);
+                loc.location_name = CCommon::StrToUnicode((prov + city).c_str(), true);
 
                 return true;
             }
             else
-                this->err_message = L"[ipip.net] invalid return statue";
+                loc.err_message = L"[ipip.net] invalid return statue";
         }
         else
-            this->err_message = L"[ipip.net] contents cannot be parsed as json";
+            loc.err_message = L"[ipip.net] contents cannot be parsed as json";
     }
 
     return false;

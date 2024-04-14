@@ -2,18 +2,23 @@
 
 #include <string>
 
-struct Locator
+struct LocationData
 {
     std::wstring ip;
     std::wstring location_name;
     std::wstring longitude;
     std::wstring latitude;
     std::wstring err_message;
-
-    virtual bool GetLocation() = 0;
 };
 
-struct IpLocatorIPIPNET : public Locator
+class Locator
 {
-    bool GetLocation() override;
+public:
+    virtual bool GetLocation(LocationData &loc) = 0;
+};
+
+class IpLocatorIPIPNET: public Locator
+{
+public:
+    bool GetLocation(LocationData &loc) override;
 };

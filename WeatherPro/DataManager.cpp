@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "DataManager.h"
 #include "resource.h"
 #include "SimpleIni.h"
@@ -707,22 +707,35 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
 {
     std::lock_guard<std::mutex> guard(g_weather_update_nutex);
 
-    // locating
-    if (m_config.m_auto_locating)
-    {
-        auto copy_ip = m_config.m_loc_ip;
-        auto copy_name = m_config.m_loc_name;
-
-        if (_queryGeoLocation())
-        {
-            // check ip first
-            
-        }
-    }
-
     std::shared_ptr<DataAPI> current_api{ GetCurrentApi() };
+    current_api->ClrearErrors();
+
     if (current_api != nullptr)
     {
+        // locating
+        if (m_config.m_auto_locating)
+        {
+            LocationData loc;
+            if (_queryGeoLocation(loc))
+            {
+                bool location_changed = (!loc.ip.empty() && loc.ip != m_config.m_loc_ip) ||
+                                        (!loc.location_name.empty() && loc.location_name != m_config.m_loc_name);
+                m_config.m_loc_ip = loc.ip;
+                m_config.m_loc_name = loc.location_name;
+                m_config.m_loc_timestamp = std::time(nullptr);
+
+                if (location_changed)
+                {
+                    CityInfoList cities;
+                    if (current_api->QueryCity(loc.location_name, cities) && !cities.empty())
+                    {
+                        SetCurrentCityInfo(cities.front());
+                        SaveConfigs();
+                    }
+                }
+            }
+        }
+
         for (int i = 0; i < 4; ++i)
         {
             if (current_api->UpdateWeather())
@@ -965,7 +978,7 @@ void CDataManager::RefreshWeatherInfoCache()
 
 /*****************************************************************************/
 
-bool CDataManager::_queryGeoLocation()
+bool CDataManager::_queryGeoLocation(LocationData &loc)
 {
     std::unique_ptr<Locator> locator;
     std::wstringstream wss;
@@ -977,16 +990,10 @@ bool CDataManager::_queryGeoLocation()
 
     if (locator != nullptr)
     {
-        if (locator->GetLocation())
-        {
-            m_config.m_loc_ip = locator->ip;
-            m_config.m_loc_name = locator->location_name;
-        }
-        else
-            wss << locator->err_message << std::endl;
+        if (!locator->GetLocation(loc))
+            wss << loc.err_message << std::endl;
     }
 
-    auto err = wss.str();
-    // todo: save err info
-    return err.empty();
+    loc.err_message = wss.str();
+    return loc.err_message.empty();
 }
