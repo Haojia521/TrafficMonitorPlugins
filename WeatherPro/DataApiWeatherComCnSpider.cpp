@@ -704,11 +704,6 @@ bool DataApiWeatherComCnSpider::UpdateWeather()
     return succeed;
 }
 
-std::wstring DataApiWeatherComCnSpider::GetLastError()
-{
-    return L"";
-}
-
 bool DataApiWeatherComCnSpider::QueryRealtimeWeather(const std::wstring &query)
 {
     return wccs::QueryRealTimeWeather(query, _realtimeWeather);

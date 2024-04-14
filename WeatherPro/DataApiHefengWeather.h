@@ -78,7 +78,6 @@ public:
     std::wstring GetWeatherCode(EWeatherInfoType type) override;
 
     bool UpdateWeather() override;
-    std::wstring GetLastError() override;
 
     bool QueryRealtimeWeather(const std::wstring &query);
     bool QueryForecastWeather(const std::wstring &query);
@@ -94,6 +93,4 @@ protected:
 
     bool _airQualityDataOutdated{ true };
     bool _alertsDataOutdated{ true };
-
-    std::wstring _lastError;
 };

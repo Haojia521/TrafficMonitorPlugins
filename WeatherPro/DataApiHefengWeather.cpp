@@ -11,7 +11,7 @@
 #include "DataManager.h"
 
 #define CHECK_KEY if (config.AppKey.empty()) {\
-    _lastError = L"no application key";\
+    m_errors.push_back(L"no application key");\
     return false;\
 }
 
@@ -169,7 +169,7 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
     if (err.empty())
         info = cities;
     else
-        _lastError = err;
+        m_errors.push_back(L"[QRC] " + err);
 
     return err.empty();
 }
@@ -179,20 +179,11 @@ std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
     const auto &app_config = CDataManager::Instance().GetConfig();
     const auto &city_info = CDataManager::Instance().GetCurrentCityInfo();
 
-    std::wostringstream oss_err;
-
     if (config.ShowAirQuality && _airQualityDataOutdated)
-    {
-        if (!QueryRealtimeAirQuality(city_info.CityNO))
-            oss_err << _lastError;
-    }
-    if (config.ShowWeatherAlert && _alertsDataOutdated)
-    {
-        if (!QueryWeatherAlerts(city_info.CityNO))
-            oss_err << std::endl << _lastError;
-    }
+        QueryRealtimeAirQuality(city_info.CityNO);
 
-    _lastError = oss_err.str();
+    if (config.ShowWeatherAlert && _alertsDataOutdated)
+        QueryWeatherAlerts(city_info.CityNO);
 
     const auto &dm = CDataManager::Instance();
     CString tmp_str;
@@ -359,27 +350,18 @@ bool DataApiHefengWeather::UpdateWeather()
     _airQualityDataOutdated = true;
     _alertsDataOutdated = true;
 
-    std::wostringstream oss;
-
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
 
-    if (!QueryRealtimeWeather(currunt_city.CityNO))
-        oss << L"[RealtimeWeather]" << _lastError << std::endl;
-    if (!QueryForecastWeather(currunt_city.CityNO))
-        oss << L"[ForcastWeather]" << _lastError << std::endl;
-    if (config.ShowAirQuality && !QueryRealtimeAirQuality(currunt_city.CityNO))
-        oss << L"[RealtimeAirQuality]" << _lastError << std::endl;
-    if (config.ShowWeatherAlert && !QueryWeatherAlerts(currunt_city.CityNO))
-        oss << L"[WeatherAlerts]" << _lastError;
+    bool succeeded{ true };
 
-    _lastError = oss.str();
+    succeeded &= QueryRealtimeWeather(currunt_city.CityNO);
+    succeeded &= QueryForecastWeather(currunt_city.CityNO);
+    if (config.ShowAirQuality)
+        succeeded &= QueryRealtimeAirQuality(currunt_city.CityNO);
+    if (config.ShowWeatherAlert)
+        succeeded &= QueryWeatherAlerts(currunt_city.CityNO);
 
-    return _lastError.empty();
-}
-
-std::wstring DataApiHefengWeather::GetLastError()
-{
-    return _lastError;
+    return succeeded;
 }
 
 bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
@@ -413,7 +395,7 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
     if (err.empty())
         _realtimeWeather = data;
     else
-        _lastError = err;
+        m_errors.push_back(L"[QRTW] " + err);
 
     return err.empty();
 }
@@ -449,7 +431,7 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
         _airQualityDataOutdated = false;
     }
     else
-        _lastError = err;
+        m_errors.push_back(L"[QRTA] " + err);
 
     return err.empty();
 }
@@ -494,7 +476,7 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
         _forcastWeatherDATM = datm;
     }
     else
-        _lastError = err;
+        m_errors.push_back(L"[QFCW] " + err);
 
     return err.empty();
 }
@@ -540,7 +522,7 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
         _alertsDataOutdated = false;
     }
     else
-        _lastError = err;
+        m_errors.push_back(L"[QWA] " + err);
 
     return err.empty();
 }

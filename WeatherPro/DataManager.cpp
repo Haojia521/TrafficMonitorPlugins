@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "DataManager.h"
 #include "resource.h"
 #include "SimpleIni.h"
@@ -939,14 +939,15 @@ std::wstring CDataManager::_getTooptipInfo() const
 
         wss << m_currentCityInfo.CityName << L" " << api->GetWeatherInfoSummary();
 
-        auto lastErr = api->GetLastError();
-        if (m_config.m_show_error_info && !lastErr.empty())
+        const auto &errors = api->GetErrors();
+        if (m_config.m_show_error_info && !errors.empty())
         {
             wss << std::endl;
 
-            wss << L"=====WeatherPro-Errors=====" << std::endl
-                << lastErr << std::endl
-                << L"===========================";
+            wss << L"=====WeatherPro-Errors=====" << std::endl;
+            for (const auto &err : errors)
+                wss << err << std::endl;
+            wss << L"===========================";
         }
 
         return wss.str();

@@ -20,6 +20,7 @@ struct SCityInfo
 };
 
 using CityInfoList = std::vector<SCityInfo>;
+using WStringList = std::vector<std::wstring>;
 
 class DataAPI
 {
@@ -33,7 +34,11 @@ public:
 
     virtual bool UpdateWeather() = 0;
 
-    virtual std::wstring GetLastError() = 0;
+    const WStringList& GetErrors() { return m_errors; }
+    void ClrearErrors() { m_errors.clear(); }
+
+protected:
+    WStringList m_errors;
 };
 
 using DataApiPtr = std::shared_ptr<DataAPI>;

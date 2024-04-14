@@ -5,8 +5,9 @@
 #include "WeatherPro.h"
 #include "SelectCityDlg.h"
 #include "DataManager.h"
-
 #include "Common.h"
+
+#include <sstream>
 // CSelectCityDlg 对话框
 
 IMPLEMENT_DYNAMIC(CSelectCityDlg, CDialogEx)
@@ -127,9 +128,12 @@ void CSelectCityDlg::OnBnClickedSearchBtn()
     }
     else
     {
-        auto err = data_api->GetLastError();
+        std::wstringstream wss;
+        for (const auto &err : data_api->GetErrors())
+            wss << err << std::endl;
+
         CString info;
-        info.Format(L"%s\r\n%s", dm.StringRes(IDS_QUERY_ERR).GetString(), err.c_str());
+        info.Format(L"%s\r\n%s", dm.StringRes(IDS_QUERY_ERR).GetString(), wss.str().c_str());
         MessageBox(info, dm.StringRes(IDS_WEATHER_PRO));
     }
 }
