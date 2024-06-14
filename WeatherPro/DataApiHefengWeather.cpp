@@ -7,6 +7,10 @@
 #include <unordered_map>
 #include <functional>
 #include <sstream>
+#include <UserEnv.h>
+#include <filesystem>
+#include<fstream>
+#include<iostream>
 
 #include "DataManager.h"
 
@@ -387,12 +391,59 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
     CString url;
-    url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s&lang=%s",
-               config.AppKey.c_str(),
-               query.c_str(),
-               dm.StringRes(IDS_HFW_LANG).GetString());
+ // try load Location from AutoDarkMode
+    auto user_profile_path = std::string(std::getenv("USERPROFILE"));
+    auto adm_location_data_conf_path = (user_profile_path + "\\AppData\\Roaming\\AutoDarkMode\\location_data.yaml");
+    //auto adm_location_data_conf_path_w = std::wstring(adm_location_data_conf_path.begin(), adm_location_data_conf_path.end());
+    using std::string;
+    if (std::filesystem::exists(adm_location_data_conf_path))
+    {
+        std::ifstream loc_conf_file(adm_location_data_conf_path);
+        string line;
+
+        if (loc_conf_file.is_open()) {
+            // Read each line from the file and store it in the 
+            // 'line' variable. 
+            string Lat="", Lon="";
+            while (std::getline(loc_conf_file, line)) {
+                if (line.rfind("Lat: ",0) ==0)
+                {
+                    Lat = line.substr(5, 6);
+                }
+                if (line.rfind("Lon: ", 0) == 0)
+                {
+                    Lon = line.substr(5, 6);
+                }
+            }
+
+            // Close the file stream once all lines have been 
+            // read. 
+            loc_conf_file.close();
+            if (Lat!="" && Lon!="")
+            {
+                url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s&lang=%s",
+                    config.AppKey.c_str(),
+                    (Lon+","+Lat).c_str(),
+                    dm.StringRes(IDS_HFW_LANG).GetString());
+            }
+        }
+        else {
+            // Print an error message to the standard error 
+            // stream if the file cannot be opened. 
+            //cerr << "Unable to open file!" << endl;
+        }
+    }
+    else
+    {
+        url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s&lang=%s",
+            config.AppKey.c_str(),
+            query.c_str(),
+            dm.StringRes(IDS_HFW_LANG).GetString());
+    }
+    
+
+
 
     RealtimeWeather data;
     auto func = [&data](yyjson_val *j_val) {
