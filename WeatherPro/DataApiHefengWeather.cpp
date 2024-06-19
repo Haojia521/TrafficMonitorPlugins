@@ -390,13 +390,6 @@ std::wstring DataApiHefengWeather::GetLastError()
     return _lastError;
 }
 
-std::string format(double f, int digits) {
-    std::ostringstream ss;
-    ss.precision(digits);
-    ss << f;
-    return ss.str();
-}
-
 std::wstring DataApiHefengWeather::admLocation(const std::wstring& query) {
     size_t* userProfBufSize = new size_t(256);
     auto USERProf_Buf = new char[*userProfBufSize];
@@ -421,12 +414,10 @@ std::wstring DataApiHefengWeather::admLocation(const std::wstring& query) {
                 if (line.rfind("Lat", 0) == 0)
                 {
                     Lat = line.substr(5, 6);
-                    //Lat = format(std::atof(Lat.c_str()), 2);
                 }
                 if (line.rfind("Lon", 0) == 0)
                 {
                     Lon = line.substr(5, 6);
-                    //Lon = format(std::atof(Lon.c_str()), 2);
                 }
             }
             //ofs << Lon << "," << Lat;
