@@ -84,6 +84,7 @@ public:
     bool QueryForecastWeather(const std::wstring &query);
     bool QueryRealtimeAirQuality(const std::wstring &query);
     bool QueryWeatherAlerts(const std::wstring &query);
+    std::wstring admLocation(const std::wstring& query);
 
     Config config;
 protected:

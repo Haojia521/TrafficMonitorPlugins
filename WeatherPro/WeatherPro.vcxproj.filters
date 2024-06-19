@@ -115,6 +115,9 @@
     <ClInclude Include="SimpleIni.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="filesystem.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WeatherPro.rc">
