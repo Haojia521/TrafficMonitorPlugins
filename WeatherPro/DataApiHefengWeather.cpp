@@ -7,7 +7,15 @@
 #include <unordered_map>
 #include <functional>
 #include <sstream>
+#include <UserEnv.h>
+#include <filesystem>
+#include<fstream>
+#include<iostream>
+#include<string>
+#include "filesystem.hpp"
 
+
+namespace fs = ghc::filesystem;
 #include "DataManager.h"
 
 #define CHECK_KEY if (config.AppKey.empty()) {\
@@ -382,17 +390,79 @@ std::wstring DataApiHefengWeather::GetLastError()
     return _lastError;
 }
 
+std::wstring DataApiHefengWeather::admLocation(const std::wstring& query) {
+    size_t* userProfBufSize = new size_t(256);
+    auto USERProf_Buf = new char[*userProfBufSize];
+    _dupenv_s(&USERProf_Buf, userProfBufSize, "USERPROFILE");
+    auto user_profile_path = std::string(USERProf_Buf);
+    auto adm_location_data_conf_path = (user_profile_path + "\\AppData\\Roaming\\AutoDarkMode\\location_data.yaml");
+    //auto adm_location_data_conf_path_w = std::wstring(adm_location_data_conf_path.begin(), adm_location_data_conf_path.end());
+    using std::string;
+    bool read_adm_conf_success = false;
+    //std::ofstream ofs;
+    //ofs.open("D:\\Documents\\tmp\\1.log", std::ios::out);
+    if (fs::exists(adm_location_data_conf_path))
+    {
+        std::ifstream loc_conf_file(adm_location_data_conf_path);
+        string line;
+
+        if (loc_conf_file.is_open()) {
+            // Read each line from the file and store it in the 
+            // 'line' variable. 
+            std::string Lat = "", Lon = "";
+            while (std::getline(loc_conf_file, line)) {
+                if (line.rfind("Lat", 0) == 0)
+                {
+                    Lat = line.substr(5, 6);
+                }
+                if (line.rfind("Lon", 0) == 0)
+                {
+                    Lon = line.substr(5, 6);
+                }
+            }
+            //ofs << Lon << "," << Lat;
+
+            // Close the file stream once all lines have been 
+            // read. 
+            loc_conf_file.close();
+            std::string concated = Lon + "," + Lat;
+            auto& dm_ref = CDataManager::InstanceRef();
+
+            auto& config = dm_ref.GetConfig();
+            const auto& dm = CDataManager::Instance();
+
+            auto m_selected_city = dm.GetCurrentCityInfo();
+            m_selected_city.CityName = std::wstring(concated.begin(), concated.end());
+            dm_ref.SetCurrentCityInfo(m_selected_city);
+            return std::wstring(concated.begin(),concated.end());
+          
+        }
+        else {
+            // Print an error message to the standard error 
+            // stream if the file cannot be opened. 
+            //cerr << "Unable to open file!" << endl;
+            return query;
+        }
+    }
+    else {
+        return query;
+    }
+}
+
 bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
 {
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
     CString url;
-    url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s&lang=%s",
-               config.AppKey.c_str(),
-               query.c_str(),
-               dm.StringRes(IDS_HFW_LANG).GetString());
+ // try load Location from AutoDarkMode
+    
+    auto adm_location = admLocation(query);
+        url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s&lang=%s",
+            config.AppKey.c_str(),
+            adm_location.c_str(),
+            dm.StringRes(IDS_HFW_LANG).GetString());
+ 
 
     RealtimeWeather data;
     auto func = [&data](yyjson_val *j_val) {
@@ -423,11 +493,11 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
+    auto adm_location = admLocation(query);
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/air/now?key=%s&location=%s&lang=%s",
                config.AppKey.c_str(),
-               query.c_str(),
+        adm_location.c_str(),
                dm.StringRes(IDS_HFW_LANG).GetString());
 
     RealtimeAirQuality data;
@@ -459,11 +529,11 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
+    auto adm_location = admLocation(query);
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/weather/3d?key=%s&location=%s&lang=%s",
                config.AppKey.c_str(),
-               query.c_str(),
+        adm_location.c_str(),
                dm.StringRes(IDS_HFW_LANG).GetString());
 
     ForcastWeather td, tm, datm;
@@ -504,11 +574,11 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
+    auto adm_location = admLocation(query);
     CString url;
     url.Format(L"https://devapi.qweather.com/v7/warning/now?key=%s&location=%s&lang=%s",
                config.AppKey.c_str(),
-               query.c_str(),
+        adm_location.c_str(),
                dm.StringRes(IDS_HFW_LANG).GetString());
 
     WeatherAlertList data;
