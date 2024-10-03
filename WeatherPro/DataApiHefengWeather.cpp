@@ -426,6 +426,14 @@ std::wstring DataApiHefengWeather::admLocation(const std::wstring& query) {
             // read. 
             loc_conf_file.close();
             std::string concated = Lon + "," + Lat;
+            auto& dm_ref = CDataManager::InstanceRef();
+
+            auto& config = dm_ref.GetConfig();
+            const auto& dm = CDataManager::Instance();
+
+            auto m_selected_city = dm.GetCurrentCityInfo();
+            m_selected_city.CityName = std::wstring(concated.begin(), concated.end());
+            dm_ref.SetCurrentCityInfo(m_selected_city);
             return std::wstring(concated.begin(),concated.end());
           
         }
