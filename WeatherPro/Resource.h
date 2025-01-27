@@ -104,6 +104,8 @@
 #define IDI_ICON_B_D13                  1036
 #define IDC_RADIO2                      1036
 #define IDI_ICON_B_N00                  1037
+#define IDC_CHECK1                      1037
+#define IDC_CHECK_AUTO_LOCATING         1037
 #define IDI_ICON_B_N01                  1038
 #define IDI_ICON_B_N03                  1039
 #define IDI_ICON_B_N13                  1040
@@ -271,7 +273,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1200
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1037
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

@@ -5,7 +5,6 @@
 
 #include "DataApiWeatherComCnSpider.h"
 #include "DataApiHefengWeather.h"
-#include "Locator.h"
 
 enum class UpdateFrequency
 {
@@ -30,11 +29,6 @@ enum class IconType
     IT_HFW_HOLLOW,
 };
 
-enum class LocatingMethod
-{
-    LM_IP_IPIPNET = 0
-};
-
 struct SConfiguration
 {
     SConfiguration();
@@ -53,10 +47,6 @@ struct SConfiguration
 
     // geo-locating
     bool m_auto_locating;
-    LocatingMethod m_loc_method;
-    std::wstring m_loc_ip;
-    std::wstring m_loc_name;
-    int m_loc_timestamp;
 };
 
 using WeatherInfoUpdatedCallback = std::function<void(const std::wstring & info)>;
@@ -107,8 +97,6 @@ private:
 
     void _setLangID(const std::wstring &cfg_dir);
 
-    bool _queryGeoLocation(LocationData &loc);
-
     static CDataManager m_instance;
     int m_dpi;
     mutable std::map<UINT, CString> m_string_resources;
@@ -128,6 +116,8 @@ private:
     };
 
     SWeatherInfoCache m_weather_info_cache;
+
+    std::wstring m_loc_name_cache;
 
     unsigned short m_lang_id;
 };

@@ -14,4 +14,7 @@ public:
 
     // 解码gzip压缩的字节数据
     static int GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata);
+
+    // 获取网页内容
+    static bool AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err);
 };

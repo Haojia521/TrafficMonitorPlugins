@@ -33,6 +33,7 @@ public:
     BOOL m_showBriefWeatherAlertInfo;
     BOOL m_showBriefRTWeather;
     BOOL m_showErrorInfo;
+    BOOL m_autoLocating;
     CComboBox m_ctrlInfoType;
     CComboBox m_ctrlDataApiType;
     CComboBox m_ctrlUpdateFrequency;

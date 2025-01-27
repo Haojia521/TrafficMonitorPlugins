@@ -1,8 +1,9 @@
 ﻿#include "pch.h"
+#include "Common.h"
 #include "DataManager.h"
 #include "resource.h"
 #include "SimpleIni.h"
-#include "Locator.h"
+#include "utilities/yyjson/yyjson.h"
 
 #include <sstream>
 #include <chrono>
@@ -606,6 +607,49 @@ namespace icon
     }
 }
 
+namespace loc
+{
+    bool QueryLocation(std::wstring &loc_name, std::wstring &err)
+    {
+        std::wstring url{ L"https://myip.ipip.net/json" }, content;
+        if (CCommon::AccessInternet(url, content, err))
+        {
+            auto json = CCommon::UnicodeToStr(content.c_str(), true);
+            std::unique_ptr<yyjson_doc, void(*)(yyjson_doc*)> json_doc(
+                yyjson_read(json.c_str(), json.size(), 0),
+                [](yyjson_doc *p) { yyjson_doc_free(p); }
+            );
+
+            auto get_json_str_value = [](yyjson_val *j_val, const char *key) {
+                auto *obj = yyjson_obj_get(j_val, key);
+                if (obj == nullptr) return "";
+                else return yyjson_get_str(obj);
+            };
+
+            if (json_doc != nullptr)
+            {
+                auto *root = yyjson_doc_get_root(json_doc.get());
+
+                if (get_json_str_value(root, "ret") == "ok")
+                {
+                    auto *data = yyjson_obj_get(root, "data");
+
+                    auto *location = yyjson_obj_get(data, "location");
+                    std::string prov = yyjson_get_str(yyjson_arr_get(location, 1));
+                    std::string city = yyjson_get_str(yyjson_arr_get(location, 2));
+                    loc_name = CCommon::StrToUnicode((prov + city).c_str(), true);
+
+                    return true;
+                } else
+                    err = L"[ipip.net] invalid return statue";
+            } else
+                err = L"[ipip.net] contents cannot be parsed as json";
+        }
+
+        return false;
+    }
+}
+
 std::mutex g_weather_update_nutex;
 
 SConfiguration::SConfiguration() :
@@ -620,9 +664,7 @@ SConfiguration::SConfiguration() :
     m_show_brief_weather_alert_info(true),
     m_show_error_info(false),
     m_double_click_action(0),
-    m_auto_locating(false),
-    m_loc_method(LocatingMethod::LM_IP_IPIPNET),
-    m_loc_timestamp(0)
+    m_auto_locating(false)
 {}
 
 CDataManager CDataManager::m_instance;
@@ -715,26 +757,27 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
         // locating
         if (m_config.m_auto_locating)
         {
-            LocationData loc;
-            if (_queryGeoLocation(loc))
+            std::wstring loc_name, err;
+            if (loc::QueryLocation(loc_name, err))
             {
-                bool location_changed = (!loc.ip.empty() && loc.ip != m_config.m_loc_ip) ||
-                                        (!loc.location_name.empty() && loc.location_name != m_config.m_loc_name);
-                m_config.m_loc_ip = loc.ip;
-                m_config.m_loc_name = loc.location_name;
-                m_config.m_loc_timestamp = std::time(nullptr);
-
-                if (location_changed)
+                if (loc_name != m_loc_name_cache)
                 {
                     CityInfoList cities;
-                    if (current_api->QueryCity(loc.location_name, cities) && !cities.empty())
+                    if (current_api->QueryCity(loc_name, cities) && !cities.empty())
                     {
                         SetCurrentCityInfo(cities.front());
                         SaveConfigs();
                     }
+                    m_loc_name_cache = loc_name;
                 }
+            } else
+            {
+                // err message
             }
-        }
+        } else
+            // If automatic locating is not enabled, clear the cache to facilitate the execution of a 
+            // geolocation query the next time automatic locating is activated.
+            m_loc_name_cache.clear();
 
         for (int i = 0; i < 4; ++i)
         {
@@ -840,13 +883,7 @@ void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
     m_config.m_show_brief_weather_alert_info = ini.GetBoolValue(L"config", L"show_brief_weather_alert_info", 1);
     m_config.m_show_error_info = ini.GetBoolValue(L"config", L"show_error_info", 0);
     m_config.m_double_click_action = ini.GetLongValue(L"config", L"double_click_action", 0);
-
-    // geo-locating
-    m_config.m_auto_locating = ini.GetBoolValue(L"loc", L"auto_locating", false);
-    m_config.m_loc_method = static_cast<LocatingMethod>(ini.GetLongValue(L"loc", L"method", 0));
-    m_config.m_loc_ip = ini.GetValue(L"loc", L"ip", L"");
-    m_config.m_loc_name = ini.GetValue(L"loc", L"name", L"");
-    m_config.m_loc_timestamp = ini.GetLongValue(L"loc", L"timestamp");
+    m_config.m_auto_locating = ini.GetBoolValue(L"config", L"auto_locating", false);
 
     auto &hf_cfg = m_api_hfw->config;
     hf_cfg.AppKey = ini.GetValue(L"hfw", L"AppKey", L"");
@@ -884,13 +921,7 @@ void CDataManager::SaveConfigs() const
     ini.SetBoolValue(L"config", L"show_brief_weather_alert_info", m_config.m_show_brief_weather_alert_info);
     ini.SetBoolValue(L"config", L"show_error_info", m_config.m_show_error_info);
     ini.SetLongValue(L"config", L"double_click_action", m_config.m_double_click_action);
-
-    // geo-locating
-    ini.SetBoolValue(L"loc", L"auto_locating", m_config.m_auto_locating);
-    ini.SetLongValue(L"loc", L"method", static_cast<int>(m_config.m_loc_method));
-    ini.SetValue(L"loc", L"ip", m_config.m_loc_ip.c_str());
-    ini.SetValue(L"loc", L"name", m_config.m_loc_name.c_str());
-    ini.SetLongValue(L"loc", L"timestamp", m_config.m_loc_timestamp);
+    ini.SetBoolValue(L"config", L"auto_locating", m_config.m_auto_locating);
 
     auto &hf_cfg = m_api_hfw->config;
     ini.SetValue(L"hfw", L"AppKey", hf_cfg.AppKey.c_str());
@@ -974,26 +1005,4 @@ void CDataManager::RefreshWeatherInfoCache()
     m_weather_info_cache.WeatherTemperature = _getWeatherTemperature();
     m_weather_info_cache.TooltipInfo = _getTooptipInfo();
     m_weather_info_cache.Icon = _getIcon();
-}
-
-/*****************************************************************************/
-
-bool CDataManager::_queryGeoLocation(LocationData &loc)
-{
-    std::unique_ptr<Locator> locator;
-    std::wstringstream wss;
-
-    if (m_config.m_loc_method == LocatingMethod::LM_IP_IPIPNET)
-        locator.reset(new IpLocatorIPIPNET);
-    else
-        wss << L"invalid locating method: " << static_cast<int>(m_config.m_loc_method) << std::endl;
-
-    if (locator != nullptr)
-    {
-        if (!locator->GetLocation(loc))
-            wss << loc.err_message << std::endl;
-    }
-
-    loc.err_message = wss.str();
-    return loc.err_message.empty();
 }

@@ -1,6 +1,9 @@
 ﻿#include "pch.h"
 #include "Common.h"
 #include <afxinet.h>    //用于支持使用网络相关的类
+#include <memory>
+#include <vector>
+#include <format>
 
 std::wstring CCommon::StrToUnicode(const char* str, bool utf8)
 {
@@ -89,4 +92,52 @@ int CCommon::GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata)
     if (inflateEnd(&d_stream) != Z_OK) return -1;
 
     return 0;
+}
+
+bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err)
+{
+    content.clear();
+    err.clear();
+
+    bool succeed{ false };
+    try
+    {
+        std::unique_ptr<CInternetSession, void(*)(CInternetSession*)> session(
+            new CInternetSession(),
+            [](CInternetSession *p) { if (p != nullptr) p->Close(); delete p; }
+        );
+
+        std::unique_ptr<CHttpFile, void(*)(CHttpFile*)> http_file(
+            dynamic_cast<CHttpFile*>(session->OpenURL(url.c_str())),
+            [](CHttpFile *p) { if (p != nullptr) p->Close(); delete p; }
+        );
+
+        DWORD dw_status_code{ 0 };
+        http_file->QueryInfoStatusCode(dw_status_code);
+
+        if (dw_status_code == HTTP_STATUS_OK)
+        {
+            auto http_content_len = http_file->Seek(0, CFile::end);
+            std::vector<char> http_content_buffer(http_content_len + 1, 0);
+
+            http_file->Seek(0, CFile::begin);
+            http_file->Read(http_content_buffer.data(), static_cast<UINT>(http_content_len));
+
+            content = CCommon::StrToUnicode(http_content_buffer.data(), true);
+            succeed = true;
+        }
+        else
+        {
+            err = std::format(L"HTTP CODE: {}", dw_status_code);
+        }
+    }
+    catch (CInternetException *e)
+    {
+        TCHAR cause[1024]{ 0 };
+        if (e->GetErrorMessage(cause, 1024) == TRUE)
+            err = cause;
+        e->Delete();
+    }
+
+    return succeed;
 }

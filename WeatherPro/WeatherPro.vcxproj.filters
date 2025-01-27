@@ -60,9 +60,6 @@
     <ClCompile Include="OptionsHfwDlg.cpp">
       <Filter>DLG</Filter>
     </ClCompile>
-    <ClCompile Include="Locator.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="WeatherPro.def">
@@ -117,9 +114,6 @@
     </ClInclude>
     <ClInclude Include="SimpleIni.h">
       <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Locator.h">
-      <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
