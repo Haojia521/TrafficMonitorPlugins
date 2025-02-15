@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <functional>
 #include <sstream>
+#include <format>
 
 #include "DataManager.h"
 
@@ -17,73 +18,6 @@
 
 namespace hf
 {
-    bool call_internet(const CString &url, std::wstring &content)
-    {
-        content.clear();
-
-        bool succeed = false;
-
-        CInternetSession *session{ nullptr };
-        CHttpFile *httpFile{ nullptr };
-
-        char *http_content_buffer{ nullptr };
-        size_t http_content_len{ 0 };
-
-        unsigned char *contents_buffer = new unsigned char[1024 * 64]{ 0 };  // 假设解压后内容长度不会超过64k字节
-        unsigned long contents_len{ 0 };
-
-        try
-        {
-            session = new CInternetSession();
-            httpFile = (CHttpFile *)session->OpenURL(url);
-
-            DWORD dwStatusCode;
-            httpFile->QueryInfoStatusCode(dwStatusCode);
-
-            if (dwStatusCode == HTTP_STATUS_OK)
-            {
-                http_content_len = httpFile->Seek(0, CFile::end);
-                http_content_buffer = new char[http_content_len + 1]{ 0 };
-
-                httpFile->Seek(0, CFile::begin);
-                httpFile->Read(http_content_buffer, static_cast<UINT>(http_content_len + 1));
-
-                // decompress
-                if (CCommon::GZipDecompress((Byte*)http_content_buffer, (uLong)http_content_len,
-                    contents_buffer, &contents_len) == 0)
-                {
-                    content = CCommon::StrToUnicode((char*)contents_buffer, true);
-                    succeed = true;
-                }
-            }
-
-            httpFile->Close();
-            session->Close();
-        }
-        catch (CInternetException *e)
-        {
-            if (httpFile != nullptr) httpFile->Close();
-            if (session != nullptr) session->Close();
-
-            succeed = false;
-            e->Delete();
-        }
-        catch (...)
-        {
-            if (httpFile != nullptr) httpFile->Close();
-            if (session != nullptr) session->Close();
-
-            succeed = false;
-        }
-
-        delete[] http_content_buffer;
-        delete[] contents_buffer;
-        delete httpFile;
-        delete session;
-
-        return succeed;
-    }
-
     std::wstring get_json_str_value(yyjson_val *j_val, const char *key)
     {
         auto *obj = yyjson_obj_get(j_val, key);
@@ -91,14 +25,14 @@ namespace hf
         else return CCommon::StrToUnicode(yyjson_get_str(obj), true);
     }
 
-    std::wstring query_func_frame(const CString &url, std::function<void(yyjson_val*)> func)
+    std::wstring query_func_frame(const std::wstring &url, std::function<void(yyjson_val*)> func)
     {
         const auto &dm = CDataManager::Instance();
 
         std::wstring error;
 
         std::wstring content;
-        auto succeed = call_internet(url, content);
+        auto succeed = CCommon::AccessInternet(url, content, error, CCommon::InternetConfig{ .gzip = true });
 
         if (succeed && !content.empty())
         {
@@ -125,7 +59,7 @@ namespace hf
         }
         else
             //error = L"Failed to access the Internet.";
-            error = dm.StringRes(IDS_HFW_NO_INTERNET);
+            error = dm.StringRes(IDS_HFW_NO_INTERNET) + L"\r\n" + error.c_str();
 
         return error;
     }
@@ -135,17 +69,14 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
 {
     CHECK_KEY;
 
+    info.clear();
     const auto &dm = CDataManager::Instance();
 
-    info.clear();
-
     auto queryEncoded = CCommon::URLEncode(query);
-
-    CString url;
-    url.Format(L"https://geoapi.qweather.com/v2/city/lookup?key=%s&location=%s&lang=%s",
-               config.AppKey.c_str(),
-               queryEncoded.c_str(),
-               dm.StringRes(IDS_HFW_LANG).GetString());
+    std::wstring url = std::format(L"https://geoapi.qweather.com/v2/city/lookup?key={}&location={}&lang={}",
+                                   config.AppKey,
+                                   queryEncoded,
+                                   dm.StringRes(IDS_HFW_LANG).GetString());
 
     CityInfoList cities;
     auto func = [&cities](yyjson_val *j_val) {
@@ -369,12 +300,10 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
-    CString url;
-    url.Format(L"https://devapi.qweather.com/v7/weather/now?key=%s&location=%s&lang=%s",
-               config.AppKey.c_str(),
-               query.c_str(),
-               dm.StringRes(IDS_HFW_LANG).GetString());
+    std::wstring url = std::format(L"https://devapi.qweather.com/v7/weather/now?key={}&location={}&lang={}",
+                                   config.AppKey,
+                                   query,
+                                   dm.StringRes(IDS_HFW_LANG).GetString());
 
     RealtimeWeather data;
     auto func = [&data](yyjson_val *j_val) {
@@ -405,12 +334,10 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
-    CString url;
-    url.Format(L"https://devapi.qweather.com/v7/air/now?key=%s&location=%s&lang=%s",
-               config.AppKey.c_str(),
-               query.c_str(),
-               dm.StringRes(IDS_HFW_LANG).GetString());
+    std::wstring url = std::format(L"https://devapi.qweather.com/v7/air/now?key={}&location={}&lang={}",
+                                   config.AppKey,
+                                   query,
+                                   dm.StringRes(IDS_HFW_LANG).GetString());
 
     RealtimeAirQuality data;
     auto func = [&data](yyjson_val *j_val) {
@@ -441,12 +368,10 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
-    CString url;
-    url.Format(L"https://devapi.qweather.com/v7/weather/3d?key=%s&location=%s&lang=%s",
-               config.AppKey.c_str(),
-               query.c_str(),
-               dm.StringRes(IDS_HFW_LANG).GetString());
+    std::wstring url = std::format(L"https://devapi.qweather.com/v7/weather/3d?key={}&location={}&lang={}",
+                                   config.AppKey,
+                                   query,
+                                   dm.StringRes(IDS_HFW_LANG).GetString());
 
     ForcastWeather td, tm, datm;
     auto func = [&td, &tm, &datm](yyjson_val *j_val) {
@@ -486,12 +411,10 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
     CHECK_KEY;
 
     const auto &dm = CDataManager::Instance();
-
-    CString url;
-    url.Format(L"https://devapi.qweather.com/v7/warning/now?key=%s&location=%s&lang=%s",
-               config.AppKey.c_str(),
-               query.c_str(),
-               dm.StringRes(IDS_HFW_LANG).GetString());
+    std::wstring url = std::format(L"https://devapi.qweather.com/v7/warning/now?key={}&location={}&lang={}",
+                                   config.AppKey,
+                                   query,
+                                   dm.StringRes(IDS_HFW_LANG).GetString());
 
     WeatherAlertList data;
     auto func = [&data](yyjson_val *j_val) {

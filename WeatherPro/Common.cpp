@@ -94,7 +94,8 @@ int CCommon::GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata)
     return 0;
 }
 
-bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err)
+bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err,
+                             const InternetConfig &cfg /* = InternetConfig() */)
 {
     content.clear();
     err.clear();
@@ -103,12 +104,12 @@ bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std
     try
     {
         std::unique_ptr<CInternetSession, void(*)(CInternetSession*)> session(
-            new CInternetSession(),
+            new CInternetSession(cfg.agent.c_str()),
             [](CInternetSession *p) { if (p != nullptr) p->Close(); delete p; }
         );
 
         std::unique_ptr<CHttpFile, void(*)(CHttpFile*)> http_file(
-            dynamic_cast<CHttpFile*>(session->OpenURL(url.c_str())),
+            dynamic_cast<CHttpFile*>(session->OpenURL(url.c_str(), 1, INTERNET_FLAG_TRANSFER_ASCII, cfg.headers.c_str())),
             [](CHttpFile *p) { if (p != nullptr) p->Close(); delete p; }
         );
 
@@ -123,8 +124,23 @@ bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std
             http_file->Seek(0, CFile::begin);
             http_file->Read(http_content_buffer.data(), static_cast<UINT>(http_content_len));
 
-            content = CCommon::StrToUnicode(http_content_buffer.data(), true);
-            succeed = true;
+            if (cfg.gzip)
+            {
+                std::vector<Byte> decomp_contents_buffer(1024 * 64, 0);
+                uLong decomp_contents_len{ 0 };
+                if (CCommon::GZipDecompress((Byte*)http_content_buffer.data(), (uLong)http_content_len,
+                                            decomp_contents_buffer.data(), &decomp_contents_len))
+                {
+                    content = CCommon::StrToUnicode((char*)decomp_contents_buffer.data(), true);
+                    succeed = true;
+                } else
+                    err = L"failed to decompress http contents via gzip";
+            }
+            else
+            {
+                content = CCommon::StrToUnicode(http_content_buffer.data(), true);
+                succeed = true;
+            }
         }
         else
         {

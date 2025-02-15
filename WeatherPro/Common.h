@@ -16,5 +16,12 @@ public:
     static int GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata);
 
     // 获取网页内容
-    static bool AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err);
+    struct InternetConfig
+    {
+        std::wstring agent;
+        std::wstring headers;
+        bool gzip = false;
+    };
+    static bool AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err,
+                               const InternetConfig &cfg = InternetConfig());
 };

@@ -7,6 +7,7 @@
 #include <regex>
 #include <map>
 #include <sstream>
+#include <format>
 
 #include "DataManager.h"
 
@@ -112,61 +113,7 @@ namespace wccs  // WeatherComCnSpider
         return result;
     }
 
-    bool _CallInternet(const CString &url, const CString &headers,
-        std::wstring &content)
-    {
-        content.clear();
-
-        CString agent = L"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36 Edg/99.0.1150.39";
-
-        bool succeed = false;
-
-        CInternetSession *session{ nullptr };
-        CHttpFile *httpFile{ nullptr };
-
-        char *multi_byte_content_buffer{ nullptr };
-
-        try
-        {
-            session = new CInternetSession(agent);
-            httpFile = (CHttpFile *)session->OpenURL(url, 1, INTERNET_FLAG_TRANSFER_ASCII, headers);
-            DWORD dwStatusCode;
-            httpFile->QueryInfoStatusCode(dwStatusCode);
-            if (dwStatusCode == HTTP_STATUS_OK)
-            {
-                auto offset = httpFile->Seek(0, CFile::end);
-                multi_byte_content_buffer = new char[offset + 1]{ 0 };
-
-                httpFile->Seek(0, CFile::begin);
-                httpFile->Read(multi_byte_content_buffer, static_cast<UINT>(offset + 1));
-
-                content = CCommon::StrToUnicode(multi_byte_content_buffer, true);
-                succeed = true;
-            }
-
-            httpFile->Close();
-            session->Close();
-        }
-        catch (CInternetException *e)
-        {
-            if (httpFile != nullptr) httpFile->Close();
-            if (session != nullptr) session->Close();
-
-            succeed = false;
-            e->Delete();
-        }
-
-        delete[] multi_byte_content_buffer;
-        multi_byte_content_buffer = nullptr;
-
-        delete httpFile;
-        httpFile = nullptr;
-
-        delete session;
-        session = nullptr;
-
-        return succeed;
-    }
+    const std::wstring agent = L"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0";
 
     bool QueryCityInfo(const std::wstring &qName, CityInfoList &city_list)
     {
@@ -175,14 +122,17 @@ namespace wccs  // WeatherComCnSpider
         auto qNameEncoded = CCommon::URLEncode(qName);
         auto timeStamp = std::time(0);
 
-        CString q_url;
-        q_url.Format(L"http://toy1.weather.com.cn/search?cityname=%s&callback=success_jsonpCallback&_=%I64d",
-            qNameEncoded.c_str(), timeStamp);
+        std::wstring url = std::format(L"http://toy1.weather.com.cn/search?cityname={}&callback=success_jsonpCallback&_={}",
+                                       qNameEncoded,
+                                       timeStamp);
 
-        CString qHeaders = L"Host: toy1.weather.com.cn\r\nReferer: http://www.weather.com.cn/";
+        CCommon::InternetConfig cfg{
+            .agent = agent,
+            .headers = L"Host: toy1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
+        };
 
-        std::wstring content;
-        bool succeed = _CallInternet(q_url, qHeaders, content);
+        std::wstring content, err;
+        bool succeed = CCommon::AccessInternet(url, content, err, cfg);
 
         if (succeed && !content.empty())
         {
@@ -207,14 +157,17 @@ namespace wccs  // WeatherComCnSpider
         rt_weather = SRealTimeWeather();
 
         auto timeStamp = std::time(0);
+        std::wstring url = std::format(L"http://d1.weather.com.cn/sk_2d/{}.html?_={}",
+                                       city_code,
+                                       timeStamp);
 
-        CString q_url;
-        q_url.Format(L"http://d1.weather.com.cn/sk_2d/%s.html?_=%I64d", city_code.c_str(), timeStamp);
+        CCommon::InternetConfig cfg{
+            .agent = agent,
+            .headers = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
+        };
 
-        CString qHeaders = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/";
-
-        std::wstring content;
-        auto succeed = _CallInternet(q_url, qHeaders, content);
+        std::wstring content, err;
+        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
 
         if (content.find(L'{') == std::wstring::npos)
             succeed = false;
@@ -320,13 +273,16 @@ namespace wccs  // WeatherComCnSpider
     {
         rt_weather = SRealTimeWeather();
 
-        CString q_url;
-        q_url.Format(L"http://forecast.weather.com.cn/town/weather1dn/%s.shtml", code.c_str());
+        std::wstring url = std::format(L"http://forecast.weather.com.cn/town/weather1dn/{}.shtml",
+                                       code);
 
-        CString qHeaders = L"Host: forecast.weather.com.cn\r\nReferer: http://www.weather.com.cn/";
+        CCommon::InternetConfig cfg{ 
+            .agent = agent, 
+            .headers = L"Host: forecast.weather.com.cn\r\nReferer: http://www.weather.com.cn/" 
+        };
 
-        std::wstring content;
-        auto succeed = _CallInternet(q_url, qHeaders, content);
+        std::wstring content, err;
+        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
 
         if (succeed && !content.empty())
         {
@@ -412,14 +368,19 @@ namespace wccs  // WeatherComCnSpider
             target_code = code.substr(0, 9);
 
         auto timeStamp = std::time(0);
-
-        CString q_url;
-        q_url.Format(L"http://d1.weather.com.cn/dingzhi/%s.html?_=%I64d", target_code.c_str(), timeStamp);
+        std::wstring url = std::format(L"http://d1.weather.com.cn/dingzhi/{}.html?_={}",
+                                       target_code,
+                                       timeStamp);
 
         CString qHeaders = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/";
 
-        std::wstring content;
-        auto succeed = _CallInternet(q_url, qHeaders, content);
+        CCommon::InternetConfig cfg{
+            .agent = agent,
+            .headers = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
+        };
+
+        std::wstring content, err;
+        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
 
         auto data_idx = content.find(L"var alarmDZ");
         if (data_idx == std::wstring::npos)
@@ -482,22 +443,22 @@ namespace wccs  // WeatherComCnSpider
         weather_td = SWeatherInfo();
         weather_tm = SWeatherInfo();
 
-        CString q_url;
-        CString qHeaders;
+        std::wstring url;
+        CCommon::InternetConfig cfg{ .agent = agent };
 
         if (code.size() == 9)
         {
-            q_url.Format(L"http://www.weather.com.cn/weathern/%s.shtml", code.c_str());
-            qHeaders.Format(L"Host: www.weather.com.cn\r\nReferer: http://www.weather.com.cn/weather1dn/%s.shtml", code.c_str());
+            url = std::format(L"http://www.weather.com.cn/weathern/{}.shtml", code);
+            cfg.headers = std::format(L"Host: www.weather.com.cn\r\nReferer: http://www.weather.com.cn/weather1dn/{}.shtml", code);
         }
         else
         {
-            q_url.Format(L"http://forecast.weather.com.cn/town/weathern/%s.shtml", code.c_str());
-            qHeaders.Format(L"Host: forecast.weather.com.cn\r\nReferer: http://forecast.weather.com.cn/town/weather1dn/%s.shtml", code.c_str());
+            url = std::format(L"http://forecast.weather.com.cn/town/weathern/{}.shtml", code);
+            cfg.headers = std::format(L"Host: forecast.weather.com.cn\r\nReferer: http://forecast.weather.com.cn/town/weather1dn/{}.shtml", code);
         }
 
-        std::wstring content;
-        auto succeed = _CallInternet(q_url, qHeaders, content);
+        std::wstring content, err;
+        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
 
         if (succeed && !content.empty())
         {
