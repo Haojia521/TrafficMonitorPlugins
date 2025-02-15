@@ -630,7 +630,7 @@ namespace loc
             {
                 auto *root = yyjson_doc_get_root(json_doc.get());
 
-                if (get_json_str_value(root, "ret") == "ok")
+                if (std::strcmp(get_json_str_value(root, "ret"), "ok") == 0)
                 {
                     auto *data = yyjson_obj_get(root, "data");
 
@@ -773,7 +773,7 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
             } else
             {
                 // err message
-            }
+           }
         } else
             // If automatic locating is not enabled, clear the cache to facilitate the execution of a 
             // geolocation query the next time automatic locating is activated.

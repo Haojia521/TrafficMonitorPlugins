@@ -132,6 +132,10 @@ void COptionsDlg::OnBnClickedBtnSelectCity()
         {
             m_selected_city = dlg.m_selectedCityInfo;
             m_currentCityName = m_selected_city.CityName.c_str();
+
+            // if the city is changed manually, disable auto locating
+            m_autoLocating = FALSE;
+
             UpdateData(FALSE);
         }
     }
@@ -160,7 +164,6 @@ void COptionsDlg::OnOK()
     config.m_show_brief_weather_alert_info = m_showBriefWeatherAlertInfo == TRUE;
     config.m_show_error_info = m_showErrorInfo == TRUE;
 
-    bool auto_locating_changed = config.m_auto_locating == (m_autoLocating == TRUE);
     config.m_auto_locating = m_autoLocating == TRUE;
 
     config.m_double_click_action = m_intRadioDoubleClickAction;
@@ -171,7 +174,7 @@ void COptionsDlg::OnOK()
         dm_ref.SetCurrentCityInfo(m_selected_city);
         CWeatherPro::Instance().UpdateWeatherInfo(true);
     }
-    else if (api_changed || auto_locating_changed)
+    else if (api_changed || config.m_auto_locating)
         CWeatherPro::Instance().UpdateWeatherInfo(true);
     else
     {

@@ -129,7 +129,7 @@ bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std
                 std::vector<Byte> decomp_contents_buffer(1024 * 64, 0);
                 uLong decomp_contents_len{ 0 };
                 if (CCommon::GZipDecompress((Byte*)http_content_buffer.data(), (uLong)http_content_len,
-                                            decomp_contents_buffer.data(), &decomp_contents_len))
+                                            decomp_contents_buffer.data(), &decomp_contents_len) == 0)
                 {
                     content = CCommon::StrToUnicode((char*)decomp_contents_buffer.data(), true);
                     succeed = true;
