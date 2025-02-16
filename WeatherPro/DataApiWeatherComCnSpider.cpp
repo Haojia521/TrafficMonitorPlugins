@@ -115,7 +115,7 @@ namespace wccs  // WeatherComCnSpider
 
     const std::wstring agent = L"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0";
 
-    bool QueryCityInfo(const std::wstring &qName, CityInfoList &city_list)
+    bool QueryCityInfo(const std::wstring &qName, CityInfoList &city_list, WStringList &errors)
     {
         city_list.clear();
 
@@ -145,6 +145,9 @@ namespace wccs  // WeatherComCnSpider
                 if (!cityInfo.CityNO.empty())
                     city_list.push_back(cityInfo);
             }
+        } else {
+            errors.emplace_back(err);
+            succeed = false;
         }
 
         return succeed;
@@ -533,12 +536,12 @@ namespace wccs  // WeatherComCnSpider
     }
 }
 
-bool DataApiWeatherComCnSpider::QueryCity(const std::wstring &query, CityInfoList &info)
+bool DataApiWeatherComCnSpider::QueryCity(const std::wstring &query, CityInfoList &info, WStringList &errors)
 {
-    return wccs::QueryCityInfo(query, info);
+    return wccs::QueryCityInfo(query, info, errors);
 }
 
-std::wstring DataApiWeatherComCnSpider::GetWeatherInfoSummary()
+std::wstring DataApiWeatherComCnSpider::GetWeatherInfoSummary(WStringList &errors)
 {
     const auto &app_config = CDataManager::Instance().GetConfig();
 
@@ -653,7 +656,7 @@ std::wstring DataApiWeatherComCnSpider::GetWeatherCode(EWeatherInfoType type)
     }
 }
 
-bool DataApiWeatherComCnSpider::UpdateWeather()
+bool DataApiWeatherComCnSpider::UpdateWeather(WStringList &errors)
 {
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
 

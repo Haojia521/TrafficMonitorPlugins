@@ -8,11 +8,12 @@
 #include <functional>
 #include <sstream>
 #include <format>
+#include <memory>
 
 #include "DataManager.h"
 
 #define CHECK_KEY if (config.AppKey.empty()) {\
-    m_errors.push_back(L"no application key");\
+    errors.push_back(L"no application key");\
     return false;\
 }
 
@@ -25,47 +26,43 @@ namespace hf
         else return CCommon::StrToUnicode(yyjson_get_str(obj), true);
     }
 
-    std::wstring query_func_frame(const std::wstring &url, std::function<void(yyjson_val*)> func)
+    bool query_func_frame(const std::wstring &url, std::function<void(yyjson_val*)> func, WStringList &errors)
     {
         const auto &dm = CDataManager::Instance();
 
-        std::wstring error;
-
-        std::wstring content;
+        std::wstring content, error;
         auto succeed = CCommon::AccessInternet(url, content, error, CCommon::InternetConfig{ .gzip = true });
 
-        if (succeed && !content.empty())
-        {
+        if (succeed && !content.empty()) {
             auto json_utf8 = CCommon::UnicodeToStr(content.c_str(), true);
-            yyjson_doc *doc = yyjson_read(json_utf8.c_str(), json_utf8.size(), 0);
-            if (doc != nullptr)
-            {
-                auto *root = yyjson_doc_get_root(doc);
+            std::unique_ptr<yyjson_doc, void(*)(yyjson_doc*)> doc(
+                yyjson_read(json_utf8.c_str(), json_utf8.size(), 0),
+                [](yyjson_doc *p) { yyjson_doc_free(p); }
+            );
 
-                auto code = get_json_str_value(root, "code");
-                if (std::stoi(code) == 200)
-                {
+            if (doc != nullptr) {
+                auto *root = yyjson_doc_get_root(doc.get());
+
+                auto code = get_json_str_value(root, "code");         // todo: need updates to compatibale with v2 errors
+                if (std::stoi(code) == 200) {
                     func(root);
+                } else {
+                    succeed = false;
+                    errors.emplace_back(std::format(L"{} {}", dm.StringRes(IDS_HFW_ERROR_CODE).GetString(), code));
                 }
-                else
-                    //error = L"Error code: " + code;
-                    error = dm.StringRes(IDS_HFW_ERROR_CODE) + code.c_str();
+            } else {
+                succeed = false;
+                errors.emplace_back(dm.StringRes(IDS_HFW_INVALID_JSON));
             }
-            else
-                //error = L"Invalid json contents.";
-                error = dm.StringRes(IDS_HFW_INVALID_JSON);
-
-            yyjson_doc_free(doc);
+        } else {
+            errors.emplace_back(std::format(L"{}({})", dm.StringRes(IDS_HFW_NO_INTERNET).GetString(), error));
         }
-        else
-            //error = L"Failed to access the Internet.";
-            error = dm.StringRes(IDS_HFW_NO_INTERNET) + L"\r\n" + error.c_str();
 
-        return error;
+        return succeed;
     }
 }
 
-bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info)
+bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info, WStringList &errors)
 {
     CHECK_KEY;
 
@@ -78,8 +75,7 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
                                    queryEncoded,
                                    dm.StringRes(IDS_HFW_LANG).GetString());
 
-    CityInfoList cities;
-    auto func = [&cities](yyjson_val *j_val) {
+    auto func = [&info](yyjson_val *j_val) {
         auto *loc_arr = yyjson_obj_get(j_val, "location");
         auto num_cities = yyjson_arr_size(loc_arr);
 
@@ -93,28 +89,27 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
         };
 
         for (decltype(num_cities) i = 0; i < num_cities; ++i)
-            cities.push_back(get_city_info(yyjson_arr_get(loc_arr, i)));
+            info.push_back(get_city_info(yyjson_arr_get(loc_arr, i)));
     };
 
-    auto err = hf::query_func_frame(url, func);
-    if (err.empty())
-        info = cities;
-    else
-        m_errors.push_back(L"[QRC] " + err);
+    if (!hf::query_func_frame(url, func, errors)) {
+        errors.push_back(L"QueryCity failed");
+        return false;
+    }
 
-    return err.empty();
+    return true;
 }
 
-std::wstring DataApiHefengWeather::GetWeatherInfoSummary()
+std::wstring DataApiHefengWeather::GetWeatherInfoSummary(WStringList &errors)
 {
     const auto &app_config = CDataManager::Instance().GetConfig();
     const auto &city_info = CDataManager::Instance().GetCurrentCityInfo();
 
     if (config.ShowAirQuality && _airQualityDataOutdated)
-        QueryRealtimeAirQuality(city_info.CityNO);
+        QueryRealtimeAirQuality(city_info.CityNO, errors);
 
     if (config.ShowWeatherAlert && _alertsDataOutdated)
-        QueryWeatherAlerts(city_info.CityNO);
+        QueryWeatherAlerts(city_info.CityNO, errors);
 
     const auto &dm = CDataManager::Instance();
     CString tmp_str;
@@ -274,7 +269,7 @@ std::wstring DataApiHefengWeather::GetWeatherCode(EWeatherInfoType type)
     }
 }
 
-bool DataApiHefengWeather::UpdateWeather()
+bool DataApiHefengWeather::UpdateWeather(WStringList &errors)
 {
     CHECK_KEY;
 
@@ -285,17 +280,17 @@ bool DataApiHefengWeather::UpdateWeather()
 
     bool succeeded{ true };
 
-    succeeded &= QueryRealtimeWeather(currunt_city.CityNO);
-    succeeded &= QueryForecastWeather(currunt_city.CityNO);
+    succeeded &= QueryRealtimeWeather(currunt_city.CityNO, errors);
+    succeeded &= QueryForecastWeather(currunt_city.CityNO, errors);
     if (config.ShowAirQuality)
-        succeeded &= QueryRealtimeAirQuality(currunt_city.CityNO);
+        succeeded &= QueryRealtimeAirQuality(currunt_city.CityNO, errors);
     if (config.ShowWeatherAlert)
-        succeeded &= QueryWeatherAlerts(currunt_city.CityNO);
+        succeeded &= QueryWeatherAlerts(currunt_city.CityNO, errors);
 
     return succeeded;
 }
 
-bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
+bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query, WStringList &errors)
 {
     CHECK_KEY;
 
@@ -320,16 +315,15 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query)
         data.Humidity = hf::get_json_str_value(now_obj, "humidity");
     };
 
-    auto err = hf::query_func_frame(url, func);
-    if (err.empty())
-        _realtimeWeather = data;
-    else
-        m_errors.push_back(L"[QRTW] " + err);
+    if (!hf::query_func_frame(url, func, errors)) {
+        errors.push_back(L"QueryRealtimeWeather failed");
+        return false;
+    }
 
-    return err.empty();
+    return true;
 }
 
-bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
+bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query, WStringList &errors)
 {
     CHECK_KEY;
 
@@ -351,19 +345,18 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query)
         data.PM10 = hf::get_json_str_value(now_obj, "pm10");
     };
 
-    auto err = hf::query_func_frame(url, func);
-    if (err.empty())
-    {
+    if (hf::query_func_frame(url, func, errors)) {
         _realtimeAirQuality = data;
         _airQualityDataOutdated = false;
-    }
-    else
-        m_errors.push_back(L"[QRTA] " + err);
 
-    return err.empty();
+        return true;
+    } else {
+        errors.push_back(L"QueryRealtimeAirQuality failed");
+        return false;
+    }
 }
 
-bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
+bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query, WStringList &errors)
 {
     CHECK_KEY;
 
@@ -393,20 +386,19 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query)
         get_daily_info(yyjson_arr_get(daily_arr, 2), datm);
     };
 
-    auto err = hf::query_func_frame(url, func);
-    if (err.empty())
-    {
+    if (hf::query_func_frame(url, func, errors)) {
         _forcastWeatherTD = td;
         _forcastWeatherTM = tm;
         _forcastWeatherDATM = datm;
-    }
-    else
-        m_errors.push_back(L"[QFCW] " + err);
 
-    return err.empty();
+        return true;
+    } else {
+        errors.push_back(L"QueryForecastWeather failed");
+        return false;
+    }
 }
 
-bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
+bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query, WStringList &errors)
 {
     CHECK_KEY;
 
@@ -438,14 +430,13 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query)
             data.push_back(get_alert_info(yyjson_arr_get(alert_arr, i)));
     };
 
-    auto err = hf::query_func_frame(url, func);
-    if (err.empty())
-    {
+    if (hf::query_func_frame(url, func, errors)) {
         _weatherAlerts = data;
         _alertsDataOutdated = false;
-    }
-    else
-        m_errors.push_back(L"[QWA] " + err);
 
-    return err.empty();
+        return true;
+    } else {
+        errors.push_back(L"QueryWeatherAlerts failed");
+        return false;
+    }
 }

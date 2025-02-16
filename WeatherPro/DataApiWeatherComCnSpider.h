@@ -45,14 +45,14 @@ public:
         std::wstring ToString() const;
     };
 
-    bool QueryCity(const std::wstring &query, CityInfoList &info) override;
+    bool QueryCity(const std::wstring &query, CityInfoList &info, WStringList &errors) override;
 
-    std::wstring GetWeatherInfoSummary() override;
+    std::wstring GetWeatherInfoSummary(WStringList &errors) override;
     std::wstring GetTemprature(EWeatherInfoType type) override;
     std::wstring GetWeatherText(EWeatherInfoType type) override;
     std::wstring GetWeatherCode(EWeatherInfoType type) override;
 
-    bool UpdateWeather() override;
+    bool UpdateWeather(WStringList &errors) override;
 
     bool QueryRealtimeWeather(const std::wstring &query);
     bool QueryForecastWeather(const std::wstring &query);

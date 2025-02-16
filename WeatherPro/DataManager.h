@@ -119,5 +119,7 @@ private:
 
     std::wstring m_loc_name_cache;
 
+    mutable WStringList m_errors;
+
     unsigned short m_lang_id;
 };

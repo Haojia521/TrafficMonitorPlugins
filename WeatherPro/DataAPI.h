@@ -25,20 +25,14 @@ using WStringList = std::vector<std::wstring>;
 class DataAPI
 {
 public:
-    virtual bool QueryCity(const std::wstring &query, CityInfoList &info) = 0;
+    virtual bool QueryCity(const std::wstring &query, CityInfoList &info, WStringList &errors) = 0;
 
-    virtual std::wstring GetWeatherInfoSummary() = 0;
+    virtual std::wstring GetWeatherInfoSummary(WStringList &errors) = 0;
     virtual std::wstring GetTemprature(EWeatherInfoType type) = 0;
     virtual std::wstring GetWeatherText(EWeatherInfoType type) = 0;
     virtual std::wstring GetWeatherCode(EWeatherInfoType type) = 0;
 
-    virtual bool UpdateWeather() = 0;
-
-    const WStringList& GetErrors() { return m_errors; }
-    void ClrearErrors() { m_errors.clear(); }
-
-protected:
-    WStringList m_errors;
+    virtual bool UpdateWeather(WStringList &errors) = 0;
 };
 
 using DataApiPtr = std::shared_ptr<DataAPI>;

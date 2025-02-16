@@ -112,7 +112,8 @@ void CSelectCityDlg::OnBnClickedSearchBtn()
 
     ResetStates();
 
-    if (data_api->QueryCity(std::wstring(m_cityNameQuery), m_cityInfoList))
+    WStringList errors;
+    if (data_api->QueryCity(std::wstring(m_cityNameQuery), m_cityInfoList, errors))
     {
         if (m_cityInfoList.size() == 0) return;
 
@@ -129,7 +130,7 @@ void CSelectCityDlg::OnBnClickedSearchBtn()
     else
     {
         std::wstringstream wss;
-        for (const auto &err : data_api->GetErrors())
+        for (const auto &err : errors)
             wss << err << std::endl;
 
         CString info;

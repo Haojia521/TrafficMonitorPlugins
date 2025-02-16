@@ -10,6 +10,7 @@
 #include <thread>
 #include <mutex>
 #include <memory>
+#include <unordered_set>
 
 namespace icon
 {
@@ -749,8 +750,10 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
 {
     std::lock_guard<std::mutex> guard(g_weather_update_nutex);
 
+    // clear the history errors
+    m_errors.clear();
+
     std::shared_ptr<DataAPI> current_api{ GetCurrentApi() };
-    current_api->ClrearErrors();
 
     if (current_api != nullptr)
     {
@@ -763,29 +766,36 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
                 if (loc_name != m_loc_name_cache)
                 {
                     CityInfoList cities;
-                    if (current_api->QueryCity(loc_name, cities) && !cities.empty())
+                    if (current_api->QueryCity(loc_name, cities, m_errors) && !cities.empty())
                     {
                         SetCurrentCityInfo(cities.front());
                         SaveConfigs();
                     }
                     m_loc_name_cache = loc_name;
                 }
-            } else
-            {
-                // err message
-           }
+            } else {
+                m_errors.emplace_back(err);
+            }
         } else
             // If automatic locating is not enabled, clear the cache to facilitate the execution of a 
             // geolocation query the next time automatic locating is activated.
             m_loc_name_cache.clear();
 
+        // record the errors if all attempts failed
+        WStringList error_list_for_update_weather;
         for (int i = 0; i < 4; ++i)
         {
-            if (current_api->UpdateWeather())
+            // clear the errors occurred in last update
+            error_list_for_update_weather.clear();
+
+            if (current_api->UpdateWeather(error_list_for_update_weather))
                 break;
 
-            std::this_thread::sleep_for(std::chrono::seconds(3));
+            std::this_thread::sleep_for(std::chrono::seconds(5));
         }
+
+        for (auto &e : error_list_for_update_weather)
+            m_errors.emplace_back(e);
 
         RefreshWeatherInfoCache();
 
@@ -981,17 +991,23 @@ std::wstring CDataManager::_getTooptipInfo() const
     {
         std::wstringstream wss;
 
-        wss << m_currentCityInfo.CityName << L" " << api->GetWeatherInfoSummary();
+        wss << m_currentCityInfo.CityName << L" " << api->GetWeatherInfoSummary(m_errors);
 
-        const auto &errors = api->GetErrors();
-        if (m_config.m_show_error_info && !errors.empty())
+        if (m_config.m_show_error_info && !m_errors.empty())
         {
             wss << std::endl;
+            
+            // remove duplicate errors
+            std::unordered_set<std::wstring> unique_errors;
 
-            wss << L"=====WeatherPro-Errors=====" << std::endl;
-            for (const auto &err : errors)
-                wss << err << std::endl;
-            wss << L"===========================";
+            wss << L"[WeatherPro-Errors]" << std::endl;
+            for (const auto &err : m_errors) {
+                if (unique_errors.find(err) == unique_errors.end()) {
+                    unique_errors.insert(err);
+                    wss << err << std::endl;
+                }
+            }
+            wss << L"[End]";
         }
 
         return wss.str();
