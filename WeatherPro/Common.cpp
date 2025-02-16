@@ -94,13 +94,14 @@ int CCommon::GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata)
     return 0;
 }
 
-bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err,
-                             const InternetConfig &cfg /* = InternetConfig() */)
+unsigned long CCommon::AccessInternet(const std::wstring &url, std::wstring &content, WStringList &errors,
+                                      const InternetConfig &cfg /* = InternetConfig() */)
 {
     content.clear();
-    err.clear();
 
-    bool succeed{ false };
+    DWORD dw_status_code{ 0 };
+    UINT buffer_len{ 0 };
+    std::vector<char> http_content_buffer(1024 * 8, 0);
     try
     {
         std::unique_ptr<CInternetSession, void(*)(CInternetSession*)> session(
@@ -113,47 +114,34 @@ bool CCommon::AccessInternet(const std::wstring &url, std::wstring &content, std
             [](CHttpFile *p) { if (p != nullptr) p->Close(); delete p; }
         );
 
-        DWORD dw_status_code{ 0 };
         http_file->QueryInfoStatusCode(dw_status_code);
 
-        if (dw_status_code == HTTP_STATUS_OK)
-        {
-            auto http_content_len = http_file->Seek(0, CFile::end);
-            std::vector<char> http_content_buffer(http_content_len + 1, 0);
+        if (dw_status_code == HTTP_STATUS_NOT_FOUND)
+            return HTTP_STATUS_NOT_FOUND;
 
-            http_file->Seek(0, CFile::begin);
-            http_file->Read(http_content_buffer.data(), static_cast<UINT>(http_content_len));
-
-            if (cfg.gzip)
-            {
-                std::vector<Byte> decomp_contents_buffer(1024 * 64, 0);
-                uLong decomp_contents_len{ 0 };
-                if (CCommon::GZipDecompress((Byte*)http_content_buffer.data(), (uLong)http_content_len,
-                                            decomp_contents_buffer.data(), &decomp_contents_len) == 0)
-                {
-                    content = CCommon::StrToUnicode((char*)decomp_contents_buffer.data(), true);
-                    succeed = true;
-                } else
-                    err = L"failed to decompress http contents via gzip";
-            }
-            else
-            {
-                content = CCommon::StrToUnicode(http_content_buffer.data(), true);
-                succeed = true;
-            }
-        }
-        else
-        {
-            err = std::format(L"HTTP CODE: {}", dw_status_code);
-        }
+        buffer_len = http_file->Read(http_content_buffer.data(), 1024 * 8);
     }
     catch (CInternetException *e)
     {
         TCHAR cause[1024]{ 0 };
         if (e->GetErrorMessage(cause, 1024) == TRUE)
-            err = cause;
+            errors.push_back(cause);
         e->Delete();
     }
 
-    return succeed;
+    if (cfg.gzip)
+    {
+        std::vector<Byte> decomp_contents_buffer(1024 * 64, 0);
+        uLong decomp_contents_len{ 0 };
+        if (CCommon::GZipDecompress((Byte*)http_content_buffer.data(), (uLong)buffer_len,
+                                    decomp_contents_buffer.data(), &decomp_contents_len) == 0) {
+            content = CCommon::StrToUnicode((char*)decomp_contents_buffer.data(), true);
+        } else
+            errors.push_back(L"failed to decompress http contents via gzip");
+    } else
+    {
+        content = CCommon::StrToUnicode(http_content_buffer.data(), true);
+    }
+
+    return dw_status_code;
 }

@@ -610,10 +610,10 @@ namespace icon
 
 namespace loc
 {
-    bool QueryLocation(std::wstring &loc_name, std::wstring &err)
+    bool QueryLocation(std::wstring &loc_name, WStringList &errors)
     {
         std::wstring url{ L"https://myip.ipip.net/json" }, content;
-        if (CCommon::AccessInternet(url, content, err))
+        if (CCommon::AccessInternet(url, content, errors) == 200)
         {
             auto json = CCommon::UnicodeToStr(content.c_str(), true);
             std::unique_ptr<yyjson_doc, void(*)(yyjson_doc*)> json_doc(
@@ -642,9 +642,9 @@ namespace loc
 
                     return true;
                 } else
-                    err = L"[ipip.net] invalid return statue";
+                    errors.emplace_back(L"[ipip.net] invalid return status");
             } else
-                err = L"[ipip.net] contents cannot be parsed as json";
+                errors.emplace_back(L"[ipip.net] contents cannot be parsed as json");
         }
 
         return false;
@@ -760,8 +760,8 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
         // locating
         if (m_config.m_auto_locating)
         {
-            std::wstring loc_name, err;
-            if (loc::QueryLocation(loc_name, err))
+            std::wstring loc_name;
+            if (loc::QueryLocation(loc_name, m_errors))
             {
                 if (loc_name != m_loc_name_cache)
                 {
@@ -773,8 +773,6 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
                     }
                     m_loc_name_cache = loc_name;
                 }
-            } else {
-                m_errors.emplace_back(err);
             }
         } else
             // If automatic locating is not enabled, clear the cache to facilitate the execution of a 

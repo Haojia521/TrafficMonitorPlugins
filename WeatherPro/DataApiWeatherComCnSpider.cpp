@@ -131,10 +131,10 @@ namespace wccs  // WeatherComCnSpider
             .headers = L"Host: toy1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
         };
 
-        std::wstring content, err;
-        bool succeed = CCommon::AccessInternet(url, content, err, cfg);
+        std::wstring content;
+        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
 
-        if (succeed && !content.empty())
+        if (status_code == 200 && !content.empty())
         {
             // parse string
             auto infoList = _ExtractCityInfoList(content);
@@ -145,12 +145,10 @@ namespace wccs  // WeatherComCnSpider
                 if (!cityInfo.CityNO.empty())
                     city_list.push_back(cityInfo);
             }
-        } else {
-            errors.emplace_back(err);
-            succeed = false;
-        }
 
-        return succeed;
+            return true;
+        } else
+            return false;
     }
 
     using SRealTimeWeather = DataApiWeatherComCnSpider::SRealTimeWeather;
@@ -169,9 +167,11 @@ namespace wccs  // WeatherComCnSpider
             .headers = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
         };
 
-        std::wstring content, err;
-        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
+        std::wstring content;
+        WStringList errors;
+        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
 
+        auto succeed = status_code == 200;
         if (content.find(L'{') == std::wstring::npos)
             succeed = false;
 
@@ -284,9 +284,11 @@ namespace wccs  // WeatherComCnSpider
             .headers = L"Host: forecast.weather.com.cn\r\nReferer: http://www.weather.com.cn/" 
         };
 
-        std::wstring content, err;
-        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
+        std::wstring content;
+        WStringList errors;
+        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
 
+        auto succeed = status_code == 200;
         if (succeed && !content.empty())
         {
             static const std::wregex pattern{ L"var forecast_default.*?(?=;)" };
@@ -382,9 +384,11 @@ namespace wccs  // WeatherComCnSpider
             .headers = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
         };
 
-        std::wstring content, err;
-        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
+        std::wstring content;
+        WStringList errors;
+        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
 
+        auto succeed = status_code == 200;
         auto data_idx = content.find(L"var alarmDZ");
         if (data_idx == std::wstring::npos)
             succeed = false;
@@ -460,9 +464,11 @@ namespace wccs  // WeatherComCnSpider
             cfg.headers = std::format(L"Host: forecast.weather.com.cn\r\nReferer: http://forecast.weather.com.cn/town/weather1dn/{}.shtml", code);
         }
 
-        std::wstring content, err;
-        auto succeed = CCommon::AccessInternet(url, content, err, cfg);
+        std::wstring content;
+        WStringList errors;
+        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
 
+        auto succeed = status_code == 200;
         if (succeed && !content.empty())
         {
             // 解析温度数据

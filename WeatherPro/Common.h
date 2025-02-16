@@ -1,6 +1,10 @@
 ﻿#pragma once
 #include <string>
+#include <vector>
 #include <zlib.h>
+
+using WStringList = std::vector<std::wstring>;
+
 class CCommon
 {
 public:
@@ -22,6 +26,6 @@ public:
         std::wstring headers;
         bool gzip = false;
     };
-    static bool AccessInternet(const std::wstring &url, std::wstring &content, std::wstring &err,
-                               const InternetConfig &cfg = InternetConfig());
+    static unsigned long AccessInternet(const std::wstring &url, std::wstring &content, WStringList &errors,
+                                        const InternetConfig &cfg = InternetConfig());
 };

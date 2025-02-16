@@ -19,21 +19,36 @@
 
 namespace hf
 {
-    std::wstring get_json_str_value(yyjson_val *j_val, const char *key)
+    static std::wstring json_get_str_value(yyjson_val *j_val, const char *key)
     {
         auto *obj = yyjson_obj_get(j_val, key);
         if (obj == nullptr) return L"";
         else return CCommon::StrToUnicode(yyjson_get_str(obj), true);
     }
 
-    bool query_func_frame(const std::wstring &url, std::function<void(yyjson_val*)> func, WStringList &errors)
+    static bool json_has_obj(yyjson_val *j_val, const char *key)
+    {
+        return yyjson_obj_get(j_val, key) != nullptr;
+    }
+
+    static std::wstring format_error_v2(yyjson_val *j_err)
+    {
+        auto status = yyjson_get_int(yyjson_obj_get(j_err, "status"));
+        auto title = json_get_str_value(j_err, "title");
+        auto detail = json_get_str_value(j_err, "detail");
+
+        return std::format(L"[{}] {} ({})", status, title, detail);
+    }
+
+    static bool query_func_frame(const std::wstring &url, std::function<void(yyjson_val*)> func, WStringList &errors)
     {
         const auto &dm = CDataManager::Instance();
 
-        std::wstring content, error;
-        auto succeed = CCommon::AccessInternet(url, content, error, CCommon::InternetConfig{ .gzip = true });
+        bool succeed{ false };
+        std::wstring content;
+        auto status_code = CCommon::AccessInternet(url, content, errors, CCommon::InternetConfig{ .gzip = true });
 
-        if (succeed && !content.empty()) {
+        if (!content.empty()) {
             auto json_utf8 = CCommon::UnicodeToStr(content.c_str(), true);
             std::unique_ptr<yyjson_doc, void(*)(yyjson_doc*)> doc(
                 yyjson_read(json_utf8.c_str(), json_utf8.size(), 0),
@@ -43,20 +58,27 @@ namespace hf
             if (doc != nullptr) {
                 auto *root = yyjson_doc_get_root(doc.get());
 
-                auto code = get_json_str_value(root, "code");         // todo: need updates to compatibale with v2 errors
-                if (std::stoi(code) == 200) {
-                    func(root);
-                } else {
-                    succeed = false;
-                    errors.emplace_back(std::format(L"{} {}", dm.StringRes(IDS_HFW_ERROR_CODE).GetString(), code));
+                if (status_code == 200) {
+                    // compatible with error code v1
+                    auto code = json_get_str_value(root, "code");
+                    if (code == L"200") {
+                        func(root);
+                        succeed = true;
+                    } else {
+                        errors.emplace_back(std::format(L"{} {}", dm.StringRes(IDS_HFW_ERROR_CODE).GetString(), code));
+                    }
                 }
-            } else {
-                succeed = false;
+                else {
+                    // compatible with error code v2
+                    if (json_has_obj(root, "error")) {
+                        errors.emplace_back(format_error_v2(yyjson_obj_get(root, "error")));
+                    } else
+                        errors.emplace_back(std::format(L"[{}] unknown error", status_code));
+                }
+            } else
                 errors.emplace_back(dm.StringRes(IDS_HFW_INVALID_JSON));
-            }
-        } else {
-            errors.emplace_back(std::format(L"{}({})", dm.StringRes(IDS_HFW_NO_INTERNET).GetString(), error));
-        }
+        } else
+            errors.emplace_back(std::format(L"[{}] {}", status_code, dm.StringRes(IDS_HFW_NO_INTERNET).GetString()));
 
         return succeed;
     }
@@ -81,9 +103,9 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
 
         auto get_city_info = [](yyjson_val *j_val) {
             SCityInfo city;
-            city.CityName = hf::get_json_str_value(j_val, "name");
-            city.CityNO = hf::get_json_str_value(j_val, "id");
-            city.CityAdministrativeOwnership = hf::get_json_str_value(j_val, "adm2") + L"-" + hf::get_json_str_value(j_val, "adm1");
+            city.CityName = hf::json_get_str_value(j_val, "name");
+            city.CityNO = hf::json_get_str_value(j_val, "id");
+            city.CityAdministrativeOwnership = hf::json_get_str_value(j_val, "adm2") + L"-" + hf::json_get_str_value(j_val, "adm1");
 
             return city;
         };
@@ -304,23 +326,24 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query, WStri
     auto func = [&data](yyjson_val *j_val) {
         auto *now_obj = yyjson_obj_get(j_val, "now");
 
-        data.Temperature = hf::get_json_str_value(now_obj, "temp");
-        data.TemperatureFeelsLike = hf::get_json_str_value(now_obj, "feelsLike");
-        data.UpdateTime = hf::get_json_str_value(now_obj, "obsTime").substr(11, 5);
-        data.WeatherText = hf::get_json_str_value(now_obj, "text");
-        data.WeatherCode = hf::get_json_str_value(now_obj, "icon");
-        data.WindDirection = hf::get_json_str_value(now_obj, "windDir");
-        data.WindScale = hf::get_json_str_value(now_obj, "windScale");
-        data.WindSpeed = hf::get_json_str_value(now_obj, "windSpeed");
-        data.Humidity = hf::get_json_str_value(now_obj, "humidity");
+        data.Temperature = hf::json_get_str_value(now_obj, "temp");
+        data.TemperatureFeelsLike = hf::json_get_str_value(now_obj, "feelsLike");
+        data.UpdateTime = hf::json_get_str_value(now_obj, "obsTime").substr(11, 5);
+        data.WeatherText = hf::json_get_str_value(now_obj, "text");
+        data.WeatherCode = hf::json_get_str_value(now_obj, "icon");
+        data.WindDirection = hf::json_get_str_value(now_obj, "windDir");
+        data.WindScale = hf::json_get_str_value(now_obj, "windScale");
+        data.WindSpeed = hf::json_get_str_value(now_obj, "windSpeed");
+        data.Humidity = hf::json_get_str_value(now_obj, "humidity");
     };
 
-    if (!hf::query_func_frame(url, func, errors)) {
+    if (hf::query_func_frame(url, func, errors)) {
+        _realtimeWeather = data;
+        return true;
+    } else {
         errors.push_back(L"QueryRealtimeWeather failed");
         return false;
     }
-
-    return true;
 }
 
 bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query, WStringList &errors)
@@ -337,12 +360,12 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query, WS
     auto func = [&data](yyjson_val *j_val) {
         auto *now_obj = yyjson_obj_get(j_val, "now");
 
-        data.PublishTime = hf::get_json_str_value(now_obj, "pubTime").substr(11, 5);
-        data.AQI = hf::get_json_str_value(now_obj, "aqi");
-        data.Level = hf::get_json_str_value(now_obj, "level");
-        data.Category = hf::get_json_str_value(now_obj, "category");
-        data.PM2p5 = hf::get_json_str_value(now_obj, "pm2p5");
-        data.PM10 = hf::get_json_str_value(now_obj, "pm10");
+        data.PublishTime = hf::json_get_str_value(now_obj, "pubTime").substr(11, 5);
+        data.AQI = hf::json_get_str_value(now_obj, "aqi");
+        data.Level = hf::json_get_str_value(now_obj, "level");
+        data.Category = hf::json_get_str_value(now_obj, "category");
+        data.PM2p5 = hf::json_get_str_value(now_obj, "pm2p5");
+        data.PM10 = hf::json_get_str_value(now_obj, "pm10");
     };
 
     if (hf::query_func_frame(url, func, errors)) {
@@ -371,14 +394,14 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query, WStri
         auto *daily_arr = yyjson_obj_get(j_val, "daily");
 
         auto get_daily_info = [](yyjson_val *j_val, ForcastWeather &w) {
-            w.TemperatureMax = hf::get_json_str_value(j_val, "tempMax");
-            w.TemperatureMin = hf::get_json_str_value(j_val, "tempMin");
-            w.WeatherDay = hf::get_json_str_value(j_val, "textDay");
-            w.WeatherNight = hf::get_json_str_value(j_val, "textNight");
-            w.WeatherCodeDay = hf::get_json_str_value(j_val, "iconDay");
-            w.WeatherCodeNight = hf::get_json_str_value(j_val, "iconNight");
-            w.UVIndex = hf::get_json_str_value(j_val, "uvIndex");
-            w.Humidity = hf::get_json_str_value(j_val, "humidity");
+            w.TemperatureMax = hf::json_get_str_value(j_val, "tempMax");
+            w.TemperatureMin = hf::json_get_str_value(j_val, "tempMin");
+            w.WeatherDay = hf::json_get_str_value(j_val, "textDay");
+            w.WeatherNight = hf::json_get_str_value(j_val, "textNight");
+            w.WeatherCodeDay = hf::json_get_str_value(j_val, "iconDay");
+            w.WeatherCodeNight = hf::json_get_str_value(j_val, "iconNight");
+            w.UVIndex = hf::json_get_str_value(j_val, "uvIndex");
+            w.Humidity = hf::json_get_str_value(j_val, "humidity");
         };
 
         get_daily_info(yyjson_arr_get(daily_arr, 0), td);
@@ -415,14 +438,14 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query, WString
 
         auto get_alert_info = [](yyjson_val *j_val) {
             WeatherAlert alert;
-            alert.Type = hf::get_json_str_value(j_val, "type");
-            alert.TypeName = hf::get_json_str_value(j_val, "typeName");
-            alert.Level = hf::get_json_str_value(j_val, "level");
-            alert.Title = hf::get_json_str_value(j_val, "title");
-            alert.Text = hf::get_json_str_value(j_val, "text");
-            alert.Severity = hf::get_json_str_value(j_val, "severity");
-            alert.SeverityColor = hf::get_json_str_value(j_val, "severityColor");
-            alert.PublishTime = hf::get_json_str_value(j_val, "pubTime").substr(0, 16).replace(10, 1, L" ");
+            alert.Type = hf::json_get_str_value(j_val, "type");
+            alert.TypeName = hf::json_get_str_value(j_val, "typeName");
+            alert.Level = hf::json_get_str_value(j_val, "level");
+            alert.Title = hf::json_get_str_value(j_val, "title");
+            alert.Text = hf::json_get_str_value(j_val, "text");
+            alert.Severity = hf::json_get_str_value(j_val, "severity");
+            alert.SeverityColor = hf::json_get_str_value(j_val, "severityColor");
+            alert.PublishTime = hf::json_get_str_value(j_val, "pubTime").substr(0, 16).replace(10, 1, L" ");
             return alert;
         };
 
