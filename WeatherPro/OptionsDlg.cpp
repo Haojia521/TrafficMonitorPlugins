@@ -164,6 +164,7 @@ void COptionsDlg::OnOK()
     config.m_show_brief_weather_alert_info = m_showBriefWeatherAlertInfo == TRUE;
     config.m_show_error_info = m_showErrorInfo == TRUE;
 
+    bool auto_loc_changed = config.m_auto_locating != (m_autoLocating == TRUE);
     config.m_auto_locating = m_autoLocating == TRUE;
 
     config.m_double_click_action = m_intRadioDoubleClickAction;
@@ -174,7 +175,7 @@ void COptionsDlg::OnOK()
         dm_ref.SetCurrentCityInfo(m_selected_city);
         CWeatherPro::Instance().UpdateWeatherInfo(true);
     }
-    else if (api_changed || config.m_auto_locating)
+    else if (api_changed || auto_loc_changed)
         CWeatherPro::Instance().UpdateWeatherInfo(true);
     else
     {

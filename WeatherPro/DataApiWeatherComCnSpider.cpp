@@ -454,12 +454,12 @@ namespace wccs  // WeatherComCnSpider
         if (code.size() == 9)
         {
             url = std::format(L"https://www.weather.com.cn/weathern/{}.shtml", code);
-            cfg.headers = std::format(L"Host: www.weather.com.cn", code);
+            cfg.headers = L"Host: www.weather.com.cn";
         }
         else
         {
             url = std::format(L"https://forecast.weather.com.cn/town/weathern/{}.shtml", code);
-            cfg.headers = std::format(L"Host: forecast.weather.com.cn", code);
+            cfg.headers = L"Host: forecast.weather.com.cn";
         }
 
         std::wstring content;

@@ -638,7 +638,8 @@ namespace loc
                     auto *location = yyjson_obj_get(data, "location");
                     std::string prov = yyjson_get_str(yyjson_arr_get(location, 1));
                     std::string city = yyjson_get_str(yyjson_arr_get(location, 2));
-                    loc_name = CCommon::StrToUnicode((prov + city).c_str(), true);
+                    //loc_name = CCommon::StrToUnicode((prov + city).c_str(), true);
+                    loc_name = CCommon::StrToUnicode(city.c_str(), true);
 
                     return true;
                 } else
