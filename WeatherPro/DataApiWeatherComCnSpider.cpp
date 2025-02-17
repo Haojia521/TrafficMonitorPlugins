@@ -122,13 +122,13 @@ namespace wccs  // WeatherComCnSpider
         auto qNameEncoded = CCommon::URLEncode(qName);
         auto timeStamp = std::time(0);
 
-        std::wstring url = std::format(L"http://toy1.weather.com.cn/search?cityname={}&callback=success_jsonpCallback&_={}",
+        std::wstring url = std::format(L"https://toy1.weather.com.cn/search?cityname={}&callback=success_jsonpCallback&_={}",
                                        qNameEncoded,
                                        timeStamp);
 
         CCommon::InternetConfig cfg{
             .agent = agent,
-            .headers = L"Host: toy1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
+            .headers = L"Host: toy1.weather.com.cn\r\nReferer: https://www.weather.com.cn/"
         };
 
         std::wstring content;
@@ -158,13 +158,13 @@ namespace wccs  // WeatherComCnSpider
         rt_weather = SRealTimeWeather();
 
         auto timeStamp = std::time(0);
-        std::wstring url = std::format(L"http://d1.weather.com.cn/sk_2d/{}.html?_={}",
+        std::wstring url = std::format(L"https://d1.weather.com.cn/sk_2d/{}.html?_={}",
                                        city_code,
                                        timeStamp);
 
         CCommon::InternetConfig cfg{
             .agent = agent,
-            .headers = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
+            .headers = L"Host: d1.weather.com.cn\r\nReferer: https://www.weather.com.cn/"
         };
 
         std::wstring content;
@@ -276,12 +276,12 @@ namespace wccs  // WeatherComCnSpider
     {
         rt_weather = SRealTimeWeather();
 
-        std::wstring url = std::format(L"http://forecast.weather.com.cn/town/weather1dn/{}.shtml",
+        std::wstring url = std::format(L"https://forecast.weather.com.cn/town/weather1dn/{}.shtml",
                                        code);
 
         CCommon::InternetConfig cfg{ 
             .agent = agent, 
-            .headers = L"Host: forecast.weather.com.cn\r\nReferer: http://www.weather.com.cn/" 
+            .headers = L"Host: forecast.weather.com.cn" 
         };
 
         std::wstring content;
@@ -373,15 +373,13 @@ namespace wccs  // WeatherComCnSpider
             target_code = code.substr(0, 9);
 
         auto timeStamp = std::time(0);
-        std::wstring url = std::format(L"http://d1.weather.com.cn/dingzhi/{}.html?_={}",
+        std::wstring url = std::format(L"https://d1.weather.com.cn/dingzhi/{}.html?_={}",
                                        target_code,
                                        timeStamp);
 
-        CString qHeaders = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/";
-
         CCommon::InternetConfig cfg{
             .agent = agent,
-            .headers = L"Host: d1.weather.com.cn\r\nReferer: http://www.weather.com.cn/"
+            .headers = L"Host: d1.weather.com.cn\r\nReferer: https://www.weather.com.cn/"
         };
 
         std::wstring content;
@@ -455,13 +453,13 @@ namespace wccs  // WeatherComCnSpider
 
         if (code.size() == 9)
         {
-            url = std::format(L"http://www.weather.com.cn/weathern/{}.shtml", code);
-            cfg.headers = std::format(L"Host: www.weather.com.cn\r\nReferer: http://www.weather.com.cn/weather1dn/{}.shtml", code);
+            url = std::format(L"https://www.weather.com.cn/weathern/{}.shtml", code);
+            cfg.headers = std::format(L"Host: www.weather.com.cn", code);
         }
         else
         {
-            url = std::format(L"http://forecast.weather.com.cn/town/weathern/{}.shtml", code);
-            cfg.headers = std::format(L"Host: forecast.weather.com.cn\r\nReferer: http://forecast.weather.com.cn/town/weather1dn/{}.shtml", code);
+            url = std::format(L"https://forecast.weather.com.cn/town/weathern/{}.shtml", code);
+            cfg.headers = std::format(L"Host: forecast.weather.com.cn", code);
         }
 
         std::wstring content;

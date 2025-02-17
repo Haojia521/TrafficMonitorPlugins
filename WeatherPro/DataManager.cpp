@@ -784,22 +784,27 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
         for (int i = 0; i < 4; ++i)
         {
             // clear the errors occurred in last update
+            for (int i = 0; i < error_list_for_update_weather.size(); ++i)
+                m_errors.pop_back();
             error_list_for_update_weather.clear();
 
-            if (current_api->UpdateWeather(error_list_for_update_weather))
-                break;
+            // update weather
+            // returns true if all parts are successfully updated
+            // todo: only retry the parts which are not updated
+            auto succeeded = current_api->UpdateWeather(error_list_for_update_weather);
+
+            for (auto &e : error_list_for_update_weather)
+                m_errors.emplace_back(e);
+
+            RefreshWeatherInfoCache();
+
+            if (callback != nullptr) {
+                callback(GetTooptipInfo());
+            }
+
+            if (succeeded) break;
 
             std::this_thread::sleep_for(std::chrono::seconds(5));
-        }
-
-        for (auto &e : error_list_for_update_weather)
-            m_errors.emplace_back(e);
-
-        RefreshWeatherInfoCache();
-
-        if (callback != nullptr)
-        {
-            callback(GetTooptipInfo());
         }
     }
 }

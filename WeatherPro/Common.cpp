@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Common.h"
 #include <afxinet.h>    //用于支持使用网络相关的类
 #include <memory>
@@ -125,7 +125,7 @@ unsigned long CCommon::AccessInternet(const std::wstring &url, std::wstring &con
     {
         TCHAR cause[1024]{ 0 };
         if (e->GetErrorMessage(cause, 1024) == TRUE)
-            errors.push_back(cause);
+            errors.push_back(std::format(L"[InternetException {}] {}", e->m_dwError, cause));
         e->Delete();
     }
 
