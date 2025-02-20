@@ -1,31 +1,14 @@
 ﻿#pragma once
-#include <string>
-#include <vector>
-#include <zlib.h>
+#include "httplib.h"
 
 using WStringList = std::vector<std::wstring>;
 
-class CCommon
+namespace utils
 {
-public:
-    //将const char*字符串转换成宽字符字符串
-    static std::wstring StrToUnicode(const char* str, bool utf8 = false);
+    // 转换宽窄字符串
+    std::wstring multi_byte2wide_char(const char *str, bool is_utf8 = true);
+    std::string wide_char2multi_byte(const wchar_t *str, bool is_utf_8 = true);
 
-    static std::string UnicodeToStr(const wchar_t* wstr, bool utf8 = false);
-
-    //将一个字符串转换成URL编码（以UTF8编码格式）
-    static std::wstring URLEncode(const std::wstring& wstr);
-
-    // 解码gzip压缩的字节数据
-    static int GZipDecompress(Byte *zdata, uLong nzdata, Byte *data, uLong *ndata);
-
-    // 获取网页内容
-    struct InternetConfig
-    {
-        std::wstring agent;
-        std::wstring headers;
-        bool gzip = false;
-    };
-    static unsigned long AccessInternet(const std::wstring &url, std::wstring &content, WStringList &errors,
-                                        const InternetConfig &cfg = InternetConfig());
-};
+    int internet_get(const std::string &host, const std::string &path, std::wstring &content, WStringList &errors,
+                     httplib::Headers headers = httplib::Headers());
+}

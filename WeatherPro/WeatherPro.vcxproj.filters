@@ -115,6 +115,9 @@
     <ClInclude Include="SimpleIni.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="httplib.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WeatherPro.rc">

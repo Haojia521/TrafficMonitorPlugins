@@ -113,26 +113,25 @@ namespace wccs  // WeatherComCnSpider
         return result;
     }
 
-    const std::wstring agent = L"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0";
+    const std::string agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0";
 
     bool QueryCityInfo(const std::wstring &qName, CityInfoList &city_list, WStringList &errors)
     {
         city_list.clear();
 
-        auto qNameEncoded = CCommon::URLEncode(qName);
-        auto timeStamp = std::time(0);
+        std::string url_host = "https://toy1.weather.com.cn";
+        std::string url_path = utils::wide_char2multi_byte(
+            std::format(L"/search?cityname={}&callback=success_jsonpCallback&_={}", qName, std::time(0)).c_str()
+        );
 
-        std::wstring url = std::format(L"https://toy1.weather.com.cn/search?cityname={}&callback=success_jsonpCallback&_={}",
-                                       qNameEncoded,
-                                       timeStamp);
-
-        CCommon::InternetConfig cfg{
-            .agent = agent,
-            .headers = L"Host: toy1.weather.com.cn\r\nReferer: https://www.weather.com.cn/"
+        httplib::Headers headers = {
+            {"host", "toy1.weather.com.cn"},
+            {"referer", "https://www.weather.com.cn/"},
+            {"user-agent", agent},
         };
 
         std::wstring content;
-        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
+        auto status_code = utils::internet_get(url_host, url_path, content, errors, headers);
 
         if (status_code == 200 && !content.empty())
         {
@@ -157,19 +156,20 @@ namespace wccs  // WeatherComCnSpider
     {
         rt_weather = SRealTimeWeather();
 
-        auto timeStamp = std::time(0);
-        std::wstring url = std::format(L"https://d1.weather.com.cn/sk_2d/{}.html?_={}",
-                                       city_code,
-                                       timeStamp);
+        std::string url_host = "https://d1.weather.com.cn";
+        std::string url_path = utils::wide_char2multi_byte(
+            std::format(L"/sk_2d/{}.html?_={}", city_code, std::time(0)).c_str()
+        );
 
-        CCommon::InternetConfig cfg{
-            .agent = agent,
-            .headers = L"Host: d1.weather.com.cn\r\nReferer: https://www.weather.com.cn/"
+        httplib::Headers headers = {
+            {"host", "d1.weather.com.cn"},
+            {"referer", "https://www.weather.com.cn/"},
+            {"user-agent", agent},
         };
 
         std::wstring content;
         WStringList errors;
-        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
+        auto status_code = utils::internet_get(url_host, url_path, content, errors, headers);
 
         auto succeed = status_code == 200;
         if (content.find(L'{') == std::wstring::npos)
@@ -180,7 +180,7 @@ namespace wccs  // WeatherComCnSpider
             auto data = content.substr(content.find(L'{'));
             if (!data.empty())
             {
-                auto data_utf8 = CCommon::UnicodeToStr(data.c_str(), true);
+                auto data_utf8 = utils::wide_char2multi_byte(data.c_str());
 
                 yyjson_doc *doc = yyjson_read(data_utf8.c_str(), data_utf8.size(), 0);
                 if (doc != nullptr)
@@ -189,7 +189,7 @@ namespace wccs  // WeatherComCnSpider
 
                     auto get_value = [root](const char *key) {
                         auto *obj = yyjson_obj_get(root, key);
-                        return CCommon::StrToUnicode(yyjson_get_str(obj), true);
+                        return utils::multi_byte2wide_char(yyjson_get_str(obj));
                     };
 
                     rt_weather.Temperature = get_value("temp");
@@ -276,17 +276,19 @@ namespace wccs  // WeatherComCnSpider
     {
         rt_weather = SRealTimeWeather();
 
-        std::wstring url = std::format(L"https://forecast.weather.com.cn/town/weather1dn/{}.shtml",
-                                       code);
+        std::string url_host = "https://forecast.weather.com.cn";
+        std::string url_path = utils::wide_char2multi_byte(
+            std::format(L"/town/weather1dn/{}.shtml", code).c_str()
+        );
 
-        CCommon::InternetConfig cfg{ 
-            .agent = agent, 
-            .headers = L"Host: forecast.weather.com.cn" 
+        httplib::Headers headers = {
+            {"host", "forecast.weather.com.cn"},
+            {"user-agent", agent},
         };
 
         std::wstring content;
         WStringList errors;
-        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
+        auto status_code = utils::internet_get(url_host, url_path, content, errors, headers);
 
         auto succeed = status_code == 200;
         if (succeed && !content.empty())
@@ -301,7 +303,7 @@ namespace wccs  // WeatherComCnSpider
                 {
                     auto data = data_str.substr(data_str.find(L'{'));
 
-                    auto data_utf8 = CCommon::UnicodeToStr(data.c_str(), true);
+                    auto data_utf8 = utils::wide_char2multi_byte(data.c_str());
 
                     yyjson_doc *doc = yyjson_read(data_utf8.c_str(), data_utf8.size(), 0);
                     if (doc != nullptr)
@@ -310,7 +312,7 @@ namespace wccs  // WeatherComCnSpider
 
                         auto get_str_value = [root](const char *key) {
                             auto *obj = yyjson_obj_get(root, key);
-                            return CCommon::StrToUnicode(yyjson_get_str(obj), true);
+                            return utils::multi_byte2wide_char(yyjson_get_str(obj));
                         };
 
                         auto get_int_value = [root](const char *key) {
@@ -372,19 +374,20 @@ namespace wccs  // WeatherComCnSpider
         if (code.size() > 9)
             target_code = code.substr(0, 9);
 
-        auto timeStamp = std::time(0);
-        std::wstring url = std::format(L"https://d1.weather.com.cn/dingzhi/{}.html?_={}",
-                                       target_code,
-                                       timeStamp);
+        std::string url_host = "https://d1.weather.com.cn";
+        std::string url_path = utils::wide_char2multi_byte(
+            std::format(L"/dingzhi/{}.html?_={}", code, std::time(0)).c_str()
+        );
 
-        CCommon::InternetConfig cfg{
-            .agent = agent,
-            .headers = L"Host: d1.weather.com.cn\r\nReferer: https://www.weather.com.cn/"
+        httplib::Headers headers = {
+            {"host", "d1.weather.com.cn"},
+            {"referer", "https://www.weather.com.cn/"},
+            {"user-agent", agent},
         };
 
         std::wstring content;
         WStringList errors;
-        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
+        auto status_code = utils::internet_get(url_host, url_path, content, errors, headers);
 
         auto succeed = status_code == 200;
         auto data_idx = content.find(L"var alarmDZ");
@@ -401,7 +404,7 @@ namespace wccs  // WeatherComCnSpider
         {
             auto data = content.substr(content.find(L'{'));
 
-            auto data_utf8 = CCommon::UnicodeToStr(data.c_str(), true);
+            auto data_utf8 = utils::wide_char2multi_byte(data.c_str());
 
             auto *jdoc = yyjson_read(data_utf8.c_str(), data_utf8.size(), 0);
             if (jdoc != nullptr)
@@ -414,7 +417,7 @@ namespace wccs  // WeatherComCnSpider
                 {
                     auto get_value = [](yyjson_val *jval, const char *key) {
                         auto *obj = yyjson_obj_get(jval, key);
-                        return CCommon::StrToUnicode(yyjson_get_str(obj), true);
+                        return utils::multi_byte2wide_char(yyjson_get_str(obj));
                     };
 
                     auto get_alert = [get_value](yyjson_val *jval) {
@@ -448,23 +451,28 @@ namespace wccs  // WeatherComCnSpider
         weather_td = SWeatherInfo();
         weather_tm = SWeatherInfo();
 
-        std::wstring url;
-        CCommon::InternetConfig cfg{ .agent = agent };
+        std::string url_host, url_path;
+        httplib::Headers headers = {
+            {"user-agent", agent},
+        };
 
-        if (code.size() == 9)
-        {
-            url = std::format(L"https://www.weather.com.cn/weathern/{}.shtml", code);
-            cfg.headers = L"Host: www.weather.com.cn";
-        }
-        else
-        {
-            url = std::format(L"https://forecast.weather.com.cn/town/weathern/{}.shtml", code);
-            cfg.headers = L"Host: forecast.weather.com.cn";
+        if (code.size() == 9) {
+            url_host = "https://www.weather.com.cn";
+            url_path = utils::wide_char2multi_byte(
+                std::format(L"/weathern/{}.shtml", code).c_str()
+            );
+            headers.insert({"host", "www.weather.com.cn"});
+        } else {
+            url_host = "https://forecast.weather.com.cn";
+            url_path = utils::wide_char2multi_byte(
+                std::format(L"/town/weathern/{}.shtml", code).c_str()
+            );
+            headers.insert({ "host", "forecast.weather.com.cn" });
         }
 
         std::wstring content;
         WStringList errors;
-        auto status_code = CCommon::AccessInternet(url, content, errors, cfg);
+        auto status_code = utils::internet_get(url_host, url_path, content, errors, headers);
 
         auto succeed = status_code == 200;
         if (succeed && !content.empty())

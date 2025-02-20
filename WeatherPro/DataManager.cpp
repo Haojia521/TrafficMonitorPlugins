@@ -612,10 +612,10 @@ namespace loc
 {
     bool QueryLocation(std::wstring &loc_name, WStringList &errors)
     {
-        std::wstring url{ L"https://myip.ipip.net/json" }, content;
-        if (CCommon::AccessInternet(url, content, errors) == 200)
+        std::wstring content;
+        if (utils::internet_get("https://myip.ipip.net", "/json", content, errors))
         {
-            auto json = CCommon::UnicodeToStr(content.c_str(), true);
+            auto json = utils::wide_char2multi_byte(content.c_str());
             std::unique_ptr<yyjson_doc, void(*)(yyjson_doc*)> json_doc(
                 yyjson_read(json.c_str(), json.size(), 0),
                 [](yyjson_doc *p) { yyjson_doc_free(p); }
@@ -638,8 +638,7 @@ namespace loc
                     auto *location = yyjson_obj_get(data, "location");
                     std::string prov = yyjson_get_str(yyjson_arr_get(location, 1));
                     std::string city = yyjson_get_str(yyjson_arr_get(location, 2));
-                    //loc_name = CCommon::StrToUnicode((prov + city).c_str(), true);
-                    loc_name = CCommon::StrToUnicode(city.c_str(), true);
+                    loc_name = utils::multi_byte2wide_char(city.c_str());
 
                     return true;
                 } else
