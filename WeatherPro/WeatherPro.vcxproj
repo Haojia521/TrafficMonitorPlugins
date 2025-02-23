@@ -103,7 +103,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\WeatherPro.def</ModuleDefinitionFile>
-      <AdditionalDependencies>utilities.lib;zlibd.lib;libssl_static.lib;libcrypto_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>utilities.lib;zlibd.lib;libssl_static.lib;libcrypto_static.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\$(Configuration);$(VCPKG_HOME)\installed\x64-windows-static\debug\lib;$(OPENSSL_30);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
@@ -188,7 +188,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>.\WeatherPro.def</ModuleDefinitionFile>
-      <AdditionalDependencies>utilities.lib;zlib.lib;libssl_static.lib;libcrypto_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>utilities.lib;zlib.lib;libssl_static.lib;libcrypto_static.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\$(Configuration);$(VCPKG_HOME)\installed\x64-windows-static\lib;$(OPENSSL_30);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
@@ -244,6 +244,7 @@
     <ResourceCompile Include="WeatherPro.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\LoadingFrames16.png" />
     <Image Include="res\QR_AliPay.bmp" />
     <Image Include="res\QR_WeChat.bmp" />
     <Image Include="res\weather_icons_blue\02.ico" />

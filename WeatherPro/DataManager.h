@@ -86,6 +86,8 @@ public:
     
     DataApiPtr GetCurrentApi() const;
 
+    bool IsUpdating() const;
+
     std::shared_ptr<DataApiWeatherComCnSpider> m_api_wccs;
     std::shared_ptr<DataApiHefengWeather> m_api_hfw;
 private:

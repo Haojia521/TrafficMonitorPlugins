@@ -8,7 +8,7 @@
 #include <sstream>
 #include <chrono>
 #include <thread>
-#include <mutex>
+#include <atomic>
 #include <memory>
 #include <unordered_set>
 
@@ -651,7 +651,17 @@ namespace loc
     }
 }
 
-std::mutex g_weather_update_nutex;
+namespace dm
+{
+    std::atomic_bool is_updating{ false };
+
+    struct UpdatingFlagGuard
+    {
+        ~UpdatingFlagGuard() {
+            is_updating.store(false);
+        }
+    };
+}
 
 SConfiguration::SConfiguration() :
     m_api_type(DataApiType::API_HefengWeather),
@@ -748,7 +758,8 @@ DataApiPtr CDataManager::GetCurrentApi() const
 
 void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
 {
-    std::lock_guard<std::mutex> guard(g_weather_update_nutex);
+    if (dm::is_updating.exchange(true)) return;
+    dm::UpdatingFlagGuard guard;
 
     // clear the history errors
     m_errors.clear();
@@ -813,6 +824,11 @@ void CDataManager::UpdateWeather(WeatherInfoUpdatedCallback callback /* = nullpt
 {
     std::thread t(&CDataManager::_updateWeather, this, callback);
     t.detach();
+}
+
+bool CDataManager::IsUpdating() const
+{
+    return dm::is_updating.load(std::memory_order_relaxed);
 }
 
 std::wstring CDataManager::GetWeatherTemperature() const

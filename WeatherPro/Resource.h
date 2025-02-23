@@ -1,4 +1,4 @@
-﻿//{{NO_DEPENDENCIES}}
+//{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ 生成的包含文件。
 // 供 WeatherPro.rc 使用
 //
@@ -266,12 +266,13 @@
 #define IDI_ICON_HFW_HOLLOW_514         1197
 #define IDI_ICON_HFW_HOLLOW_515         1198
 #define IDI_ICON_HFW_HOLLOW_999         1199
+#define IDB_PNG_LOADING_FRAMES          1200
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1200
+#define _APS_NEXT_RESOURCE_VALUE        1201
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           1000
