@@ -66,7 +66,9 @@ namespace item
         int src_x = c * frame_size;
         int src_y = r * frame_size;
 
-        dc->BitBlt(x, y, frame_size, frame_size, helper.DC(), src_x, src_y, SRCCOPY);
+        //dc->BitBlt(x, y, frame_size, frame_size, helper.DC(), src_x, src_y, SRCCOPY);
+        BLENDFUNCTION blend = { AC_SRC_OVER, 0, 128, AC_SRC_ALPHA };  // 半透明
+        dc->AlphaBlend(x, y, frame_size, frame_size, helper.DC(), src_x, src_y, frame_size, frame_size, blend);
 
         idx = (idx + 1) % (rows * cols);
     }
