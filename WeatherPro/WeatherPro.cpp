@@ -1,4 +1,4 @@
-// WeatherPro.cpp: 定义 DLL 的初始化例程。
+﻿// WeatherPro.cpp: 定义 DLL 的初始化例程。
 //
 
 #include "pch.h"
