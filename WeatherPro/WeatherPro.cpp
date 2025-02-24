@@ -81,12 +81,12 @@ const wchar_t* CWeatherPro::GetInfo(PluginInfoIndex index)
     case TMI_AUTHOR:
         return L"Haojia521";
     case TMI_COPYRIGHT:
-        return L"Copyright (C) by Haojia 2022";
+        return L"Copyright (C) by Haojia 2025";
     case ITMPlugin::TMI_URL:
         return L"https://github.com/Haojia521/TrafficMonitorPlugins";
         break;
     case TMI_VERSION:
-        return L"0.8";
+        return L"0.12";
     default:
         break;
     }
