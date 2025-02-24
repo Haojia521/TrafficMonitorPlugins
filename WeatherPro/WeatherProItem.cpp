@@ -156,7 +156,7 @@ void CWeatherProItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_
     }
 
     if (is_updating) {
-        pDC->DrawText(L"更新中", rect, DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+        pDC->DrawText(dm.StringRes(IDS_ITEM_UPDATING), rect, DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
     } else {
         pDC->DrawText(dm.GetWeatherTemperature().c_str(), rect, DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
     }

@@ -1,4 +1,4 @@
-//{{NO_DEPENDENCIES}}
+﻿//{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ 生成的包含文件。
 // 供 WeatherPro.rc 使用
 //
@@ -100,6 +100,7 @@
 #define IDC_RADIO_DC_TB_WND_ACT_OPEN_OPTIONS 1033
 #define IDI_ICON_B_D01                  1034
 #define IDC_RADIO_DC_TB_WND_ACT_UPDATE  1034
+#define IDS_ITEM_UPDATING               1034
 #define IDI_ICON_B_D03                  1035
 #define IDI_ICON_B_D13                  1036
 #define IDC_RADIO2                      1036

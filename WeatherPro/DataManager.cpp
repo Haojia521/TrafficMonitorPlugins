@@ -866,7 +866,8 @@ void CDataManager::_setLangID(const std::wstring &cfg_dir)
 
     CSimpleIni tm_ini;
     tm_ini.SetUnicode();
-    tm_ini.LoadFile(tm_cfg_file.c_str());
+    if (tm_ini.LoadFile(tm_cfg_file.c_str()) != SI_OK)
+        return;
 
     auto tm_lang_id = tm_ini.GetLongValue(L"general", L"language", 0);
     if (tm_lang_id == 0)  // 跟随系统
