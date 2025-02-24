@@ -52,7 +52,7 @@ public:
     std::wstring GetWeatherText(EWeatherInfoType type) override;
     std::wstring GetWeatherCode(EWeatherInfoType type) override;
 
-    bool UpdateWeather(WStringList &errors) override;
+    bool UpdateWeather(WStringList &errors, UpdatingMask &mask) override;
 
     bool QueryRealtimeWeather(const std::wstring &query);
     bool QueryForecastWeather(const std::wstring &query);

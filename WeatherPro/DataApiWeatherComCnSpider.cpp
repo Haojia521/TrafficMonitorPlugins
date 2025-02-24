@@ -546,6 +546,10 @@ namespace wccs  // WeatherComCnSpider
 
         return succeed;
     }
+
+    static const UpdatingMask um_realtime_weather{ 1ull << 0 };
+    static const UpdatingMask um_forecast_weather{ 1ull << 1 };
+    static const UpdatingMask um_weather_alerts{ 1ull << 2 };
 }
 
 bool DataApiWeatherComCnSpider::QueryCity(const std::wstring &query, CityInfoList &info, WStringList &errors)
@@ -668,16 +672,25 @@ std::wstring DataApiWeatherComCnSpider::GetWeatherCode(EWeatherInfoType type)
     }
 }
 
-bool DataApiWeatherComCnSpider::UpdateWeather(WStringList &errors)
+bool DataApiWeatherComCnSpider::UpdateWeather(WStringList &errors, UpdatingMask &mask)
 {
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
 
-    bool succeed = true;
-    succeed &= QueryRealtimeWeather(currunt_city.CityNO);
-    succeed &= QueryWeatherAlerts(currunt_city.CityNO);
-    succeed &= QueryForecastWeather(currunt_city.CityNO);
+    UpdatingMask target_mask;
+    auto do_query =
+        [&](DataApiWeatherComCnSpider *o,
+            std::function<bool(DataApiWeatherComCnSpider*, const std::wstring&)> q_func,
+             const UpdatingMask &um) {
+                target_mask |= um;
+                if ((mask & um).none() && q_func(o, currunt_city.CityNO))
+                    mask |= um;
+        };
 
-    return succeed;
+    do_query(this, &DataApiWeatherComCnSpider::QueryRealtimeWeather, wccs::um_realtime_weather);
+    do_query(this, &DataApiWeatherComCnSpider::QueryForecastWeather, wccs::um_forecast_weather);
+    do_query(this, &DataApiWeatherComCnSpider::QueryWeatherAlerts, wccs::um_weather_alerts);
+
+    return target_mask == mask;
 }
 
 bool DataApiWeatherComCnSpider::QueryRealtimeWeather(const std::wstring &query)

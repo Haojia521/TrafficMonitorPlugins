@@ -792,6 +792,7 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
 
         // record the errors if all attempts failed
         WStringList error_list_for_update_weather;
+        UpdatingMask updating_mask;
         for (int i = 0; i < 4; ++i)
         {
             // clear the errors occurred in last update
@@ -801,8 +802,8 @@ void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
 
             // update weather
             // returns true if all parts are successfully updated
-            // todo: only retry the parts which are not updated
-            auto succeeded = current_api->UpdateWeather(error_list_for_update_weather);
+            // with the 'updating mask', only retry the failed parts
+            auto succeeded = current_api->UpdateWeather(error_list_for_update_weather, updating_mask);
 
             for (auto &e : error_list_for_update_weather)
                 m_errors.emplace_back(e);

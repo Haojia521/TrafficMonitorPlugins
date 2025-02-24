@@ -82,6 +82,11 @@ namespace hf
 
         return succeed;
     }
+
+    static const UpdatingMask um_realtime_weather{ 1ull << 0 };
+    static const UpdatingMask um_forecast_weather{ 1ull << 1 };
+    static const UpdatingMask um_realtime_aq{ 1ull << 2 };
+    static const UpdatingMask um_weather_alerts{ 1ull << 3 };
 }
 
 bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info, WStringList &errors)
@@ -290,7 +295,7 @@ std::wstring DataApiHefengWeather::GetWeatherCode(EWeatherInfoType type)
     }
 }
 
-bool DataApiHefengWeather::UpdateWeather(WStringList &errors)
+bool DataApiHefengWeather::UpdateWeather(WStringList &errors, UpdatingMask &mask)
 {
     CHECK_KEY;
 
@@ -299,22 +304,29 @@ bool DataApiHefengWeather::UpdateWeather(WStringList &errors)
 
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
 
-    bool succeeded{ true };
+    UpdatingMask target_mask;
+    auto do_query =
+        [&](DataApiHefengWeather *o,
+            std::function<bool(DataApiHefengWeather*, const std::wstring&, WStringList&)> q_func,
+            const UpdatingMask &um) {
+                target_mask |= um;
+                if ((mask & um).none() && q_func(o, currunt_city.CityNO, errors))
+                    mask |= um;
+        };
 
-    succeeded &= QueryRealtimeWeather(currunt_city.CityNO, errors);
-    succeeded &= QueryForecastWeather(currunt_city.CityNO, errors);
-    if (config.ShowAirQuality)
-        succeeded &= QueryRealtimeAirQuality(currunt_city.CityNO, errors);
-    if (config.ShowWeatherAlert)
-        succeeded &= QueryWeatherAlerts(currunt_city.CityNO, errors);
+    do_query(this, &DataApiHefengWeather::QueryRealtimeWeather, hf::um_realtime_weather);
+    do_query(this, &DataApiHefengWeather::QueryForecastWeather, hf::um_forecast_weather);
+    if (config.ShowAirQuality) do_query(this, &DataApiHefengWeather::QueryRealtimeAirQuality, hf::um_realtime_aq);
+    if (config.ShowWeatherAlert) do_query(this, &DataApiHefengWeather::QueryWeatherAlerts, hf::um_weather_alerts);
 
-    return succeeded;
+    return target_mask == mask;
 }
 
 bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query, WStringList &errors)
 {
     CHECK_KEY;
 
+    _realtimeWeather = RealtimeWeather();
     const auto &dm = CDataManager::Instance();
 
     std::string url_host = "https://devapi.qweather.com";
@@ -350,6 +362,7 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query, WS
 {
     CHECK_KEY;
 
+    _realtimeAirQuality = RealtimeAirQuality();
     const auto &dm = CDataManager::Instance();
 
     std::string url_host = "https://devapi.qweather.com";
@@ -384,6 +397,9 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query, WStri
 {
     CHECK_KEY;
 
+    _forcastWeatherTD = ForcastWeather();
+    _forcastWeatherTM = ForcastWeather();
+    _forcastWeatherDATM = ForcastWeather();
     const auto &dm = CDataManager::Instance();
 
     std::string url_host = "https://devapi.qweather.com";
@@ -427,6 +443,7 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query, WString
 {
     CHECK_KEY;
 
+    _weatherAlerts.clear();
     const auto &dm = CDataManager::Instance();
 
     std::string url_host = "https://devapi.qweather.com";

@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <bitset>
 
 enum class EWeatherInfoType
 {
@@ -21,6 +22,7 @@ struct SCityInfo
 
 using CityInfoList = std::vector<SCityInfo>;
 using WStringList = std::vector<std::wstring>;
+using UpdatingMask = std::bitset<8>;
 
 class DataAPI
 {
@@ -32,7 +34,7 @@ public:
     virtual std::wstring GetWeatherText(EWeatherInfoType type) = 0;
     virtual std::wstring GetWeatherCode(EWeatherInfoType type) = 0;
 
-    virtual bool UpdateWeather(WStringList &errors) = 0;
+    virtual bool UpdateWeather(WStringList &errors, UpdatingMask &mask) = 0;
 };
 
 using DataApiPtr = std::shared_ptr<DataAPI>;
