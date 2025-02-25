@@ -304,7 +304,7 @@ bool DataApiHefengWeather::UpdateWeather(WStringList &errors, UpdatingMask &mask
 
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
 
-    UpdatingMask target_mask;
+    UpdatingMask target_mask = mask;
     auto do_query =
         [&](DataApiHefengWeather *o,
             std::function<bool(DataApiHefengWeather*, const std::wstring&, WStringList&)> q_func,

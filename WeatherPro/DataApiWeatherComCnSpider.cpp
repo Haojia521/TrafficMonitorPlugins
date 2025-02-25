@@ -676,7 +676,7 @@ bool DataApiWeatherComCnSpider::UpdateWeather(WStringList &errors, UpdatingMask 
 {
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();
 
-    UpdatingMask target_mask;
+    UpdatingMask target_mask = mask;
     auto do_query =
         [&](DataApiWeatherComCnSpider *o,
             std::function<bool(DataApiWeatherComCnSpider*, const std::wstring&)> q_func,
