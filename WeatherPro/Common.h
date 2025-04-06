@@ -11,4 +11,11 @@ namespace utils
 
     int internet_get(const std::string &host, const std::string &path, std::wstring &content, WStringList &errors,
                      httplib::Headers headers = httplib::Headers());
+
+    /**
+     * @brief 生成 ED25519 密钥对
+     * @param errors 输出参数，用于存储错误信息
+     * @return 包含 (private_key, public_key) 的元组，失败时均为空字符串
+     */
+    std::tuple<std::string, std::string> generate_ed25519_keypair(std::vector<std::string>& errors) noexcept;
 }
