@@ -88,6 +88,7 @@
 #define IDC_BUTTON1                     1029
 #define IDC_BTN_DONATE                  1029
 #define IDS_CFG_WND_ICON_CLASSIC_BLUE   1029
+#define IDC_BTN_HFW_JWT_CREATE_KEY_PAIR 1029
 #define IDI_ICON_B_A55                  1030
 #define IDC_COMBO_ICON_TYPE             1030
 #define IDS_CFG_WND_ICON_CLASSIC_WHITE  1030
@@ -104,16 +105,27 @@
 #define IDI_ICON_B_D03                  1035
 #define IDI_ICON_B_D13                  1036
 #define IDC_RADIO2                      1036
+#define IDC_RADIO_HFW_JWT_AUTH_VIA_JWT  1036
+#define IDC_RADIO_HFW_AUTH_VIA_JWT      1036
 #define IDI_ICON_B_N00                  1037
 #define IDC_CHECK1                      1037
 #define IDC_CHECK_AUTO_LOCATING         1037
 #define IDI_ICON_B_N01                  1038
+#define IDC_STATIC_AUTH                 1038
 #define IDI_ICON_B_N03                  1039
+#define IDC_EDIT_HFW_API_HOST           1039
 #define IDI_ICON_B_N13                  1040
+#define IDC_EDIT_HFW_SUB_ID             1040
 #define IDD_OPTIONS_HFW_DLG             1041
+#define IDC_EDIT_HFW_KEY_ID             1041
+#define IDC_STATIC_HFW_JWT_PUB_KEY_FILE 1042
 #define IDB_BITMAP_ALIPAY               1043
+#define IDC_STATIC_HFW_JWT_PRI_KEY_FILE 1043
 #define IDB_BITMAP_WECHAT               1044
+#define IDC_BTN_HFW_JWT_SELECT_KEY      1044
 #define IDD_DONATE_DLG                  1045
+#define IDC_BTN_HFW_JWT_COPY_PUB_KEY    1045
+#define IDC_RADIO_HFW_AUTH_VIA_KEY      1046
 #define IDI_ICON_W_A02                  1047
 #define IDI_ICON_W_A04                  1048
 #define IDI_ICON_W_A05                  1049
@@ -275,7 +287,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1201
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1038
+#define _APS_NEXT_CONTROL_VALUE         1047
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif

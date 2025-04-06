@@ -22,8 +22,16 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
+
+	void EnableControlsOfAuthorization(BOOL auth_by_key);
 public:
 	CString m_key;
+	CString m_api_host;
+	CString m_project_id;
+	CString m_credential_id;
+	CString m_ssh_public_key_file;
+	CString m_ssh_private_key_file;
+	BOOL m_auth_by_key;
 	BOOL m_rt_temp_feels;
 	BOOL m_rt_humidity;
 	BOOL m_rt_wind;
@@ -39,4 +47,8 @@ public:
 	std::shared_ptr<DataApiHefengWeather> m_api;
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
+	afx_msg void OnBnClickedRadioHfwAuth();
+	afx_msg void OnBnClickedBtnHfwJwtCreateKeyPair();
+	afx_msg void OnBnClickedBtnHfwJwtSelectKey();
+	afx_msg void OnBnClickedBtnHfwJwtCopyPubKey();
 };
