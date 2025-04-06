@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "DataAPI.h"
 
 class DataApiHefengWeather : public DataAPI
@@ -7,6 +7,14 @@ public:
     struct Config
     {
         std::wstring AppKey;
+
+        std::wstring ApiHost;
+        std::wstring ProjectID;
+        std::wstring CredentialID;
+        std::wstring JwtPublicKeyFile;
+        std::wstring JwtPrivateKeyFile;
+
+        bool AuthViaJWT{ false };
 
         bool ShowRealtimeTemperatureFeelsLike{ false };
         bool ShowRealtimeWind{ true };

@@ -918,6 +918,14 @@ void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
 
     auto &hf_cfg = m_api_hfw->config;
     hf_cfg.AppKey = ini.GetValue(L"hfw", L"AppKey", L"");
+
+    hf_cfg.ApiHost = ini.GetValue(L"hfw", L"ApiHost", L"");
+    hf_cfg.ProjectID = ini.GetValue(L"hfw", L"ProjectId", L"");
+    hf_cfg.CredentialID = ini.GetValue(L"hfw", L"CredentialID", L"");
+    hf_cfg.JwtPublicKeyFile = ini.GetValue(L"hfw", L"JwtPublicKeyFile", L"");
+    hf_cfg.JwtPrivateKeyFile = ini.GetValue(L"hfw", L"JwtPrivateKeyFile", L"");
+    hf_cfg.AuthViaJWT = ini.GetBoolValue(L"hfw", L"AuthViaJWT", 0);
+
     hf_cfg.ShowRealtimeTemperatureFeelsLike = ini.GetBoolValue(L"hfw", L"show_rt_temp_feels_like", 0);
     hf_cfg.ShowRealtimeWind = ini.GetBoolValue(L"hfw", L"show_rt_wind", 1);
     hf_cfg.ShowRealtimeWindScale = ini.GetBoolValue(L"hfw", L"show_rt_wind_scale", 1);
@@ -956,6 +964,14 @@ void CDataManager::SaveConfigs() const
 
     auto &hf_cfg = m_api_hfw->config;
     ini.SetValue(L"hfw", L"AppKey", hf_cfg.AppKey.c_str());
+
+    ini.SetValue(L"hfw", L"ApiHost", hf_cfg.ApiHost.c_str());
+    ini.SetValue(L"hfw", L"ProjectID", hf_cfg.ProjectID.c_str());
+    ini.SetValue(L"hfw", L"CredentialID", hf_cfg.CredentialID.c_str());
+    ini.SetValue(L"hfw", L"JwtPublicKeyFile", hf_cfg.JwtPublicKeyFile.c_str());
+    ini.SetValue(L"hfw", L"JwtPrivateKeyFile", hf_cfg.JwtPrivateKeyFile.c_str());
+    ini.SetBoolValue(L"hfw", L"AuthViaJWT", hf_cfg.AuthViaJWT);
+
     ini.SetBoolValue(L"hfw", L"show_rt_temp_feels_like", hf_cfg.ShowRealtimeTemperatureFeelsLike);
     ini.SetBoolValue(L"hfw", L"show_rt_wind", hf_cfg.ShowRealtimeWind);
     ini.SetBoolValue(L"hfw", L"show_rt_wind_scale", hf_cfg.ShowRealtimeWindScale);
