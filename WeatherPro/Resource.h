@@ -133,6 +133,7 @@
 #define IDI_ICON_W_A07                  1051
 #define IDI_ICON_W_A08                  1052
 #define IDI_ICON_W_A09                  1053
+#define IDC_BUTTON3                     1053
 #define IDI_ICON_W_A10                  1054
 #define IDI_ICON_W_A11                  1055
 #define IDI_ICON_W_A12                  1056
@@ -287,7 +288,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1201
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1047
+#define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif
