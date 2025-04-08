@@ -78,7 +78,7 @@ BEGIN_MESSAGE_MAP(OptionsHfwDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_HFW_JWT_COPY_PUB_KEY, &OptionsHfwDlg::OnBnClickedBtnHfwJwtCopyPubKey)
 END_MESSAGE_MAP()
 
-void OptionsHfwDlg::EnableControlsOfAuthorization(BOOL auth_by_key)
+void OptionsHfwDlg::EnableControlsOfAuthentication(BOOL auth_by_key)
 {	
     GetDlgItem(IDC_EDIT_HFW_APP_KEY)->EnableWindow(auth_by_key);
     GetDlgItem(IDC_EDIT_HFW_SUB_ID)->EnableWindow(!auth_by_key);
@@ -136,7 +136,7 @@ BOOL OptionsHfwDlg::OnInitDialog()
         m_ssh_public_key_file = config.JwtPublicKeyFile.c_str();
         m_ssh_private_key_file = config.JwtPrivateKeyFile.c_str();
         m_auth_by_key = config.AuthViaJWT ? 1 : 0;
-        EnableControlsOfAuthorization(m_auth_by_key == 0 ? TRUE : FALSE);
+        EnableControlsOfAuthentication(m_auth_by_key == 0 ? TRUE : FALSE);
 
         m_rt_temp_feels = config.ShowRealtimeTemperatureFeelsLike ? TRUE : FALSE;
         m_rt_humidity = config.ShowRealtimeHumidity ? TRUE : FALSE;
@@ -199,7 +199,7 @@ void OptionsHfwDlg::OnBnClickedRadioHfwAuth()
 {
     UpdateData(true);
 
-    EnableControlsOfAuthorization(m_auth_by_key == 0 ? TRUE : FALSE);
+    EnableControlsOfAuthentication(m_auth_by_key == 0 ? TRUE : FALSE);
 }
 
 CString SelectFolder()

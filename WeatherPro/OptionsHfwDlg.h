@@ -25,7 +25,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-	void EnableControlsOfAuthorization(BOOL auth_by_key);
+	void EnableControlsOfAuthentication(BOOL auth_by_key);
 
 	std::vector<std::unique_ptr<CToolTipCtrl>> m_toolTips;
 public:
