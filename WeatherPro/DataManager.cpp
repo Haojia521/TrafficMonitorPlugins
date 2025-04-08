@@ -711,9 +711,6 @@ const CString& CDataManager::StringRes(UINT id) const
 {
     if (m_string_resources.count(id) == 0)
     {
-        if (m_lang_id != GetThreadUILanguage())
-            SetThreadUILanguage(m_lang_id);
-
         AFX_MANAGE_STATE(AfxGetStaticModuleState());
         m_string_resources[id].LoadString(id);
     }
@@ -857,33 +854,48 @@ void CDataManager::_setLangID(const std::wstring &cfg_dir)
     static const WORD langid_en_us = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
     static const WORD langid_zh_cn = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
 
-    // 插件配置文件所在文件夹的上一级为主程序配置文件路径
+    // 查找TrafficMonitor的配置文件，读取语言id
+    long tm_lang_id{ -1 };
     auto pos = cfg_dir.rfind(L"plugins");
-    if (pos == std::wstring::npos)
-        return;
+    if (pos != std::wstring::npos) {
+        auto tm_cfg_dir = cfg_dir.substr(0, pos);
+        auto tm_cfg_file = tm_cfg_dir + L"config.ini";
 
-    auto tm_cfg_dir = cfg_dir.substr(0, pos);
-    auto tm_cfg_file = tm_cfg_dir + L"config.ini";
+        CSimpleIni tm_ini;
+        tm_ini.SetUnicode();
+        if (tm_ini.LoadFile(tm_cfg_file.c_str()) == SI_OK) {
+            tm_lang_id = tm_ini.GetLongValue(L"general", L"language", 0);
+        }
+    }
 
-    CSimpleIni tm_ini;
-    tm_ini.SetUnicode();
-    if (tm_ini.LoadFile(tm_cfg_file.c_str()) != SI_OK)
-        return;
+    auto current_lang = GetThreadUILanguage();
+    if (tm_lang_id <= 0) {           // 没有查找到TrafficMonitor的语言设置 或 语言跟随系统
+        auto primary_lang = PRIMARYLANGID(current_lang);
 
-    auto tm_lang_id = tm_ini.GetLongValue(L"general", L"language", 0);
-    if (tm_lang_id == 0)  // 跟随系统
-    {
-        auto p_lang_id = PRIMARYLANGID(m_lang_id);
-        if (p_lang_id != LANG_CHINESE)
-            m_lang_id = langid_en_us;
-        else
+        if (primary_lang == LANG_CHINESE) {
             m_lang_id = langid_zh_cn;
-    } else if (tm_lang_id == 1)  // 英语
-        m_lang_id = langid_en_us;
-    else if (tm_lang_id == 2 || tm_lang_id == 3)  // 汉语
-        m_lang_id = langid_zh_cn;
-    else  // 处理意外值
-        m_lang_id = langid_en_us;
+        } else {
+            m_lang_id = langid_en_us;
+        }
+    } else {
+        if (tm_lang_id < 5) {        // 兼容旧版id值 1-English 2-Chinese_S 3-Chinese_T
+            if (tm_lang_id == 2 || tm_lang_id == 3) {
+                m_lang_id = langid_zh_cn;
+            } else {
+                m_lang_id = langid_en_us;
+            }
+        } else {                     // 新版直接存储语言id
+            auto primary_lang = PRIMARYLANGID(tm_lang_id);
+
+            if (primary_lang == LANG_CHINESE) {
+                m_lang_id = langid_zh_cn;
+            } else {
+                m_lang_id = langid_en_us;
+            }
+        }
+    }
+
+    SetThreadUILanguage(m_lang_id);
 }
 
 void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
