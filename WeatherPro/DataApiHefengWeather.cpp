@@ -9,13 +9,34 @@
 #include <sstream>
 #include <format>
 #include <memory>
+#include <chrono>
+#include <jwt-cpp/jwt.h>
 
 #include "DataManager.h"
 
-#define CHECK_KEY if (config.AppKey.empty()) {\
+#define CHECK_APIHOST if (config.ApiHost.empty()) {\
+    errors.push_back(L"no API host");\
+    return false;\
+}
+
+#define CHECK_KEY if (!config.AuthViaJWT && config.AppKey.empty()) {\
     errors.push_back(L"no application key");\
     return false;\
 }
+
+#define CHECK_JWT_SUB_ID if (config.AuthViaJWT && config.ProjectID.empty()) {\
+    errors.push_back(L"no project ID");\
+    return false;\
+}
+
+#define CHECK_JWT_CRD_ID if (config.AuthViaJWT && config.CredentialID.empty()) {\
+    errors.push_back(L"no JWT credential ID");\
+    return false;\
+}
+
+#define CHECK_JWT CHECK_JWT_SUB_ID CHECK_JWT_CRD_ID
+
+#define HFW_CHECK CHECK_APIHOST CHECK_KEY CHECK_JWT
 
 namespace hf
 {
@@ -40,13 +61,14 @@ namespace hf
         return std::format(L"[{}] {} ({})", status, title, detail);
     }
 
-    static bool query_func_frame(const std::string &host, const std::string &path, std::function<void(yyjson_val*)> func, WStringList &errors)
+    static bool query_func_frame(const std::string &host, const std::string &path, std::function<void(yyjson_val*)> func, WStringList &errors,
+                                 httplib::Headers http_headers = httplib::Headers())
     {
         const auto &dm = CDataManager::Instance();
 
         bool succeed{ false };
         std::wstring content;
-        auto status_code = utils::internet_get(host, path, content, errors);
+        auto status_code = utils::internet_get(host, path, content, errors, http_headers);
 
         if (!content.empty()) {
             auto json_utf8 = utils::wide_char2multi_byte(content.c_str());
@@ -87,19 +109,86 @@ namespace hf
     static const UpdatingMask um_forecast_weather{ 1ull << 1 };
     static const UpdatingMask um_realtime_aq{ 1ull << 2 };
     static const UpdatingMask um_weather_alerts{ 1ull << 3 };
+
+    static const std::chrono::seconds jwt_time_offset{ 30 };
+    static const std::chrono::seconds jwt_time_duration{ 900 };
+
+    std::string generate_jwt(const DataApiHefengWeather::Config &cfg, WStringList &errors)
+    {
+        static std::chrono::system_clock::time_point timestamp;
+        static std::string token_cache;
+
+        auto now = std::chrono::system_clock::now();
+
+        if ((now < timestamp + jwt_time_duration - jwt_time_offset) && !token_cache.empty()) {
+            return token_cache;
+        }
+
+        std::ifstream ifs(cfg.JwtPrivateKeyFile);
+
+        std::string private_key;
+        if (ifs.is_open()) {
+            private_key.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+
+            ifs.close();
+        } else {
+            errors.push_back(L"[GenJWT] cannot open private key file");
+            return "";
+        }
+
+        auto project_id = utils::wide_char2multi_byte(cfg.ProjectID.c_str());
+        auto credential_id = utils::wide_char2multi_byte(cfg.CredentialID.c_str());
+
+        try {
+            auto token = jwt::create()
+                .set_issued_at(now - jwt_time_offset)
+                .set_expires_at(now + jwt_time_duration)
+                .set_subject(project_id)
+                .set_header_claim("kid", jwt::claim(credential_id))
+                .sign(jwt::algorithm::ed25519("", private_key));
+
+            timestamp = now;
+            token_cache = token;
+        }
+        catch (const std::exception &e) {
+            errors.push_back(utils::multi_byte2wide_char(e.what()));
+
+            token_cache.clear();
+        }
+
+        return token_cache;
+    }
 }
 
 bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &info, WStringList &errors)
 {
-    CHECK_KEY;
+    HFW_CHECK;
 
     info.clear();
     const auto &dm = CDataManager::Instance();
 
-    std::string url_host = "https://geoapi.qweather.com";
-    std::string url_path = utils::wide_char2multi_byte(
-        std::format(L"/v2/city/lookup?key={}&location={}&lang={}", config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
-    );
+    std::string url_host = std::format("https://{}", utils::wide_char2multi_byte(config.ApiHost.c_str()));
+    std::string url_path;
+    httplib::Headers http_headers;
+    
+    if (config.AuthViaJWT) {
+        auto jwt = hf::generate_jwt(config, errors);
+        if (jwt.empty()) {
+            return false;
+        }
+
+        http_headers.emplace(std::make_pair("Authorization", std::format("Bearer {}", jwt)));
+
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/geo/v2/city/lookup?location={}&lang={}",
+                        query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    } else {
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/geo/v2/city/lookup?key={}&location={}&lang={}",
+                        config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    }
 
     auto func = [&info](yyjson_val *j_val) {
         auto *loc_arr = yyjson_obj_get(j_val, "location");
@@ -118,7 +207,7 @@ bool DataApiHefengWeather::QueryCity(const std::wstring &query, CityInfoList &in
             info.push_back(get_city_info(yyjson_arr_get(loc_arr, i)));
     };
 
-    if (!hf::query_func_frame(url_host, url_path, func, errors)) {
+    if (!hf::query_func_frame(url_host, url_path, func, errors, http_headers)) {
         errors.push_back(L"QueryCity failed");
         return false;
     }
@@ -324,15 +413,33 @@ bool DataApiHefengWeather::UpdateWeather(WStringList &errors, UpdatingMask &mask
 
 bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query, WStringList &errors)
 {
-    CHECK_KEY;
+    HFW_CHECK;
 
     _realtimeWeather = RealtimeWeather();
     const auto &dm = CDataManager::Instance();
 
-    std::string url_host = "https://devapi.qweather.com";
-    std::string url_path = utils::wide_char2multi_byte(
-        std::format(L"/v7/weather/now?key={}&location={}&lang={}", config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
-    );
+    std::string url_host = std::format("https://{}", utils::wide_char2multi_byte(config.ApiHost.c_str()));
+    std::string url_path;
+    httplib::Headers http_headers;
+
+    if (config.AuthViaJWT) {
+        auto jwt = hf::generate_jwt(config, errors);
+        if (jwt.empty()) {
+            return false;
+        }
+
+        http_headers.emplace(std::make_pair("Authorization", std::format("Bearer {}", jwt)));
+
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/weather/now?location={}&lang={}",
+                        query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    } else {
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/weather/now?key={}&location={}&lang={}",
+                        config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    }
 
     RealtimeWeather data;
     auto func = [&data](yyjson_val *j_val) {
@@ -349,7 +456,7 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query, WStri
         data.Humidity = hf::json_get_str_value(now_obj, "humidity");
     };
 
-    if (hf::query_func_frame(url_host, url_path, func, errors)) {
+    if (hf::query_func_frame(url_host, url_path, func, errors, http_headers)) {
         _realtimeWeather = data;
         return true;
     } else {
@@ -360,15 +467,33 @@ bool DataApiHefengWeather::QueryRealtimeWeather(const std::wstring &query, WStri
 
 bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query, WStringList &errors)
 {
-    CHECK_KEY;
+    HFW_CHECK;
 
     _realtimeAirQuality = RealtimeAirQuality();
     const auto &dm = CDataManager::Instance();
 
-    std::string url_host = "https://devapi.qweather.com";
-    std::string url_path = utils::wide_char2multi_byte(
-        std::format(L"/v7/air/now?key={}&location={}&lang={}", config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
-    );
+    std::string url_host = std::format("https://{}", utils::wide_char2multi_byte(config.ApiHost.c_str()));
+    std::string url_path;
+    httplib::Headers http_headers;
+
+    if (config.AuthViaJWT) {
+        auto jwt = hf::generate_jwt(config, errors);
+        if (jwt.empty()) {
+            return false;
+        }
+
+        http_headers.emplace(std::make_pair("Authorization", std::format("Bearer {}", jwt)));
+
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/air/now?location={}&lang={}",
+                        query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    } else {
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/air/now?key={}&location={}&lang={}",
+                        config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    }
 
     RealtimeAirQuality data;
     auto func = [&data](yyjson_val *j_val) {
@@ -382,7 +507,7 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query, WS
         data.PM10 = hf::json_get_str_value(now_obj, "pm10");
     };
 
-    if (hf::query_func_frame(url_host, url_path, func, errors)) {
+    if (hf::query_func_frame(url_host, url_path, func, errors, http_headers)) {
         _realtimeAirQuality = data;
         _airQualityDataOutdated = false;
 
@@ -395,17 +520,35 @@ bool DataApiHefengWeather::QueryRealtimeAirQuality(const std::wstring &query, WS
 
 bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query, WStringList &errors)
 {
-    CHECK_KEY;
+    HFW_CHECK;
 
     _forcastWeatherTD = ForcastWeather();
     _forcastWeatherTM = ForcastWeather();
     _forcastWeatherDATM = ForcastWeather();
     const auto &dm = CDataManager::Instance();
 
-    std::string url_host = "https://devapi.qweather.com";
-    std::string url_path = utils::wide_char2multi_byte(
-        std::format(L"/v7/weather/3d?key={}&location={}&lang={}", config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
-    );
+    std::string url_host = std::format("https://{}", utils::wide_char2multi_byte(config.ApiHost.c_str()));
+    std::string url_path;
+    httplib::Headers http_headers;
+
+    if (config.AuthViaJWT) {
+        auto jwt = hf::generate_jwt(config, errors);
+        if (jwt.empty()) {
+            return false;
+        }
+
+        http_headers.emplace(std::make_pair("Authorization", std::format("Bearer {}", jwt)));
+
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/weather/3d?location={}&lang={}",
+                        query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    } else {
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/weather/3d?key={}&location={}&lang={}",
+                        config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    }
 
     ForcastWeather td, tm, datm;
     auto func = [&td, &tm, &datm](yyjson_val *j_val) {
@@ -427,7 +570,7 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query, WStri
         get_daily_info(yyjson_arr_get(daily_arr, 2), datm);
     };
 
-    if (hf::query_func_frame(url_host, url_path, func, errors)) {
+    if (hf::query_func_frame(url_host, url_path, func, errors, http_headers)) {
         _forcastWeatherTD = td;
         _forcastWeatherTM = tm;
         _forcastWeatherDATM = datm;
@@ -441,15 +584,33 @@ bool DataApiHefengWeather::QueryForecastWeather(const std::wstring &query, WStri
 
 bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query, WStringList &errors)
 {
-    CHECK_KEY;
+    HFW_CHECK;
 
     _weatherAlerts.clear();
     const auto &dm = CDataManager::Instance();
 
-    std::string url_host = "https://devapi.qweather.com";
-    std::string url_path = utils::wide_char2multi_byte(
-        std::format(L"/v7/warning/now?key={}&location={}&lang={}", config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
-    );
+    std::string url_host = std::format("https://{}", utils::wide_char2multi_byte(config.ApiHost.c_str()));
+    std::string url_path;
+    httplib::Headers http_headers;
+
+    if (config.AuthViaJWT) {
+        auto jwt = hf::generate_jwt(config, errors);
+        if (jwt.empty()) {
+            return false;
+        }
+
+        http_headers.emplace(std::make_pair("Authorization", std::format("Bearer {}", jwt)));
+
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/warning/now?location={}&lang={}",
+                        query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    } else {
+        url_path = utils::wide_char2multi_byte(
+            std::format(L"/v7/warning/now?key={}&location={}&lang={}",
+                        config.AppKey, query, dm.StringRes(IDS_HFW_LANG).GetString()).c_str()
+        );
+    }
 
     WeatherAlertList data;
     auto func = [&data](yyjson_val *j_val) {
@@ -473,7 +634,7 @@ bool DataApiHefengWeather::QueryWeatherAlerts(const std::wstring &query, WString
             data.push_back(get_alert_info(yyjson_arr_get(alert_arr, i)));
     };
 
-    if (hf::query_func_frame(url_host, url_path, func, errors)) {
+    if (hf::query_func_frame(url_host, url_path, func, errors, http_headers)) {
         _weatherAlerts = data;
         _alertsDataOutdated = false;
 

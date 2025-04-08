@@ -119,6 +119,7 @@ BOOL OptionsHfwDlg::OnInitDialog()
         auto pToolTip = std::make_unique<CToolTipCtrl>();
         pToolTip->Create(this);
         pToolTip->AddTool(GetDlgItem(ctrl_id), dm.StringRes(str_id));
+        pToolTip->SetMaxTipWidth(300);
         pToolTip->Activate(TRUE);
         m_toolTips.push_back(std::move(pToolTip));
     }
