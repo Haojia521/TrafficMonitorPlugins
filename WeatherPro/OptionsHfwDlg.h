@@ -2,6 +2,8 @@
 #include "afxdialogex.h"
 #include "DataApiHefengWeather.h"
 
+#include <vector>
+
 
 // OptionsHfwDlg 对话框
 
@@ -24,6 +26,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	void EnableControlsOfAuthorization(BOOL auth_by_key);
+
+	std::vector<std::unique_ptr<CToolTipCtrl>> m_toolTips;
 public:
 	CString m_key;
 	CString m_api_host;
@@ -45,6 +49,7 @@ public:
     BOOL m_alert;
 
 	std::shared_ptr<DataApiHefengWeather> m_api;
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	afx_msg void OnBnClickedRadioHfwAuth();

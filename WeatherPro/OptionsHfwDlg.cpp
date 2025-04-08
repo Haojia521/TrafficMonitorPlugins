@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <fstream>
 #include <format>
+#include <map>
 
 // OptionsHfwDlg 对话框
 
@@ -91,10 +92,36 @@ void OptionsHfwDlg::EnableControlsOfAuthorization(BOOL auth_by_key)
 
 // OptionsHfwDlg 消息处理程序
 
+namespace detail
+{
+    std::map<int, int> tooltip_resources_id_pair{
+        {IDC_STATIC_HFW_QUES_API_HOST,    IDS_HFW_QUES_API_HOST},
+        {IDC_STATIC_HFW_QUES_JWT,         IDS_HFW_QUES_JWT},
+        {IDC_STATIC_HFW_QUES_SUB_ID,      IDS_HFW_QUES_SUB_ID},
+        {IDC_STATIC_HFW_QUES_JWT_KEY,     IDS_HFW_QUES_JWT_KEY_ID},
+        {IDC_BTN_HFW_JWT_CREATE_KEY_PAIR, IDS_HFW_QUES_CREATE_KEY_PAIR},
+        {IDC_BTN_HFW_JWT_SELECT_KEY,      IDS_HFW_QUES_SELECT_KEY},
+        {IDC_BTN_HFW_JWT_COPY_PUB_KEY,    IDS_HFW_QUES_COPY_PUB_KEY},
+    };
+}
 
 BOOL OptionsHfwDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
+
+    const auto &dm = CDataManager::Instance();
+
+    for (const auto& pair : detail::tooltip_resources_id_pair) {
+        int ctrl_id = pair.first;      // 控件ID（如 IDC_STATIC1）
+        int str_id = pair.second;      // 字符串资源ID（如 IDS_TOOLTIP1）
+
+        // 动态创建 ToolTip
+        auto pToolTip = std::make_unique<CToolTipCtrl>();
+        pToolTip->Create(this);
+        pToolTip->AddTool(GetDlgItem(ctrl_id), dm.StringRes(str_id));
+        pToolTip->Activate(TRUE);
+        m_toolTips.push_back(std::move(pToolTip));
+    }
 
     if (m_api != nullptr)
     {
@@ -230,8 +257,11 @@ void OptionsHfwDlg::OnBnClickedBtnHfwJwtCreateKeyPair()
 
     bool generate_keypair{ true };
 
+    const auto &dm = CDataManager::Instance();
+
     if (std::filesystem::exists(pri_key_file) && std::filesystem::exists(pub_key_file)) {
-        auto ret = ::MessageBox(GetSafeHwnd(), L"当前窗口已存在密钥对，是否重新生成？", L"创建密钥对",
+        auto ret = ::MessageBox(GetSafeHwnd(),
+                                dm.StringRes(IDS_HFW_MB_CKP_KEY_EXISTED), dm.StringRes(IDS_HFW_MB_TITLE_CREATE_KEYPAIR),
                                 MB_YESNOCANCEL | MB_DEFBUTTON2 | MB_ICONQUESTION);
         if (ret == IDCANCEL) {
             return;
@@ -246,7 +276,9 @@ void OptionsHfwDlg::OnBnClickedBtnHfwJwtCreateKeyPair()
             ofs_pri << pri_key;
             ofs_pri.close();
         } else {
-            ::MessageBox(GetSafeHwnd(), L"创建私钥文件失败，请选择其它文件夹重试", L"创建密钥对", MB_ICONERROR);
+            ::MessageBox(GetSafeHwnd(),
+                         dm.StringRes(IDS_HFW_MB_CKP_PRI_FAILED), dm.StringRes(IDS_HFW_MB_TITLE_CREATE_KEYPAIR),
+                         MB_ICONERROR);
             return;
         }
 
@@ -255,7 +287,9 @@ void OptionsHfwDlg::OnBnClickedBtnHfwJwtCreateKeyPair()
             ofs_pub << pub_key;
             ofs_pub.close();
         } else {
-            ::MessageBox(GetSafeHwnd(), L"创建公钥文件失败，请选择其它文件夹重试", L"创建密钥对", MB_ICONERROR);
+            ::MessageBox(GetSafeHwnd(),
+                         dm.StringRes(IDS_HFW_MB_CKP_PUB_FAILED), dm.StringRes(IDS_HFW_MB_TITLE_CREATE_KEYPAIR),
+                         MB_ICONERROR);
             return;
         }
     }
@@ -284,7 +318,10 @@ void OptionsHfwDlg::OnBnClickedBtnHfwJwtSelectKey()
 
         UpdateData(FALSE);
     } else {
-        ::MessageBox(GetSafeHwnd(), L"文件夹内未发现密钥对，请选择其它文件夹重试", L"选择密钥", MB_ICONINFORMATION);
+        const auto &dm = CDataManager::Instance();
+        ::MessageBox(GetSafeHwnd(),
+                     dm.StringRes(IDS_HFW_MB_SKP_NOT_FOUND), dm.StringRes(IDS_HFW_MB_TITLE_SELECT_KEY),
+                     MB_ICONINFORMATION);
     }
 }
 
@@ -345,6 +382,8 @@ bool CopyStringToClipboard(const CString& strText, CWnd* pWnd /*= nullptr*/)
 
 void OptionsHfwDlg::OnBnClickedBtnHfwJwtCopyPubKey()
 {
+    const auto &dm = CDataManager::Instance();
+
     if (std::filesystem::exists(m_ssh_public_key_file.GetString())) {
         std::wifstream ifs(m_ssh_public_key_file.GetString());
 
@@ -352,16 +391,37 @@ void OptionsHfwDlg::OnBnClickedBtnHfwJwtCopyPubKey()
             std::wstring pub_key{ std::istreambuf_iterator<wchar_t>(ifs), std::istreambuf_iterator<wchar_t>() };
 
             if (CopyStringToClipboard(pub_key.c_str(), this)) {
-                ::MessageBox(GetSafeHwnd(), L"已将公钥复制到剪切板", L"复制公钥", MB_ICONINFORMATION);
+                ::MessageBox(GetSafeHwnd(),
+                             dm.StringRes(IDS_HFW_MB_CPK_COPIED), dm.StringRes(IDS_HFW_MB_TITLE_COPY_PUB_KEY),
+                             MB_ICONINFORMATION);
             } else {
-                ::MessageBox(GetSafeHwnd(), L"无法复制公钥到剪切板，需自行打开公钥文件复制内容", L"复制公钥", MB_ICONWARNING);
+                ::MessageBox(GetSafeHwnd(),
+                             dm.StringRes(IDS_HFW_MB_CPK_FAILED), dm.StringRes(IDS_HFW_MB_TITLE_COPY_PUB_KEY),
+                             MB_ICONWARNING);
             }
 
             ifs.close();
         } else {
-            ::MessageBox(GetSafeHwnd(), L"无法打开公钥文件", L"复制公钥", MB_ICONWARNING);
+            ::MessageBox(GetSafeHwnd(),
+                         dm.StringRes(IDS_HFW_MB_CPK_CANNOT_OPEN), dm.StringRes(IDS_HFW_MB_TITLE_COPY_PUB_KEY),
+                         MB_ICONWARNING);
         }
     } else {
-        ::MessageBox(GetSafeHwnd(), L"公钥文件不存在", L"复制公钥", MB_ICONWARNING);
+        ::MessageBox(GetSafeHwnd(),
+                     dm.StringRes(IDS_HFW_MB_CPK_NOT_FOUND), dm.StringRes(IDS_HFW_MB_TITLE_COPY_PUB_KEY),
+                     MB_ICONWARNING);
     }
+}
+
+BOOL OptionsHfwDlg::PreTranslateMessage(MSG* pMsg)
+{
+    if (pMsg->message >= WM_MOUSEFIRST && pMsg->message <= WM_MOUSELAST) {
+        for (auto& toolTip : m_toolTips) {
+            if (toolTip->GetSafeHwnd()) {
+                toolTip->RelayEvent(pMsg); // 转发消息给所有 ToolTip
+            }
+        }
+    }
+
+    return CDialogEx::PreTranslateMessage(pMsg);
 }
