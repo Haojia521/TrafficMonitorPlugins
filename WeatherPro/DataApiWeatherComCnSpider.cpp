@@ -672,6 +672,39 @@ std::wstring DataApiWeatherComCnSpider::GetWeatherCode(EWeatherInfoType type)
     }
 }
 
+std::wstring DataApiWeatherComCnSpider::GetHumidity(EWeatherInfoType type)
+{
+    return L"-";
+}
+
+std::wstring DataApiWeatherComCnSpider::GetAQI(EWeatherInfoType type)
+{
+    return L"-";
+}
+
+std::wstring DataApiWeatherComCnSpider::GetWind(EWeatherInfoType type)
+{
+    if (type == EWeatherInfoType::WEATHER_REALTIME) {
+        return std::format(L"{}{}", _realtimeWeather.WindDirection, _realtimeWeather.WindStrength);
+    }
+
+    return L"-";
+}
+
+std::wstring DataApiWeatherComCnSpider::GetPM2p5(EWeatherInfoType type)
+{
+    if (type == EWeatherInfoType::WEATHER_REALTIME) {
+        return _realtimeWeather.AqiPM25;
+    }
+
+    return L"-";
+}
+
+std::wstring DataApiWeatherComCnSpider::GetPM10(EWeatherInfoType type)
+{
+    return L"-";
+}
+
 bool DataApiWeatherComCnSpider::UpdateWeather(WStringList &errors, UpdatingMask &mask)
 {
     const auto &currunt_city = CDataManager::Instance().GetCurrentCityInfo();

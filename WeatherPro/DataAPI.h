@@ -35,6 +35,12 @@ public:
     virtual std::wstring GetWeatherCode(EWeatherInfoType type) = 0;
 
     virtual bool UpdateWeather(WStringList &errors, UpdatingMask &mask) = 0;
+
+    virtual std::wstring GetHumidity(EWeatherInfoType type) = 0;
+    virtual std::wstring GetWind(EWeatherInfoType type) = 0;
+    virtual std::wstring GetAQI(EWeatherInfoType type) = 0;
+    virtual std::wstring GetPM2p5(EWeatherInfoType type) = 0;
+    virtual std::wstring GetPM10(EWeatherInfoType type) = 0;
 };
 
 using DataApiPtr = std::shared_ptr<DataAPI>;

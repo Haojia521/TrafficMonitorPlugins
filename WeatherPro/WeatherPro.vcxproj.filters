@@ -60,6 +60,9 @@
     <ClCompile Include="OptionsHfwDlg.cpp">
       <Filter>DLG</Filter>
     </ClCompile>
+    <ClCompile Include="PermanentItem.cpp">
+      <Filter>WeatherProItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="WeatherPro.def">
@@ -117,6 +120,9 @@
     </ClInclude>
     <ClInclude Include="httplib.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PermanentItem.h">
+      <Filter>WeatherProItem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

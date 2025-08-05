@@ -384,6 +384,62 @@ std::wstring DataApiHefengWeather::GetWeatherCode(EWeatherInfoType type)
     }
 }
 
+std::wstring DataApiHefengWeather::GetHumidity(EWeatherInfoType type)
+{
+    if (type == EWeatherInfoType::WEATHER_REALTIME) {
+        return std::format(L"{}%", _realtimeWeather.Humidity);
+    }
+
+    return L"-";
+}
+
+std::wstring DataApiHefengWeather::GetWind(EWeatherInfoType type)
+{
+    if (type == EWeatherInfoType::WEATHER_REALTIME) {
+        const auto &dm = CDataManager::Instance();
+
+        std::wstring scale_or_speead;
+        CString tmp;
+        if (config.ShowRealtimeWindScale) {
+            tmp.Format(dm.StringRes(IDS_HFW_FMT_WIND_SCALE), _realtimeWeather.WindScale.c_str());
+            scale_or_speead = tmp.GetString();
+        } else {
+            scale_or_speead = std::format(L"{}km/h", _realtimeWeather.WindSpeed);
+        }
+
+        return std::format(L"{} {}", _realtimeWeather.WindDirection, scale_or_speead);
+    }
+
+    return L"-";
+}
+
+std::wstring DataApiHefengWeather::GetAQI(EWeatherInfoType type)
+{
+    if (type == EWeatherInfoType::WEATHER_REALTIME) {
+        return std::format(L"{}({})", _realtimeAirQuality.Category, _realtimeAirQuality.AQI);
+    }
+
+    return L"-";
+}
+
+std::wstring DataApiHefengWeather::GetPM2p5(EWeatherInfoType type)
+{
+    if (type == EWeatherInfoType::WEATHER_REALTIME) {
+        return _realtimeAirQuality.PM2p5;
+    }
+
+    return L"-";
+}
+
+std::wstring DataApiHefengWeather::GetPM10(EWeatherInfoType type)
+{
+    if (type == EWeatherInfoType::WEATHER_REALTIME) {
+        return _realtimeAirQuality.PM10;
+    }
+
+    return L"-";
+}
+
 bool DataApiHefengWeather::UpdateWeather(WStringList &errors, UpdatingMask &mask)
 {
     CHECK_KEY;

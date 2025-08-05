@@ -52,13 +52,12 @@ CWeatherPro& CWeatherPro::Instance()
 
 IPluginItem* CWeatherPro::GetItem(int index)
 {
-    switch (index)
-    {
-    case 0:
-        return &m_item;
+    if (index < 0) return nullptr;
 
-    default:
-        break;
+    if (index == 0) {
+        return &m_item;
+    } else if (index <= m_permanent_items.size()) {
+        return &m_permanent_items[index - 1];
     }
 
     return nullptr;
@@ -130,10 +129,30 @@ void CWeatherPro::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data)
     {
     case ITMPlugin::EI_CONFIG_DIR:
         CDataManager::InstanceRef().LoadConfigs(data);
+        _initializePermanentItems();
         break;
 
     default:
         break;
+    }
+}
+
+void CWeatherPro::_initializePermanentItems()
+{
+    const auto &cfg = CDataManager::Instance().GetConfig();
+
+    std::vector<PermanmentItemType> types{
+        PermanmentItemType::RT_Humidity,
+        PermanmentItemType::RT_Wind,
+        PermanmentItemType::RT_AQI,
+        PermanmentItemType::RT_PM2P5,
+        PermanmentItemType::RT_PM10,
+    };
+
+    for (const auto &t : types) {
+        if (static_cast<int>(t) & cfg.m_permanent_item) {
+            m_permanent_items.emplace_back(CPermanmentItem{ t });
+        }
     }
 }
 

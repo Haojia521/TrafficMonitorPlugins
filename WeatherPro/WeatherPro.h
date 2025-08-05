@@ -3,8 +3,10 @@
 #include <include/PluginInterface.h>
 #include <string>
 #include <ctime>
+#include <vector>
 
 #include "WeatherProItem.h"
+#include "PermanentItem.h"
 
 class CWeatherPro : public ITMPlugin
 {
@@ -27,9 +29,11 @@ public:
     std::time_t GetLastUpdateTimestamp() const;
 
 private:
+    void _initializePermanentItems();
     static CWeatherPro m_instance;
 
     CWeatherProItem m_item;
+    std::vector<CPermanmentItem> m_permanent_items;
     std::wstring m_tooltips_info;
 
     std::time_t m_last_update_timestamp;

@@ -47,6 +47,9 @@ struct SConfiguration
 
     // geo-locating
     bool m_auto_locating;
+
+    // permanent items
+    int m_permanent_item;
 };
 
 using WeatherInfoUpdatedCallback = std::function<void(const std::wstring & info)>;
@@ -87,6 +90,8 @@ public:
     DataApiPtr GetCurrentApi() const;
 
     bool IsUpdating() const;
+
+    unsigned short GetLangID() const;
 
     std::shared_ptr<DataApiWeatherComCnSpider> m_api_wccs;
     std::shared_ptr<DataApiHefengWeather> m_api_hfw;

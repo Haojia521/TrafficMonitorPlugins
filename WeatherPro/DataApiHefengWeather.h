@@ -87,6 +87,12 @@ public:
 
     bool UpdateWeather(WStringList &errors, UpdatingMask &mask) override;
 
+    std::wstring GetHumidity(EWeatherInfoType type) override;
+    std::wstring GetWind(EWeatherInfoType type) override;
+    std::wstring GetAQI(EWeatherInfoType type) override;
+    std::wstring GetPM2p5(EWeatherInfoType type) override;
+    std::wstring GetPM10(EWeatherInfoType type) override;
+
     bool QueryRealtimeWeather(const std::wstring &query, WStringList &errors);
     bool QueryForecastWeather(const std::wstring &query, WStringList &errors);
     bool QueryRealtimeAirQuality(const std::wstring &query, WStringList &errors);

@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Common.h"
 #include "DataManager.h"
 #include "resource.h"
@@ -675,7 +675,8 @@ SConfiguration::SConfiguration() :
     m_show_brief_weather_alert_info(true),
     m_show_error_info(false),
     m_double_click_action(0),
-    m_auto_locating(false)
+    m_auto_locating(false),
+    m_permanent_item(0)
 {}
 
 CDataManager CDataManager::m_instance;
@@ -900,6 +901,11 @@ void CDataManager::_setLangID(const std::wstring &cfg_dir)
     SetThreadUILanguage(m_lang_id);
 }
 
+unsigned short CDataManager::GetLangID() const
+{
+    return m_lang_id;
+}
+
 void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
 {
     _setLangID(cfg_dir);
@@ -929,6 +935,7 @@ void CDataManager::LoadConfigs(const std::wstring &cfg_dir)
     m_config.m_show_error_info = ini.GetBoolValue(L"config", L"show_error_info", 0);
     m_config.m_double_click_action = ini.GetLongValue(L"config", L"double_click_action", 0);
     m_config.m_auto_locating = ini.GetBoolValue(L"config", L"auto_locating", false);
+    m_config.m_permanent_item = ini.GetLongValue(L"config", L"permanent_item", 0);
 
     auto &hf_cfg = m_api_hfw->config;
     hf_cfg.AppKey = ini.GetValue(L"hfw", L"AppKey", L"");
@@ -975,6 +982,7 @@ void CDataManager::SaveConfigs() const
     ini.SetBoolValue(L"config", L"show_error_info", m_config.m_show_error_info);
     ini.SetLongValue(L"config", L"double_click_action", m_config.m_double_click_action);
     ini.SetBoolValue(L"config", L"auto_locating", m_config.m_auto_locating);
+    ini.SetLongValue(L"config", L"permanent_item", m_config.m_permanent_item);
 
     auto &hf_cfg = m_api_hfw->config;
     ini.SetValue(L"hfw", L"AppKey", hf_cfg.AppKey.c_str());
