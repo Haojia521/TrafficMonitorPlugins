@@ -46,4 +46,5 @@ public:
     afx_msg void OnBnClickedBtnUpdateManually();
     afx_msg void OnBnClickedBtnApiSettings();
     afx_msg void OnBnClickedBtnDonate();
+    afx_msg void OnBnClickedBtnSetPermanentItems();
 };

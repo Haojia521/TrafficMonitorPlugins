@@ -63,6 +63,9 @@
     <ClCompile Include="PermanentItem.cpp">
       <Filter>WeatherProItem</Filter>
     </ClCompile>
+    <ClCompile Include="PermanentItemsDlg.cpp">
+      <Filter>DLG</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="WeatherPro.def">
@@ -123,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="PermanentItem.h">
       <Filter>WeatherProItem</Filter>
+    </ClInclude>
+    <ClInclude Include="PermanentItemsDlg.h">
+      <Filter>DLG</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

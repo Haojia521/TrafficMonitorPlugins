@@ -7,6 +7,7 @@
 
 #include "SelectCityDlg.h"
 #include "OptionsHfwDlg.h"
+#include "PermanentItemsDlg.h"
 #include "DataManager.h"
 
 
@@ -60,6 +61,7 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_UPDATE_MANUALLY, &COptionsDlg::OnBnClickedBtnUpdateManually)
     ON_BN_CLICKED(IDC_BTN_API_SETTINGS, &COptionsDlg::OnBnClickedBtnApiSettings)
     ON_BN_CLICKED(IDC_BTN_DONATE, &COptionsDlg::OnBnClickedBtnDonate)
+    ON_BN_CLICKED(IDC_BTN_SET_PERMANENT_ITEMS, &COptionsDlg::OnBnClickedBtnSetPermanentItems)
 END_MESSAGE_MAP()
 
 
@@ -226,5 +228,11 @@ void COptionsDlg::OnBnClickedBtnApiSettings()
 void COptionsDlg::OnBnClickedBtnDonate()
 {
     CDialogEx dlg(IDD_DONATE_DLG, this);
+    dlg.DoModal();
+}
+
+void COptionsDlg::OnBnClickedBtnSetPermanentItems()
+{
+    CPermanentItemsDlg dlg(this);
     dlg.DoModal();
 }

@@ -220,6 +220,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PermanentItem.cpp" />
+    <ClCompile Include="PermanentItemsDlg.cpp" />
     <ClCompile Include="SelectCityDlg.cpp" />
     <ClCompile Include="WeatherPro.cpp" />
     <ClCompile Include="WeatherProItem.cpp" />
@@ -240,6 +241,7 @@
     <ClInclude Include="OptionsHfwDlg.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PermanentItem.h" />
+    <ClInclude Include="PermanentItemsDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectCityDlg.h" />
     <ClInclude Include="SimpleIni.h" />

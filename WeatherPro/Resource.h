@@ -31,6 +31,7 @@
 #define IDI_ICON_B_A05                  1010
 #define IDS_TODAY                       1010
 #define IDC_CHECK_HFW_FC_UV             1010
+#define IDC_CHECK_PI_PM10               1010
 #define IDI_ICON_B_A06                  1011
 #define IDC_BTN_UPDATE_MANUALLY         1011
 #define IDS_TOMORROW                    1011
@@ -171,10 +172,16 @@
 #define IDS_PI_AIR_SAMPLE               1059
 #define IDI_ICON_W_A17                  1060
 #define IDI_ICON_W_A18                  1061
+#define IDC_CHECK_PI_WIND               1061
 #define IDI_ICON_W_A19                  1062
+#define IDC_CHECK_PI_AIR_QUALITY_INDEX  1062
 #define IDI_ICON_W_A20                  1063
+#define IDC_CHECK_PI_PM2P5              1063
 #define IDI_ICON_W_A29                  1064
+#define IDC_CHECK_PI_HUMIDITY           1064
 #define IDI_ICON_W_A30                  1065
+#define IDC_BUTTON2                     1065
+#define IDC_BTN_SET_PERMANENT_ITEMS     1065
 #define IDI_ICON_W_A31                  1066
 #define IDI_ICON_W_A53                  1067
 #define IDI_ICON_W_A54                  1068
@@ -310,14 +317,15 @@
 #define IDI_ICON_HFW_HOLLOW_515         1198
 #define IDI_ICON_HFW_HOLLOW_999         1199
 #define IDB_PNG_LOADING_FRAMES          1200
+#define IDD_PERMANENT_ITEMS_DLG         1201
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        1201
+#define _APS_NEXT_RESOURCE_VALUE        1203
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_CONTROL_VALUE         1066
 #define _APS_NEXT_SYMED_VALUE           1000
 #endif
 #endif
