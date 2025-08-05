@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Common.h"
 #include "DataManager.h"
 #include "resource.h"
@@ -755,6 +755,8 @@ DataApiPtr CDataManager::GetCurrentApi() const
 
 void CDataManager::_updateWeather(WeatherInfoUpdatedCallback callback)
 {
+    SetThreadUILanguage(m_lang_id);
+
     if (dm::is_updating.exchange(true)) return;
     dm::UpdatingFlagGuard guard;
 
