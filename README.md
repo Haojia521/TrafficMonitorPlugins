@@ -1,4 +1,8 @@
-# TrafficMonitorPlugins
+# 此仓库将归档，不在更新代码与发布新版本。
+
+## WeatherPro 新版本 v1.0 已在新仓库[TMP-WeatherPro](https://github.com/Haojia521/TMP-WeatherPro)发布，请前往下载。
+
+## TrafficMonitorPlugins
 这是用于[TrafficMonitor](https://github.com/zhongyang219/TrafficMonitor)的插件。
 
 ## 插件下载
